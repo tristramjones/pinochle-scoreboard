@@ -1,50 +1,50 @@
-# Welcome to your Expo app 👋
+# Pinochle Score Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile app built with Expo for tracking scores in Pinochle card games. Keep track of bids, melds, and trick points for multiple teams with an easy-to-use interface.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Track scores for 2-team Pinochle games
+- Record bids, melds, and trick points for each round
+- Automatic score calculation following Pinochle rules
+- Game history with final scores
+- Clean, modern UI optimized for iOS
 
+## Getting Started
+
+1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+2. Start the development server:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Open the app in:
+   - iOS Simulator
+   - Android Emulator
+   - Expo Go on your physical device
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Scoring Rules
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Each round, one team makes a bid
+- Teams record their meld points and trick points
+- Bid-winning team must achieve their bid amount in combined meld + trick points
+- If bid team makes their bid, they score: meld points + trick points
+- If bid team fails to make their bid, they score: -bid amount
+- Non-bidding team always scores: meld points + trick points
+- First team to reach 1500 points wins
 
-## Get a fresh project
+## Development
 
-When you're ready, run:
+This app is built with:
+- [Expo](https://expo.dev)
+- [React Native](https://reactnative.dev)
+- [Expo Router](https://docs.expo.dev/router/introduction/) for navigation
+- [AsyncStorage](https://docs.expo.dev/versions/latest/sdk/async-storage/) for data persistence
 
-```bash
-npm run reset-project
-```
+## Contributing
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Feel free to submit issues and enhancement requests!
