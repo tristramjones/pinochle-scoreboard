@@ -45,7 +45,7 @@ export default function VictoryScreen({ winningTeam }: VictoryScreenProps) {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [opacity, router]);
 
   return (
     <Animated.View style={[styles.container, { opacity }]}>
