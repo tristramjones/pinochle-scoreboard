@@ -83,4 +83,15 @@ export const saveGameHistory = async (games: Game[]): Promise<void> => {
     console.error('Error saving game history:', error);
     throw error;
   }
+};
+
+export const deleteGamesFromHistory = async (gameIds: string[]): Promise<void> => {
+  try {
+    const history = await getGameHistory();
+    const updatedHistory = history.filter(game => !gameIds.includes(game.id));
+    await saveGameHistory(updatedHistory);
+  } catch (error) {
+    console.error('Error deleting games from history:', error);
+    throw error;
+  }
 }; 

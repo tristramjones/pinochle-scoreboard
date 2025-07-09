@@ -1,77 +1,85 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
 } from 'react-native';
+import { ThemedButton } from '../../components/ThemedButton';
 import { useGame } from '../../contexts/GameContext';
-import { GameSettings } from '../../types/game';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function NewGameScreen() {
   const router = useRouter();
-  const { startNewGame, currentGame } = useGame();
+  const { startNewGame } = useGame();
+  const { theme, colors } = useTheme();
   const [team1Name, setTeam1Name] = useState('');
   const [team2Name, setTeam2Name] = useState('');
 
   const handleStartGame = async () => {
-    if (!team1Name || !team2Name) {
-      Alert.alert('Error', 'Please enter names for both teams');
-      return;
-    }
-
-    const settings: GameSettings = {
-      teamNames: [team1Name, team2Name],
-    };
-
     try {
-      await startNewGame(settings);
-      router.push('/games/current');
+      await startNewGame({
+        teamNames: [team1Name || 'Team 1', team2Name || 'Team 2']
+      });
+      router.replace('/games/current');
     } catch (error) {
-      Alert.alert('Error', 'Failed to start new game');
+      console.error('Error starting game:', error);
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>New Game</Text>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.title, { color: colors.text }]}>New Game</Text>
 
       <View style={styles.teamSection}>
-        <Text style={styles.sectionTitle}>Team 1</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Team 1</Text>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Team Name</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Team Name</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.input.background,
+                borderColor: colors.input.border,
+                color: colors.input.text,
+              }
+            ]}
             value={team1Name}
             onChangeText={setTeam1Name}
             placeholder="Enter team name"
+            placeholderTextColor={colors.input.placeholder}
           />
         </View>
       </View>
 
       <View style={styles.teamSection}>
-        <Text style={styles.sectionTitle}>Team 2</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Team 2</Text>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Team Name</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Team Name</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.input.background,
+                borderColor: colors.input.border,
+                color: colors.input.text,
+              }
+            ]}
             value={team2Name}
             onChangeText={setTeam2Name}
             placeholder="Enter team name"
+            placeholderTextColor={colors.input.placeholder}
           />
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
+      <ThemedButton
+        title="Start Game"
         onPress={handleStartGame}
-      >
-        <Text style={styles.buttonText}>Start Game</Text>
-      </TouchableOpacity>
+        size="lg"
+      />
     </ScrollView>
   );
 }
@@ -80,7 +88,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
@@ -97,7 +104,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -110,18 +116,5 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 16,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
   },
 }); 

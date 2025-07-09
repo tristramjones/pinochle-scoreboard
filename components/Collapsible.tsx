@@ -1,26 +1,31 @@
-import { PropsWithChildren, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { IconSymbol } from './ui/IconSymbol';
+import { useTheme } from '../hooks/useTheme';
 
-export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+interface CollapsibleProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+export function Collapsible({ title, children }: CollapsibleProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { theme, colors } = useTheme();
 
   return (
     <View>
       <TouchableOpacity
         style={styles.heading}
-        onPress={() => setIsOpen((value) => !value)}
-        activeOpacity={0.8}>
-        <IconSymbol
-          name="chevron.right"
-          size={18}
-          weight="medium"
-          color="#007AFF"
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
-        />
-        <Text style={styles.title}>{title}</Text>
+        onPress={() => setIsExpanded(!isExpanded)}
+      >
+        <Text style={[styles.title, { color: colors.primary }]}>
+          {isExpanded ? '▼' : '▶'} {title}
+        </Text>
       </TouchableOpacity>
-      {isOpen && <View style={styles.content}>{children}</View>}
+      {isExpanded && (
+        <View style={styles.content}>
+          {children}
+        </View>
+      )}
     </View>
   );
 }
@@ -38,6 +43,5 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#007AFF',
   },
 });

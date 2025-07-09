@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import { useTheme } from '../hooks/useTheme';
 
 interface VictoryScreenProps {
   winningTeam: {
@@ -14,6 +15,7 @@ interface VictoryScreenProps {
 export default function VictoryScreen({ winningTeam }: VictoryScreenProps) {
   const router = useRouter();
   const opacity = useRef(new Animated.Value(0)).current;
+  const { theme, colors } = useTheme();
 
   useEffect(() => {
     // Play haptic feedback
@@ -22,14 +24,14 @@ export default function VictoryScreen({ winningTeam }: VictoryScreenProps) {
     // Fade in animation
     const fadeIn = Animated.timing(opacity, {
       toValue: 1,
-      duration: 500,
+      duration: theme.animation.duration.normal,
       useNativeDriver: true,
     });
 
     // Fade out animation
     const fadeOut = Animated.timing(opacity, {
       toValue: 0,
-      duration: 500,
+      duration: theme.animation.duration.normal,
       useNativeDriver: true,
     });
 
@@ -45,14 +47,24 @@ export default function VictoryScreen({ winningTeam }: VictoryScreenProps) {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [opacity, router]);
+  }, [opacity, router, theme.animation.duration.normal]);
 
   return (
-    <Animated.View style={[styles.container, { opacity }]}>
+    <Animated.View 
+      style={[
+        styles.container, 
+        { 
+          opacity,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)' // Keep this hardcoded for the overlay effect
+        }
+      ]}
+    >
       <View style={styles.content}>
-        <Text style={styles.title}>🎉 Victory! 🎉</Text>
-        <Text style={styles.teamName}>{winningTeam.name}</Text>
-        <Text style={styles.score}>Final Score: {winningTeam.score}</Text>
+        <Text style={[styles.title, { color: colors.text }]}>🎉 Victory! 🎉</Text>
+        <Text style={[styles.teamName, { color: colors.text }]}>{winningTeam.name}</Text>
+        <Text style={[styles.score, { color: colors.text }]}>
+          Final Score: {winningTeam.score}
+        </Text>
       </View>
       <ConfettiCannon
         count={200}
@@ -71,7 +83,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
@@ -82,17 +93,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 20,
   },
   teamName: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 16,
   },
   score: {
     fontSize: 24,
-    color: '#fff',
   },
 }); 

@@ -12,12 +12,14 @@ import {
 import { Collapsible } from '../../components/Collapsible';
 import VictoryScreen from '../../components/VictoryScreen';
 import { useGame } from '../../contexts/GameContext';
+import { useTheme } from '../../hooks/useTheme';
 import { Round } from '../../types/game';
 import { calculateTeamScore } from '../../utils/scoring';
 
 type RoundPhase = 'bid' | 'meld' | 'tricks';
 
 export default function CurrentGameScreen() {
+  const { theme, colors } = useTheme();
   const { currentGame, addRound } = useGame();
 
   const router = useRouter();
@@ -360,13 +362,13 @@ export default function CurrentGameScreen() {
 
   return (
     <>
-      <ScrollView style={styles.container}>
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.scoreHeader}>
-          <Text style={styles.title}>Current Game</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Current Game</Text>
           {currentGame.teams.map(team => (
             <View key={team.id} style={styles.teamScore}>
-              <Text style={styles.teamName}>{team.name}</Text>
-              <Text style={styles.score}>
+              <Text style={[styles.teamName, { color: colors.text }]}>{team.name}</Text>
+              <Text style={[styles.score, { color: colors.text }]}>
                 Score: {calculateTeamScore(currentGame, team.id)}
               </Text>
             </View>
@@ -374,7 +376,7 @@ export default function CurrentGameScreen() {
         </View>
 
         <View style={styles.roundInput}>
-          <Text style={styles.sectionTitle}>New Round</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>New Round</Text>
           {phase === 'bid' && renderBidPhase()}
           {phase === 'meld' && renderMeldPhase()}
           {phase === 'tricks' && renderTricksPhase()}
@@ -399,7 +401,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
@@ -444,7 +445,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#f0f0f0',
   },
   selectedTeam: {
     backgroundColor: '#007AFF',
