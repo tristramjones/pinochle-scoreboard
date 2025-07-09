@@ -111,7 +111,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (winningTeam) {
         console.log('Game over - winning team:', winningTeam[0], 'with score:', winningTeam[1]);
-        await endGame(updatedGame); // Pass the final game state
+        // The game will be ended after the victory screen is shown
+        // The VictoryScreen component will navigate to the games screen
+        // which will trigger the useEffect in GamesScreen to reload games
+        setTimeout(async () => {
+          try {
+            await endGame(updatedGame);
+          } catch (error) {
+            console.error('Error ending game:', error);
+          }
+        }, 3500); // Slightly longer than the victory screen duration
       }
     } catch (error) {
       console.error('Error adding round:', error);

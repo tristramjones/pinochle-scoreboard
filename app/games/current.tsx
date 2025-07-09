@@ -1,14 +1,15 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import VictoryScreen from '../../components/VictoryScreen';
 import { useGame } from '../../contexts/GameContext';
 import { calculateTeamScore } from '../../utils/scoring';
 
@@ -22,6 +23,7 @@ export default function CurrentGameScreen() {
   const [bidTeamId, setBidTeamId] = useState<string | null>(null);
   const [meldPoints, setMeldPoints] = useState<{ [key: string]: string }>({});
   const [trickPoints, setTrickPoints] = useState<{ [key: string]: string }>({});
+  const [winningTeam, setWinningTeam] = useState<{ name: string; score: number } | null>(null);
 
   if (!currentGame) {
     return (
@@ -67,7 +69,7 @@ export default function CurrentGameScreen() {
     setPhase('tricks');
   };
 
-  const handleSubmitTricks = () => {
+  const handleSubmitTricks = async () => {
     if (!bidTeamId || !bidAmount) return;
 
     const meldValues: { [key: string]: number } = {};
@@ -101,19 +103,46 @@ export default function CurrentGameScreen() {
       }
     });
 
-    addRound({
+    const roundData = {
       bidWinner: bidTeamId,
       bid: parseInt(bidAmount),
       meld: meldValues,
       trickPoints: trickValues,
-    });
+    };
 
-    // Reset form
-    setBidAmount('');
-    setBidTeamId(null);
-    setMeldPoints({});
-    setTrickPoints({});
-    setPhase('bid');
+    // Calculate new scores after this round
+    const updatedGame = {
+      ...currentGame,
+      rounds: [...currentGame.rounds, { ...roundData, id: 'temp', timestamp: Date.now() }]
+    };
+
+    const scores = currentGame.teams.reduce((acc, team) => {
+      acc[team.id] = calculateTeamScore(updatedGame, team.id);
+      return acc;
+    }, {} as { [key: string]: number });
+
+    // Check if any team won
+    const winner = currentGame.teams.find(team => scores[team.id] >= currentGame.winningScore);
+
+    try {
+      await addRound(roundData);
+
+      if (winner) {
+        setWinningTeam({
+          name: winner.name,
+          score: scores[winner.id]
+        });
+      } else {
+        // Reset form only if game isn't over
+        setBidAmount('');
+        setBidTeamId(null);
+        setMeldPoints({});
+        setTrickPoints({});
+        setPhase('bid');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to submit round');
+    }
   };
 
   const calculateRequiredTricks = () => {
@@ -262,26 +291,29 @@ export default function CurrentGameScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.scoreHeader}>
-        <Text style={styles.title}>Current Game</Text>
-        {currentGame.teams.map(team => (
-          <View key={team.id} style={styles.teamScore}>
-            <Text style={styles.teamName}>{team.name}</Text>
-            <Text style={styles.score}>
-              Score: {calculateTeamScore(currentGame, team.id)}
-            </Text>
-          </View>
-        ))}
-      </View>
+    <>
+      <ScrollView style={styles.container}>
+        <View style={styles.scoreHeader}>
+          <Text style={styles.title}>Current Game</Text>
+          {currentGame.teams.map(team => (
+            <View key={team.id} style={styles.teamScore}>
+              <Text style={styles.teamName}>{team.name}</Text>
+              <Text style={styles.score}>
+                Score: {calculateTeamScore(currentGame, team.id)}
+              </Text>
+            </View>
+          ))}
+        </View>
 
-      <View style={styles.roundInput}>
-        <Text style={styles.sectionTitle}>New Round</Text>
-        {phase === 'bid' && renderBidPhase()}
-        {phase === 'meld' && renderMeldPhase()}
-        {phase === 'tricks' && renderTricksPhase()}
-      </View>
-    </ScrollView>
+        <View style={styles.roundInput}>
+          <Text style={styles.sectionTitle}>New Round</Text>
+          {phase === 'bid' && renderBidPhase()}
+          {phase === 'meld' && renderMeldPhase()}
+          {phase === 'tricks' && renderTricksPhase()}
+        </View>
+      </ScrollView>
+      {winningTeam && <VictoryScreen winningTeam={winningTeam} />}
+    </>
   );
 }
 

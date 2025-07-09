@@ -19,9 +19,10 @@ export default function GamesScreen() {
   const [completedGames, setCompletedGames] = useState<Game[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Load games initially and when currentGame changes
   useEffect(() => {
     loadGames();
-  }, [currentGame]); // Reload when currentGame changes (including when it becomes null after game end)
+  }, [currentGame]);
 
   const loadGames = async () => {
     try {
