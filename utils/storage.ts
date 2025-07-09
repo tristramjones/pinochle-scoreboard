@@ -74,4 +74,13 @@ export const clearCurrentGame = async (): Promise<void> => {
     console.error('Error clearing current game:', error);
     throw error;
   }
+};
+
+export const saveGameHistory = async (games: Game[]): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.GAME_HISTORY, JSON.stringify(games));
+  } catch (error) {
+    console.error('Error saving game history:', error);
+    throw error;
+  }
 }; 
