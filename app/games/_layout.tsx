@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { Text } from 'react-native';
 import { useColorScheme } from '../../hooks/useColorScheme';
 
 export default function GamesLayout() {
@@ -32,6 +33,13 @@ export default function GamesLayout() {
         options={{
           title: 'New Game',
           presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          title: 'Game Details',
+          headerTitle: () => <Text>Game Details</Text>
         }}
       />
     </Stack>

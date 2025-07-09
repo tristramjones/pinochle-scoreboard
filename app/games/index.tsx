@@ -1,5 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -128,6 +127,57 @@ export default function GamesScreen() {
     }
   };
 
+  const renderGame = (game: Game) => {
+    const scores = calculateTeamScores(game);
+    const winner = game.teams.reduce((prev, curr) => 
+      scores[curr.id] > scores[prev.id] ? curr : prev
+    );
+
+    return (
+      <Link
+        key={game.id}
+        href={`/games/${game.id}`}
+        asChild
+      >
+        <TouchableOpacity style={styles.gameCard}>
+          <View style={styles.gameHeader}>
+            <Text style={styles.date}>
+              {new Date(game.timestamp).toLocaleDateString()}
+            </Text>
+            {isSelectionMode && (
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={() => toggleGameSelection(game.id)}
+              >
+                <View style={[
+                  styles.checkboxInner,
+                  selectedGames.has(game.id) && styles.checkboxSelected
+                ]} />
+              </TouchableOpacity>
+            )}
+          </View>
+          {game.teams.map(team => (
+            <View key={team.id} style={styles.teamRow}>
+              <Text style={[
+                styles.teamName,
+                team.id === winner.id && styles.winnerText
+              ]}>
+                {team.name}
+                {team.id === winner.id && ' 🏆'}
+              </Text>
+              <Text style={[
+                styles.score,
+                team.id === winner.id && styles.winnerText
+              ]}>
+                {scores[team.id]} points
+              </Text>
+            </View>
+          ))}
+        </TouchableOpacity>
+      </Link>
+    );
+  };
+
   return (
     <ScrollView 
       style={styles.container}
@@ -217,53 +267,7 @@ export default function GamesScreen() {
           )}
         </View>
         {completedGames.length > 0 ? (
-          completedGames.map(game => {
-            const scores = calculateTeamScores(game);
-            const winner = game.teams.reduce((prev, curr) => 
-              scores[curr.id] > scores[prev.id] ? curr : prev
-            );
-
-            return (
-              <View key={game.id} style={styles.gameCard}>
-                <View style={styles.gameHeader}>
-                  <View style={styles.gameHeaderLeft}>
-                    {isSelectionMode && (
-                      <TouchableOpacity
-                        style={styles.checkbox}
-                        onPress={() => toggleGameSelection(game.id)}
-                      >
-                        <Ionicons
-                          name={selectedGames.has(game.id) ? "checkbox" : "square-outline"}
-                          size={24}
-                          color="#007AFF"
-                        />
-                      </TouchableOpacity>
-                    )}
-                    <Text style={styles.date}>{formatDate(game.timestamp)}</Text>
-                  </View>
-                  <View style={styles.gameHeaderRight}>
-                    <Text style={styles.winner}>Winner: {winner.name}</Text>
-                    {!isSelectionMode && (
-                      <TouchableOpacity
-                        onPress={() => handleDeleteGame(game.id)}
-                        style={styles.deleteIcon}
-                      >
-                        <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </View>
-                <View style={styles.teams}>
-                  {game.teams.map(team => (
-                    <View key={team.id} style={styles.teamScore}>
-                      <Text style={styles.teamName}>{team.name}</Text>
-                      <Text style={styles.score}>{scores[team.id]} points</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            );
-          })
+          completedGames.map(game => renderGame(game))
         ) : (
           <View style={styles.emptyStateCard}>
             <Text style={styles.emptyStateText}>No completed games yet</Text>
@@ -414,5 +418,23 @@ const styles = StyleSheet.create({
   },
   selectAllButton: {
     backgroundColor: '#007AFF',
+  },
+  checkboxInner: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    borderRadius: 4,
+  },
+  checkboxSelected: {
+    backgroundColor: '#007AFF',
+  },
+  teamRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  winnerText: {
+    fontWeight: '600',
   },
 }); 

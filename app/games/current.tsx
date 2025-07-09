@@ -1,22 +1,25 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { Collapsible } from '../../components/Collapsible';
 import VictoryScreen from '../../components/VictoryScreen';
 import { useGame } from '../../contexts/GameContext';
+import { Round } from '../../types/game';
 import { calculateTeamScore } from '../../utils/scoring';
 
 type RoundPhase = 'bid' | 'meld' | 'tricks';
 
 export default function CurrentGameScreen() {
   const { currentGame, addRound } = useGame();
+
   const router = useRouter();
   const [phase, setPhase] = useState<RoundPhase>('bid');
   const [bidAmount, setBidAmount] = useState('');
@@ -290,6 +293,71 @@ export default function CurrentGameScreen() {
     );
   };
 
+  const renderRound = (round: Round, index: number) => {
+    const bidWinningTeam = currentGame.teams.find(team => team.id === round.bidWinner);
+    const roundNumber = index + 1;
+
+    return (
+      <View key={round.id} style={styles.roundCard}>
+        <Text style={styles.roundTitle}>Round {roundNumber}</Text>
+        
+        <View style={styles.bidInfo}>
+          <Text style={styles.bidText}>
+            {bidWinningTeam?.name} bid {round.bid}
+          </Text>
+          {round.meld[round.bidWinner] + round.trickPoints[round.bidWinner] >= round.bid ? (
+            <Text style={styles.madeBid}>Made Bid</Text>
+          ) : (
+            <Text style={styles.setBid}>Went set</Text>
+          )}
+        </View>
+
+        <View style={styles.pointsTable}>
+          <View style={styles.tableHeader}>
+            <Text style={styles.tableCell}>Team</Text>
+            <Text style={styles.tableCell}>Meld</Text>
+            <Text style={styles.tableCell}>Tricks</Text>
+            <Text style={styles.tableCell}>Total</Text>
+            <Text style={styles.tableCell}>Game Score</Text>
+          </View>
+          {currentGame.teams.map(team => {
+            const meldPoints = round.meld[team.id] || 0;
+            const trickPoints = round.trickPoints[team.id] || 0;
+            const roundTotal = meldPoints + trickPoints;
+            
+            // Calculate cumulative score up to this round
+            const gameScore = currentGame.rounds
+              .slice(0, index + 1)
+              .reduce((sum, r) => {
+                const meld = r.meld[team.id] || 0;
+                const tricks = r.trickPoints[team.id] || 0;
+                const roundTotal = meld + tricks;
+
+                if (r.bidWinner === team.id && roundTotal < r.bid) {
+                  return sum - r.bid;
+                }
+                
+                return sum + roundTotal;
+              }, 0);
+            
+            return (
+              <View key={team.id} style={styles.tableRow}>
+                <Text style={styles.tableCell}>{team.name}</Text>
+                <Text style={styles.tableCell}>{meldPoints}</Text>
+                <Text style={styles.tableCell}>{trickPoints}</Text>
+                <Text style={styles.tableCell}>{roundTotal}</Text>
+                <Text style={[
+                  styles.tableCell,
+                  styles.gameScoreCell
+                ]}>{gameScore}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
   return (
     <>
       <ScrollView style={styles.container}>
@@ -311,6 +379,16 @@ export default function CurrentGameScreen() {
           {phase === 'meld' && renderMeldPhase()}
           {phase === 'tricks' && renderTricksPhase()}
         </View>
+
+        {currentGame?.rounds?.length > 0 && (
+          <View>
+            <Collapsible title="Previous Rounds">
+              <View style={styles.roundsContainer}>
+                {currentGame.rounds.map((round, index) => renderRound(round, index))}
+              </View>
+            </Collapsible>
+          </View>
+        )}
       </ScrollView>
       {winningTeam && <VictoryScreen winningTeam={winningTeam} />}
     </>
@@ -436,5 +514,70 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     marginTop: 16,
+  },
+  roundsContainer: {
+    marginTop: 16,
+    marginBottom: 24,
+  },
+  roundCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  roundTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  bidInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  bidText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  madeBid: {
+    fontSize: 14,
+    color: '#34C759',
+    fontWeight: '600',
+  },
+  setBid: {
+    fontSize: 14,
+    color: '#FF3B30',
+    fontWeight: '600',
+  },
+  pointsTable: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#f8f8f8',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#f0f0f0',
+    paddingVertical: 8,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingVertical: 8,
+  },
+  tableCell: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 16,
+  },
+  gameScoreCell: {
+    fontWeight: '600',
+    color: '#007AFF',
   },
 }); 
