@@ -1,5 +1,5 @@
 {
-  "name": "pinochle-score-tracker",
+  "name": "pinochle-scoreboard",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
