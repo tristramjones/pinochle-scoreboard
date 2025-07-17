@@ -9,13 +9,13 @@ import {
   View,
 } from 'react-native';
 import {Collapsible} from '../../components/Collapsible';
+import {RoundCard} from '../../components/RoundCard';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
 import {ThemedView} from '../../components/ThemedView';
 import VictoryScreen from '../../components/VictoryScreen';
 import {useGame} from '../../contexts/GameContext';
 import {useTheme} from '../../hooks/useTheme';
-import {Round} from '../../types/game';
 import {calculateTeamScore} from '../../utils/scoring';
 
 type RoundPhase = 'bid' | 'meld' | 'tricks';
@@ -317,73 +317,6 @@ export default function CurrentGameScreen() {
     );
   };
 
-  const renderRound = (round: Round, index: number) => {
-    const bidWinningTeam = currentGame.teams.find(
-      team => team.id === round.bidWinner,
-    );
-    const roundNumber = index + 1;
-
-    return (
-      <View key={round.id} style={styles.roundCard}>
-        <ThemedText type="heading">Round {roundNumber}</ThemedText>
-
-        <View style={styles.bidInfo}>
-          <ThemedText type="label">
-            {bidWinningTeam?.name} bid {round.bid}
-          </ThemedText>
-          {round.meld[round.bidWinner] + round.trickPoints[round.bidWinner] >=
-          round.bid ? (
-            <ThemedText type="label">Made Bid</ThemedText>
-          ) : (
-            <ThemedText type="label">Went set</ThemedText>
-          )}
-        </View>
-
-        <View style={styles.pointsTable}>
-          <View style={styles.tableHeader}>
-            <ThemedText type="label">Team</ThemedText>
-            <ThemedText type="label">Meld</ThemedText>
-            <ThemedText type="label">Tricks</ThemedText>
-            <ThemedText type="label">Total</ThemedText>
-            <ThemedText type="label">Game Score</ThemedText>
-          </View>
-          {currentGame.teams.map(team => {
-            const meldPoints = round.meld[team.id] || 0;
-            const trickPoints = round.trickPoints[team.id] || 0;
-            const roundTotal = meldPoints + trickPoints;
-
-            // Calculate cumulative score up to this round
-            const gameScore = currentGame.rounds
-              .slice(0, index + 1)
-              .reduce((sum, r) => {
-                const meld = r.meld[team.id] || 0;
-                const tricks = r.trickPoints[team.id] || 0;
-                const roundTotal = meld + tricks;
-
-                if (r.bidWinner === team.id && roundTotal < r.bid) {
-                  return sum - r.bid;
-                }
-
-                return sum + roundTotal;
-              }, 0);
-
-            return (
-              <View key={team.id} style={styles.tableRow}>
-                <ThemedText type="label">{team.name}</ThemedText>
-                <ThemedText type="label">{meldPoints}</ThemedText>
-                <ThemedText type="label">{trickPoints}</ThemedText>
-                <ThemedText type="label">{roundTotal}</ThemedText>
-                <ThemedText type="label" style={styles.gameScoreCell}>
-                  {gameScore}
-                </ThemedText>
-              </View>
-            );
-          })}
-        </View>
-      </View>
-    );
-  };
-
   return (
     <ScrollView
       style={[styles.container, {backgroundColor: theme.colors.background}]}
@@ -410,9 +343,14 @@ export default function CurrentGameScreen() {
       {currentGame?.rounds?.length > 0 && (
         <Collapsible title="Previous Rounds">
           <View style={styles.roundsContainer}>
-            {currentGame.rounds.map((round, index) =>
-              renderRound(round, index),
-            )}
+            {currentGame.rounds.map((round, index) => (
+              <RoundCard
+                key={round.id}
+                round={round}
+                game={currentGame}
+                roundNumber={index + 1}
+              />
+            ))}
           </View>
         </Collapsible>
       )}
@@ -537,68 +475,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   roundsContainer: {
+    gap: 16,
     marginTop: 16,
-    marginBottom: 24,
-  },
-  roundCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  roundTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  bidInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  bidText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  madeBid: {
-    fontSize: 14,
-    color: '#34C759',
-    fontWeight: '600',
-  },
-  setBid: {
-    fontSize: 14,
-    color: '#FF3B30',
-    fontWeight: '600',
-  },
-  pointsTable: {
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#f8f8f8',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    paddingVertical: 8,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    paddingVertical: 8,
-  },
-  tableCell: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 16,
-  },
-  gameScoreCell: {
-    fontWeight: '600',
-    color: '#007AFF',
   },
 });
