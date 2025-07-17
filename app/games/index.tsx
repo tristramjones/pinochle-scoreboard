@@ -1,25 +1,25 @@
-import { useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import {useRouter} from 'expo-router';
+import React, {useCallback, useState} from 'react';
 import {
-    Alert,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { ThemedButton } from '../../components/ThemedButton';
-import { useGame } from '../../contexts/GameContext';
-import { useTheme } from '../../hooks/useTheme';
-import { Game } from '../../types/game';
-import { calculateTeamScores } from '../../utils/scoring';
+import {ThemedButton} from '../../components/ThemedButton';
+import {useGame} from '../../contexts/GameContext';
+import {useTheme} from '../../hooks/useTheme';
+import {Game} from '../../types/game';
+import {calculateTeamScores} from '../../utils/scoring';
 import * as Storage from '../../utils/storage';
 
 export default function GamesScreen() {
   const router = useRouter();
-  const { currentGame } = useGame();
-  const { theme, colors } = useTheme();
+  const {currentGame} = useGame();
+  const {theme, colors} = useTheme();
   const [completedGames, setCompletedGames] = useState<Game[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,8 +85,8 @@ export default function GamesScreen() {
 
   const renderGameCard = (game: Game, isCompleted = false) => {
     const scores = calculateTeamScores(game);
-    const winner = game.teams.reduce((prev, curr) => 
-      scores[curr.id] > scores[prev.id] ? curr : prev
+    const winner = game.teams.reduce((prev, curr) =>
+      scores[curr.id] > scores[prev.id] ? curr : prev,
     );
 
     return (
@@ -97,9 +97,11 @@ export default function GamesScreen() {
           {
             backgroundColor: colors.card.background,
             shadowColor: colors.card.shadow,
-          }
+          },
         ]}
-        onPress={() => router.push(isCompleted ? `/games/${game.id}` : '/games/current')}
+        onPress={() =>
+          router.push(isCompleted ? `/games/${game.id}` : '/games/current')
+        }
       >
         <View style={styles.gameHeader}>
           <View style={styles.gameHeaderLeft}>
@@ -108,41 +110,39 @@ export default function GamesScreen() {
                 style={styles.checkbox}
                 onPress={() => toggleGameSelection(game.id)}
               >
-                <View style={[
-                  styles.checkboxInner,
-                  {
-                    borderColor: colors.primary,
-                    backgroundColor: selectedGames.includes(game.id) 
-                      ? colors.primary 
-                      : 'transparent'
-                  }
-                ]} />
+                <View
+                  style={[
+                    styles.checkboxInner,
+                    {
+                      borderColor: colors.primary,
+                      backgroundColor: selectedGames.includes(game.id)
+                        ? colors.primary
+                        : 'transparent',
+                    },
+                  ]}
+                />
               </TouchableOpacity>
             )}
-            <Text style={[styles.date, { color: colors.textSecondary }]}>
+            <Text style={[styles.date, {color: colors.textSecondary}]}>
               {formatDate(game.timestamp)}
             </Text>
           </View>
-          <Text style={[
-            isCompleted ? styles.winner : styles.status,
-            { color: colors.primary }
-          ]}>
+          <Text
+            style={[
+              isCompleted ? styles.winner : styles.status,
+              {color: colors.primary},
+            ]}
+          >
             {isCompleted ? `${winner.name} Won!` : 'In Progress'}
           </Text>
         </View>
         <View style={styles.teams}>
           {game.teams.map(team => (
             <View key={team.id} style={styles.teamScore}>
-              <Text style={[
-                styles.teamName,
-                { color: colors.text }
-              ]}>
+              <Text style={[styles.teamName, {color: colors.text}]}>
                 {team.name}
               </Text>
-              <Text style={[
-                styles.score,
-                { color: colors.text }
-              ]}>
+              <Text style={[styles.score, {color: colors.text}]}>
                 {scores[team.id]} points
               </Text>
             </View>
@@ -153,25 +153,25 @@ export default function GamesScreen() {
   };
 
   return (
-    <ScrollView 
-      style={[styles.container, { backgroundColor: colors.background }]}
+    <ScrollView
+      style={[styles.container, {backgroundColor: colors.background}]}
       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-        />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Current Game</Text>
+        <Text style={[styles.sectionTitle, {color: colors.text}]}>
+          Current Game
+        </Text>
         {currentGame ? (
           renderGameCard(currentGame)
         ) : (
-          <View style={[
-            styles.emptyStateCard,
-            { backgroundColor: colors.surface }
-          ]}>
-            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+          <View
+            style={[styles.emptyStateCard, {backgroundColor: colors.surface}]}
+          >
+            <Text
+              style={[styles.emptyStateText, {color: colors.textSecondary}]}
+            >
               No game in progress
             </Text>
           </View>
@@ -179,14 +179,14 @@ export default function GamesScreen() {
         <ThemedButton
           title="New Game"
           onPress={() => router.push('/games/new')}
-          style={{ marginTop: theme.spacing.sm }}
+          style={{marginTop: theme.spacing.sm}}
         />
       </View>
 
       {completedGames.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            <Text style={[styles.sectionTitle, {color: colors.text}]}>
               Completed Games
             </Text>
             <View style={styles.completedGamesActions}>
@@ -195,18 +195,20 @@ export default function GamesScreen() {
                   <TouchableOpacity
                     style={[
                       styles.actionButton,
-                      { backgroundColor: colors.primary }
+                      {backgroundColor: colors.primary},
                     ]}
                     onPress={toggleSelectAll}
                   >
                     <Text style={styles.actionButtonText}>
-                      {selectedGames.length === completedGames.length ? 'Deselect All' : 'Select All'}
+                      {selectedGames.length === completedGames.length
+                        ? 'Deselect All'
+                        : 'Select All'}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
                       styles.actionButton,
-                      { backgroundColor: colors.textSecondary }
+                      {backgroundColor: colors.textSecondary},
                     ]}
                     onPress={() => {
                       setIsDeleting(false);
@@ -218,7 +220,7 @@ export default function GamesScreen() {
                   <TouchableOpacity
                     style={[
                       styles.actionButton,
-                      { backgroundColor: colors.error }
+                      {backgroundColor: colors.error},
                     ]}
                     onPress={handleDeleteSelected}
                     disabled={selectedGames.length === 0}
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -355,4 +357,4 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-}); 
+});

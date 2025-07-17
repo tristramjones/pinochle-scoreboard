@@ -1,4 +1,4 @@
-import { Theme, ThemeType } from '../constants/Theme';
+import {Theme, ThemeType} from '../constants/Theme';
 
 export function useTheme(): {
   theme: ThemeType;
@@ -8,4 +8,4 @@ export function useTheme(): {
     theme: Theme,
     colors: Theme.colors,
   };
-} 
+}

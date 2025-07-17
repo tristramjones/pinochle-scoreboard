@@ -12,12 +12,12 @@ export const Theme = {
     text: '#11181C',
     textSecondary: '#666666',
     border: '#CCCCCC',
-    
+
     // Status colors
     success: '#34C759',
     error: '#FF3B30',
     warning: '#FFCC00',
-    
+
     // Component specific
     card: {
       background: '#FFFFFF',
@@ -37,7 +37,7 @@ export const Theme = {
       placeholder: '#999999',
     },
   },
-  
+
   typography: {
     fontSizes: {
       xs: 12,
@@ -60,7 +60,7 @@ export const Theme = {
       relaxed: 1.75,
     },
   },
-  
+
   spacing: {
     xs: 4,
     sm: 8,
@@ -69,7 +69,7 @@ export const Theme = {
     xl: 32,
     xxl: 48,
   },
-  
+
   borderRadius: {
     sm: 4,
     md: 8,
@@ -77,31 +77,31 @@ export const Theme = {
     xl: 16,
     round: 9999,
   },
-  
+
   shadows: {
     sm: {
-      shadowOffset: { width: 0, height: 1 },
+      shadowOffset: {width: 0, height: 1},
       shadowOpacity: 0.05,
       shadowRadius: 2,
     },
     md: {
-      shadowOffset: { width: 0, height: 2 },
+      shadowOffset: {width: 0, height: 2},
       shadowOpacity: 0.1,
       shadowRadius: 4,
     },
     lg: {
-      shadowOffset: { width: 0, height: 4 },
+      shadowOffset: {width: 0, height: 4},
       shadowOpacity: 0.15,
       shadowRadius: 8,
     },
   },
-  
+
   // Layout
   layout: {
     containerPadding: 16,
     maxWidth: 800,
   },
-  
+
   // Animation
   animation: {
     duration: {
@@ -122,4 +122,4 @@ export type ThemeColors = typeof Theme.colors;
 export type ThemeType = typeof Theme;
 
 // Helper to ensure we're using valid theme colors
-export type ThemeColor = keyof ThemeColors; 
+export type ThemeColor = keyof ThemeColors;

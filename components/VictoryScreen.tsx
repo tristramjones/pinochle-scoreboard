@@ -1,9 +1,9 @@
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import {useRouter} from 'expo-router';
+import React, {useEffect, useRef} from 'react';
+import {Animated, StyleSheet, Text, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { useTheme } from '../hooks/useTheme';
+import {useTheme} from '../hooks/useTheme';
 
 interface VictoryScreenProps {
   winningTeam: {
@@ -12,10 +12,10 @@ interface VictoryScreenProps {
   };
 }
 
-export default function VictoryScreen({ winningTeam }: VictoryScreenProps) {
+export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
   const router = useRouter();
   const opacity = useRef(new Animated.Value(0)).current;
-  const { theme, colors } = useTheme();
+  const {theme, colors} = useTheme();
 
   useEffect(() => {
     // Play haptic feedback
@@ -40,7 +40,7 @@ export default function VictoryScreen({ winningTeam }: VictoryScreenProps) {
       Animated.sequence([
         fadeIn,
         Animated.delay(2000), // Show for 2 seconds
-        fadeOut
+        fadeOut,
       ]).start(() => {
         router.replace('/games');
       });
@@ -50,25 +50,27 @@ export default function VictoryScreen({ winningTeam }: VictoryScreenProps) {
   }, [opacity, router, theme.animation.duration.normal]);
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
-        styles.container, 
-        { 
+        styles.container,
+        {
           opacity,
-          backgroundColor: 'rgba(0, 0, 0, 0.9)' // Keep this hardcoded for the overlay effect
-        }
+          backgroundColor: 'rgba(0, 0, 0, 0.9)', // Keep this hardcoded for the overlay effect
+        },
       ]}
     >
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>🎉 Victory! 🎉</Text>
-        <Text style={[styles.teamName, { color: colors.text }]}>{winningTeam.name}</Text>
-        <Text style={[styles.score, { color: colors.text }]}>
+        <Text style={[styles.title, {color: colors.text}]}>🎉 Victory! 🎉</Text>
+        <Text style={[styles.teamName, {color: colors.text}]}>
+          {winningTeam.name}
+        </Text>
+        <Text style={[styles.score, {color: colors.text}]}>
           Final Score: {winningTeam.score}
         </Text>
       </View>
       <ConfettiCannon
         count={200}
-        origin={{ x: -10, y: 0 }}
+        origin={{x: -10, y: 0}}
         autoStart={true}
         fadeOut={true}
       />
@@ -103,4 +105,4 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 24,
   },
-}); 
+});

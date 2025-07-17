@@ -1,6 +1,6 @@
-import { Stack } from 'expo-router';
-import { Text } from 'react-native';
-import { Theme } from '../../constants/Theme';
+import {Stack} from 'expo-router';
+import {Text} from 'react-native';
+import {Theme} from '../../constants/Theme';
 
 export default function GamesLayout() {
   return (
@@ -16,9 +16,9 @@ export default function GamesLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          headerTitle: () => <Text>Game Details</Text>
+          headerTitle: () => <Text>Game Details</Text>,
         }}
       />
     </Stack>
   );
-} 
+}

@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
-import { Game, GameSettings, Round, Team } from '../types/game';
-import { calculateTeamScores } from '../utils/scoring';
+import React, {createContext, useContext, useEffect, useState} from 'react';
+import {Alert} from 'react-native';
+import {Game, GameSettings, Round, Team} from '../types/game';
+import {calculateTeamScores} from '../utils/scoring';
 import * as Storage from '../utils/storage';
 
 interface GameContextType {
@@ -22,7 +22,9 @@ export const useGame = () => {
   return context;
 };
 
-export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const GameProvider: React.FC<{children: React.ReactNode}> = ({
+  children,
+}) => {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,8 +53,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // First check if there's really a current game
       const existingGame = await Storage.getCurrentGame();
-      console.log('Starting new game, existing game:', existingGame ? 'exists' : 'null');
-      
+      console.log(
+        'Starting new game, existing game:',
+        existingGame ? 'exists' : 'null',
+      );
+
       if (existingGame) {
         // Save it to history before starting new game
         await Storage.saveGameToHistory(existingGame);
@@ -62,7 +67,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const teams: Team[] = settings.teamNames.map((name, index) => ({
         id: `team-${index + 1}`,
         name,
-        players: []
+        players: [],
       }));
 
       const newGame: Game = {
@@ -70,7 +75,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         teams,
         rounds: [],
         winningScore: 1500,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       await Storage.saveCurrentGame(newGame);
@@ -90,12 +95,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newRound: Round = {
         ...roundData,
         id: `round-${currentGame.rounds.length + 1}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const updatedGame: Game = {
         ...currentGame,
-        rounds: [...currentGame.rounds, newRound]
+        rounds: [...currentGame.rounds, newRound],
       };
 
       // Calculate scores before saving
@@ -107,10 +112,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCurrentGame(updatedGame);
 
       // Check if game is over
-      const winningTeam = Object.entries(teamScores).find(([_, score]) => score >= updatedGame.winningScore);
+      const winningTeam = Object.entries(teamScores).find(
+        ([_, score]) => score >= updatedGame.winningScore,
+      );
 
       if (winningTeam) {
-        console.log('Game over - winning team:', winningTeam[0], 'with score:', winningTeam[1]);
+        console.log(
+          'Game over - winning team:',
+          winningTeam[0],
+          'with score:',
+          winningTeam[1],
+        );
         // The game will be ended after the victory screen is shown
         // The VictoryScreen component will navigate to the games screen
         // which will trigger the useEffect in GamesScreen to reload games
@@ -140,15 +152,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const finalScores = calculateTeamScores(gameToEnd);
       console.log('Ending game:', gameToEnd.id);
       console.log('Final scores:', finalScores);
-      
+
       // Save to history first
       await Storage.saveGameToHistory(gameToEnd);
       console.log('Game saved to history');
-      
+
       // Then clear current game
       await Storage.clearCurrentGame();
       console.log('Current game cleared');
-      
+
       // Finally update state
       setCurrentGame(null);
       console.log('Game ended successfully');
@@ -166,10 +178,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         startNewGame,
         addRound,
-        endGame
+        endGame,
       }}
     >
       {children}
     </GameContext.Provider>
   );
-}; 
+};

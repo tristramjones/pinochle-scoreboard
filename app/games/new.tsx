@@ -1,27 +1,21 @@
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-} from 'react-native';
-import { ThemedButton } from '../../components/ThemedButton';
-import { useGame } from '../../contexts/GameContext';
-import { useTheme } from '../../hooks/useTheme';
+import {useRouter} from 'expo-router';
+import React, {useState} from 'react';
+import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {ThemedButton} from '../../components/ThemedButton';
+import {useGame} from '../../contexts/GameContext';
+import {useTheme} from '../../hooks/useTheme';
 
 export default function NewGameScreen() {
   const router = useRouter();
-  const { startNewGame } = useGame();
-  const { theme, colors } = useTheme();
+  const {startNewGame} = useGame();
+  const {colors} = useTheme();
   const [team1Name, setTeam1Name] = useState('');
   const [team2Name, setTeam2Name] = useState('');
 
   const handleStartGame = async () => {
     try {
       await startNewGame({
-        teamNames: [team1Name || 'Team 1', team2Name || 'Team 2']
+        teamNames: [team1Name || 'Team 1', team2Name || 'Team 2'],
       });
       router.replace('/games/current');
     } catch (error) {
@@ -30,13 +24,15 @@ export default function NewGameScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>New Game</Text>
+    <ScrollView
+      style={[styles.container, {backgroundColor: colors.background}]}
+    >
+      <Text style={[styles.title, {color: colors.text}]}>New Game</Text>
 
       <View style={styles.teamSection}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Team 1</Text>
+        <Text style={[styles.sectionTitle, {color: colors.text}]}>Team 1</Text>
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Team Name</Text>
+          <Text style={[styles.label, {color: colors.text}]}>Team Name</Text>
           <TextInput
             style={[
               styles.input,
@@ -44,7 +40,7 @@ export default function NewGameScreen() {
                 backgroundColor: colors.input.background,
                 borderColor: colors.input.border,
                 color: colors.input.text,
-              }
+              },
             ]}
             value={team1Name}
             onChangeText={setTeam1Name}
@@ -55,9 +51,9 @@ export default function NewGameScreen() {
       </View>
 
       <View style={styles.teamSection}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Team 2</Text>
+        <Text style={[styles.sectionTitle, {color: colors.text}]}>Team 2</Text>
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Team Name</Text>
+          <Text style={[styles.label, {color: colors.text}]}>Team Name</Text>
           <TextInput
             style={[
               styles.input,
@@ -65,7 +61,7 @@ export default function NewGameScreen() {
                 backgroundColor: colors.input.background,
                 borderColor: colors.input.border,
                 color: colors.input.text,
-              }
+              },
             ]}
             value={team2Name}
             onChangeText={setTeam2Name}
@@ -75,11 +71,7 @@ export default function NewGameScreen() {
         </View>
       </View>
 
-      <ThemedButton
-        title="Start Game"
-        onPress={handleStartGame}
-        size="lg"
-      />
+      <ThemedButton title="Start Game" onPress={handleStartGame} size="lg" />
     </ScrollView>
   );
 }
@@ -117,4 +109,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 16,
   },
-}); 
+});

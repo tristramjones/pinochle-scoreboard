@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import {useRouter} from 'expo-router';
+import React, {useState} from 'react';
 import {
   Alert,
   ScrollView,
@@ -9,35 +9,35 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Collapsible } from '../../components/Collapsible';
+import {Collapsible} from '../../components/Collapsible';
 import VictoryScreen from '../../components/VictoryScreen';
-import { useGame } from '../../contexts/GameContext';
-import { useTheme } from '../../hooks/useTheme';
-import { Round } from '../../types/game';
-import { calculateTeamScore } from '../../utils/scoring';
+import {useGame} from '../../contexts/GameContext';
+import {useTheme} from '../../hooks/useTheme';
+import {Round} from '../../types/game';
+import {calculateTeamScore} from '../../utils/scoring';
 
 type RoundPhase = 'bid' | 'meld' | 'tricks';
 
 export default function CurrentGameScreen() {
-  const { theme, colors } = useTheme();
-  const { currentGame, addRound } = useGame();
+  const {colors} = useTheme();
+  const {currentGame, addRound} = useGame();
 
   const router = useRouter();
   const [phase, setPhase] = useState<RoundPhase>('bid');
   const [bidAmount, setBidAmount] = useState('');
   const [bidTeamId, setBidTeamId] = useState<string | null>(null);
-  const [meldPoints, setMeldPoints] = useState<{ [key: string]: string }>({});
-  const [trickPoints, setTrickPoints] = useState<{ [key: string]: string }>({});
-  const [winningTeam, setWinningTeam] = useState<{ name: string; score: number } | null>(null);
+  const [meldPoints, setMeldPoints] = useState<{[key: string]: string}>({});
+  const [trickPoints, setTrickPoints] = useState<{[key: string]: string}>({});
+  const [winningTeam, setWinningTeam] = useState<{
+    name: string;
+    score: number;
+  } | null>(null);
 
   if (!currentGame) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>No Current Game</Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.button} onPress={() => router.back()}>
           <Text style={styles.buttonText}>Back to Games</Text>
         </TouchableOpacity>
       </View>
@@ -60,7 +60,7 @@ export default function CurrentGameScreen() {
   };
 
   const handleSubmitMeld = () => {
-    const meldValues: { [key: string]: number } = {};
+    const meldValues: {[key: string]: number} = {};
 
     for (const team of currentGame.teams) {
       const meld = parseInt(meldPoints[team.id] || '0');
@@ -77,8 +77,8 @@ export default function CurrentGameScreen() {
   const handleSubmitTricks = async () => {
     if (!bidTeamId || !bidAmount) return;
 
-    const meldValues: { [key: string]: number } = {};
-    const trickValues: { [key: string]: number } = {};
+    const meldValues: {[key: string]: number} = {};
+    const trickValues: {[key: string]: number} = {};
     let totalTricks = 0;
 
     for (const team of currentGame.teams) {
@@ -118,16 +118,21 @@ export default function CurrentGameScreen() {
     // Calculate new scores after this round
     const updatedGame = {
       ...currentGame,
-      rounds: [...currentGame.rounds, { ...roundData, id: 'temp', timestamp: Date.now() }]
+      rounds: [
+        ...currentGame.rounds,
+        {...roundData, id: 'temp', timestamp: Date.now()},
+      ],
     };
 
     const scores = currentGame.teams.reduce((acc, team) => {
       acc[team.id] = calculateTeamScore(updatedGame, team.id);
       return acc;
-    }, {} as { [key: string]: number });
+    }, {} as {[key: string]: number});
 
     // Check if any team won
-    const winner = currentGame.teams.find(team => scores[team.id] >= currentGame.winningScore);
+    const winner = currentGame.teams.find(
+      team => scores[team.id] >= currentGame.winningScore,
+    );
 
     try {
       await addRound(roundData);
@@ -135,7 +140,7 @@ export default function CurrentGameScreen() {
       if (winner) {
         setWinningTeam({
           name: winner.name,
-          score: scores[winner.id]
+          score: scores[winner.id],
         });
       } else {
         // Reset form only if game isn't over
@@ -176,10 +181,10 @@ export default function CurrentGameScreen() {
               ]}
               onPress={() => setBidTeamId(team.id)}
             >
-              <Text 
+              <Text
                 style={[
                   styles.teamButtonText,
-                  bidTeamId === team.id && styles.selectedTeamText
+                  bidTeamId === team.id && styles.selectedTeamText,
                 ]}
               >
                 {team.name}
@@ -197,10 +202,7 @@ export default function CurrentGameScreen() {
           placeholder="Enter bid amount"
         />
 
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmitBid}
-        >
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmitBid}>
           <Text style={styles.buttonText}>Submit Bid</Text>
         </TouchableOpacity>
       </View>
@@ -219,8 +221,8 @@ export default function CurrentGameScreen() {
               <TextInput
                 style={styles.input}
                 value={meldPoints[team.id] || ''}
-                onChangeText={(value) => 
-                  setMeldPoints(prev => ({ ...prev, [team.id]: value }))
+                onChangeText={value =>
+                  setMeldPoints(prev => ({...prev, [team.id]: value}))
                 }
                 keyboardType="number-pad"
                 placeholder="Enter meld points"
@@ -230,19 +232,19 @@ export default function CurrentGameScreen() {
         </View>
       ))}
 
-      {bidTeamId && bidAmount && Object.keys(meldPoints).length === currentGame.teams.length && (
-        <View style={styles.requiredTricksInfo}>
-          <Text style={styles.infoText}>
-            {currentGame.teams.find(t => t.id === bidTeamId)?.name} needs{' '}
-            {calculateRequiredTricks()} trick points to make their bid of {bidAmount}
-          </Text>
-        </View>
-      )}
+      {bidTeamId &&
+        bidAmount &&
+        Object.keys(meldPoints).length === currentGame.teams.length && (
+          <View style={styles.requiredTricksInfo}>
+            <Text style={styles.infoText}>
+              {currentGame.teams.find(t => t.id === bidTeamId)?.name} needs{' '}
+              {calculateRequiredTricks()} trick points to make their bid of{' '}
+              {bidAmount}
+            </Text>
+          </View>
+        )}
 
-      <TouchableOpacity
-        style={styles.submitButton}
-        onPress={handleSubmitMeld}
-      >
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmitMeld}>
         <Text style={styles.buttonText}>Submit Meld</Text>
       </TouchableOpacity>
     </View>
@@ -252,14 +254,14 @@ export default function CurrentGameScreen() {
     const handleTrickPointsChange = (teamId: string, value: string) => {
       const points = parseInt(value) || 0;
       const otherTeam = currentGame.teams.find(t => t.id !== teamId);
-      
+
       if (otherTeam) {
         setTrickPoints({
           [teamId]: value,
-          [otherTeam.id]: points <= 250 ? String(250 - points) : '0'
+          [otherTeam.id]: points <= 250 ? String(250 - points) : '0',
         });
       } else {
-        setTrickPoints(prev => ({ ...prev, [teamId]: value }));
+        setTrickPoints(prev => ({...prev, [teamId]: value}));
       }
     };
 
@@ -275,7 +277,9 @@ export default function CurrentGameScreen() {
                 <TextInput
                   style={styles.input}
                   value={trickPoints[team.id] || ''}
-                  onChangeText={(value) => handleTrickPointsChange(team.id, value)}
+                  onChangeText={value =>
+                    handleTrickPointsChange(team.id, value)
+                  }
                   keyboardType="number-pad"
                   placeholder="Enter trick points"
                   editable={index === 0} // Only first team can edit
@@ -296,18 +300,21 @@ export default function CurrentGameScreen() {
   };
 
   const renderRound = (round: Round, index: number) => {
-    const bidWinningTeam = currentGame.teams.find(team => team.id === round.bidWinner);
+    const bidWinningTeam = currentGame.teams.find(
+      team => team.id === round.bidWinner,
+    );
     const roundNumber = index + 1;
 
     return (
       <View key={round.id} style={styles.roundCard}>
         <Text style={styles.roundTitle}>Round {roundNumber}</Text>
-        
+
         <View style={styles.bidInfo}>
           <Text style={styles.bidText}>
             {bidWinningTeam?.name} bid {round.bid}
           </Text>
-          {round.meld[round.bidWinner] + round.trickPoints[round.bidWinner] >= round.bid ? (
+          {round.meld[round.bidWinner] + round.trickPoints[round.bidWinner] >=
+          round.bid ? (
             <Text style={styles.madeBid}>Made Bid</Text>
           ) : (
             <Text style={styles.setBid}>Went set</Text>
@@ -326,7 +333,7 @@ export default function CurrentGameScreen() {
             const meldPoints = round.meld[team.id] || 0;
             const trickPoints = round.trickPoints[team.id] || 0;
             const roundTotal = meldPoints + trickPoints;
-            
+
             // Calculate cumulative score up to this round
             const gameScore = currentGame.rounds
               .slice(0, index + 1)
@@ -338,20 +345,19 @@ export default function CurrentGameScreen() {
                 if (r.bidWinner === team.id && roundTotal < r.bid) {
                   return sum - r.bid;
                 }
-                
+
                 return sum + roundTotal;
               }, 0);
-            
+
             return (
               <View key={team.id} style={styles.tableRow}>
                 <Text style={styles.tableCell}>{team.name}</Text>
                 <Text style={styles.tableCell}>{meldPoints}</Text>
                 <Text style={styles.tableCell}>{trickPoints}</Text>
                 <Text style={styles.tableCell}>{roundTotal}</Text>
-                <Text style={[
-                  styles.tableCell,
-                  styles.gameScoreCell
-                ]}>{gameScore}</Text>
+                <Text style={[styles.tableCell, styles.gameScoreCell]}>
+                  {gameScore}
+                </Text>
               </View>
             );
           })}
@@ -362,13 +368,17 @@ export default function CurrentGameScreen() {
 
   return (
     <>
-      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView
+        style={[styles.container, {backgroundColor: colors.background}]}
+      >
         <View style={styles.scoreHeader}>
-          <Text style={[styles.title, { color: colors.text }]}>Current Game</Text>
+          <Text style={[styles.title, {color: colors.text}]}>Current Game</Text>
           {currentGame.teams.map(team => (
             <View key={team.id} style={styles.teamScore}>
-              <Text style={[styles.teamName, { color: colors.text }]}>{team.name}</Text>
-              <Text style={[styles.score, { color: colors.text }]}>
+              <Text style={[styles.teamName, {color: colors.text}]}>
+                {team.name}
+              </Text>
+              <Text style={[styles.score, {color: colors.text}]}>
                 Score: {calculateTeamScore(currentGame, team.id)}
               </Text>
             </View>
@@ -376,7 +386,9 @@ export default function CurrentGameScreen() {
         </View>
 
         <View style={styles.roundInput}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>New Round</Text>
+          <Text style={[styles.sectionTitle, {color: colors.text}]}>
+            New Round
+          </Text>
           {phase === 'bid' && renderBidPhase()}
           {phase === 'meld' && renderMeldPhase()}
           {phase === 'tricks' && renderTricksPhase()}
@@ -386,7 +398,9 @@ export default function CurrentGameScreen() {
           <View>
             <Collapsible title="Previous Rounds">
               <View style={styles.roundsContainer}>
-                {currentGame.rounds.map((round, index) => renderRound(round, index))}
+                {currentGame.rounds.map((round, index) =>
+                  renderRound(round, index),
+                )}
               </View>
             </Collapsible>
           </View>
@@ -525,7 +539,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -580,4 +594,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#007AFF',
   },
-}); 
+});
