@@ -220,7 +220,12 @@ export default function CurrentGameScreen() {
           placeholderTextColor={theme.colors.input.placeholder}
         />
 
-        <ThemedButton title="Submit Bid" onPress={handleSubmitBid} />
+        <ThemedButton
+          title="Submit Bid"
+          onPress={handleSubmitBid}
+          variant="primary"
+          size="md"
+        />
       </View>
     </View>
   );
@@ -261,7 +266,12 @@ export default function CurrentGameScreen() {
           </View>
         )}
 
-      <ThemedButton title="Submit Meld" onPress={handleSubmitMeld} />
+      <ThemedButton
+        title="Submit Meld"
+        onPress={handleSubmitMeld}
+        variant="primary"
+        size="md"
+      />
     </View>
   );
 
@@ -304,7 +314,12 @@ export default function CurrentGameScreen() {
           </View>
         ))}
 
-        <ThemedButton title="Submit Round" onPress={handleSubmitTricks} />
+        <ThemedButton
+          title="Submit Round"
+          onPress={handleSubmitTricks}
+          variant="primary"
+          size="md"
+        />
       </View>
     );
   };

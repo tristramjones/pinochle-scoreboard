@@ -84,6 +84,7 @@ export default function NewGameScreen() {
           title="Start Game"
           onPress={handleStartGame}
           variant="primary"
+          size="md"
         />
       </View>
     </ScrollView>

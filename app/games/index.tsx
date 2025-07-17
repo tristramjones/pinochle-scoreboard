@@ -189,6 +189,8 @@ export default function GamesScreen() {
         <ThemedButton
           title="New Game"
           onPress={() => router.push('/games/new')}
+          variant="primary"
+          size="md"
           style={{marginTop: theme.spacing.sm}}
         />
       </View>
