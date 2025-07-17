@@ -1,25 +1,33 @@
 import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useTheme} from '../hooks/useTheme';
+import {
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import {Theme} from '../constants/Theme';
 import {ThemedText} from './ThemedText';
 
-interface CollapsibleProps {
+type CollapsibleProps = {
   title: string;
   children: React.ReactNode;
-}
+};
 
 export function Collapsible({title, children}: CollapsibleProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const theme = useTheme();
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity
-        style={styles.heading}
+        style={styles.header}
         onPress={() => setIsExpanded(!isExpanded)}
       >
-        <ThemedText style={[styles.title, {color: theme.colors.primary}]}>
-          {isExpanded ? '▾' : '▸'} {title}
+        <ThemedText style={styles.title} type="subtitle">
+          {title}
+        </ThemedText>
+        <ThemedText style={styles.expandIcon}>
+          {isExpanded ? '▼' : '▶'}
         </ThemedText>
       </TouchableOpacity>
       {isExpanded && <View style={styles.content}>{children}</View>}
@@ -28,16 +36,23 @@ export function Collapsible({title, children}: CollapsibleProps) {
 }
 
 const styles = StyleSheet.create({
-  heading: {
+  container: {
+    marginBottom: Theme.spacing.md,
+  } as ViewStyle,
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-  },
-  content: {
-    marginTop: 6,
-  },
+    paddingVertical: Theme.spacing.sm,
+  } as ViewStyle,
   title: {
-    fontSize: 16,
-  },
+    color: Theme.colors.primary,
+  } as TextStyle,
+  expandIcon: {
+    fontSize: Theme.typography.fontSizes.sm,
+    color: Theme.colors.textSecondary,
+  } as TextStyle,
+  content: {
+    marginTop: Theme.spacing.sm,
+  } as ViewStyle,
 });

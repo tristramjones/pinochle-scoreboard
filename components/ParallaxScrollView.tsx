@@ -1,88 +1,86 @@
-import type {PropsWithChildren, ReactElement} from 'react';
-import {StyleSheet} from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from 'react-native-reanimated';
+import {useHeaderHeight} from '@react-navigation/elements';
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  View,
+  ViewStyle,
+  type ScrollViewProps,
+} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Theme} from '../constants/Theme';
+import {useColorScheme} from '../hooks/useColorScheme';
 
-import {ThemedView} from '@/components/ThemedView';
-import {useBottomTabOverflow} from '@/components/ui/TabBarBackground';
-import {useColorScheme} from '@/hooks/useColorScheme';
+type ParallaxScrollViewProps = ScrollViewProps & {
+  headerBackgroundColor?: {
+    light: string;
+    dark: string;
+  };
+  headerHeight?: number;
+  children: React.ReactNode;
+};
 
-const HEADER_HEIGHT = 250;
-
-type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: {dark: string; light: string};
-}>;
-
-export default function ParallaxScrollView({
+export function ParallaxScrollView({
+  headerBackgroundColor = {
+    light: Theme.colors.background,
+    dark: Theme.colors.background,
+  },
+  headerHeight: customHeaderHeight,
   children,
-  headerImage,
-  headerBackgroundColor,
-}: Props) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
-  const bottom = useBottomTabOverflow();
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75],
-          ),
-        },
-        {
-          scale: interpolate(
-            scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [2, 1, 1],
-          ),
-        },
-      ],
-    };
+  ...rest
+}: ParallaxScrollViewProps) {
+  const colorScheme = useColorScheme();
+  const defaultHeaderHeight = useHeaderHeight();
+  const headerHeight = customHeaderHeight ?? defaultHeaderHeight;
+  const {bottom} = useSafeAreaInsets();
+  const scrollY = new Animated.Value(0);
+
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight],
+    extrapolate: 'clamp',
   });
 
   return (
-    <ThemedView style={styles.container}>
-      <Animated.ScrollView
-        ref={scrollRef}
+    <View style={styles.container}>
+      <Animated.View
+        style={[
+          styles.header,
+          {
+            height: headerHeight,
+            transform: [{translateY: headerTranslateY}],
+            backgroundColor: headerBackgroundColor[colorScheme || 'light'],
+          },
+        ]}
+      />
+      <ScrollView
+        {...rest}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollY}}}],
+          {useNativeDriver: true},
+        )}
         scrollEventThrottle={16}
-        scrollIndicatorInsets={{bottom}}
-        contentContainerStyle={{paddingBottom: bottom}}
+        contentContainerStyle={[
+          rest.contentContainerStyle,
+          {paddingBottom: bottom},
+        ]}
       >
-        <Animated.View
-          style={[
-            styles.header,
-            {backgroundColor: headerBackgroundColor[colorScheme]},
-            headerAnimatedStyle,
-          ]}
-        >
-          {headerImage}
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
-    </ThemedView>
+        {children}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
+  } as ViewStyle,
   header: {
-    height: HEADER_HEIGHT,
-    overflow: 'hidden',
-  },
-  content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
-    overflow: 'hidden',
-  },
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    padding: Theme.spacing.xl,
+  } as ViewStyle,
 });
