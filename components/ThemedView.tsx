@@ -1,14 +1,22 @@
-import {StyleSheet, View, type ViewProps} from 'react-native';
+import React from 'react';
+import {
+  Platform,
+  StyleSheet,
+  View,
+  ViewStyle,
+  type ViewProps,
+} from 'react-native';
+import {Theme} from '../constants/Theme';
 import {useTheme} from '../hooks/useTheme';
 
 export type ThemedViewProps = ViewProps & {
-  variant?: 'default' | 'card' | 'surface';
+  variant?: 'default' | 'card';
 };
 
 export function ThemedView({
   style,
   variant = 'default',
-  ...otherProps
+  ...rest
 }: ThemedViewProps) {
   const theme = useTheme();
 
@@ -16,8 +24,6 @@ export function ThemedView({
     switch (variant) {
       case 'card':
         return theme.colors.card.background;
-      case 'surface':
-        return theme.colors.surface;
       default:
         return theme.colors.background;
     }
@@ -26,24 +32,37 @@ export function ThemedView({
   return (
     <View
       style={[
-        {backgroundColor: getBackgroundColor()},
+        styles.container,
         variant === 'card' && styles.card,
+        {backgroundColor: getBackgroundColor()},
         variant === 'card' && {
           borderColor: theme.colors.card.border,
           shadowColor: theme.colors.card.shadow,
-          ...theme.shadows.md,
         },
         style,
       ]}
-      {...otherProps}
+      {...rest}
     />
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  } as ViewStyle,
   card: {
+    borderRadius: Theme.borderRadius.md,
+    padding: Theme.spacing.md,
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-  },
+    ...Platform.select({
+      ios: {
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  } as ViewStyle,
 });

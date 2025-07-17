@@ -1,6 +1,6 @@
 import React from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
-import {useTheme} from '../hooks/useTheme';
+import {Theme} from '../constants/Theme';
 import {Game} from '../types/game';
 import {Round} from '../types/round';
 import {ThemedText} from './ThemedText';
@@ -12,31 +12,18 @@ type RoundCardProps = {
 };
 
 export function RoundCard({round, game, roundNumber}: RoundCardProps) {
-  const theme = useTheme();
   const bidWinningTeam = game.teams.find(team => team.id === round.bidWinner);
 
   return (
-    <View
-      style={[
-        styles.roundCard,
-        {
-          backgroundColor: theme.colors.card.background,
-          borderColor: theme.colors.card.border,
-          shadowColor: theme.colors.card.shadow,
-        },
-      ]}
-    >
-      {/* Card Header */}
+    <View style={[styles.roundCard, styles.roundCardThemed]}>
       <View style={styles.roundHeader}>
         <ThemedText type="subtitle">Round {roundNumber}</ThemedText>
-        <ThemedText type="label" style={{color: theme.colors.textSecondary}}>
+        <ThemedText type="label" style={styles.bidText}>
           {bidWinningTeam?.name} bid {round.bid}
         </ThemedText>
       </View>
 
-      {/* Score Table */}
       <View style={styles.scoreTable}>
-        {/* Table Header */}
         <View style={styles.tableRow}>
           <ThemedText
             type="label"
@@ -56,7 +43,6 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
           </ThemedText>
         </View>
 
-        {/* Team Rows */}
         {game.teams.map(team => {
           const meldPoints = round.meld[team.id] || 0;
           const trickPoints = round.trickPoints[team.id] || 0;
@@ -81,7 +67,7 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
                 style={[
                   styles.tableCell,
                   styles.teamCell,
-                  isBidWinner && {color: theme.colors.primary},
+                  isBidWinner && styles.bidWinnerText,
                 ]}
               >
                 {team.name}
@@ -94,13 +80,13 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
               </ThemedText>
               <ThemedText
                 type="subtitle"
-                style={[styles.tableCell, {fontSize: 16, lineHeight: 24}]}
+                style={[styles.tableCell, styles.boldText]}
               >
                 {roundTotal}
               </ThemedText>
               <ThemedText
                 type="subtitle"
-                style={[styles.tableCell, {fontSize: 16, lineHeight: 24}]}
+                style={[styles.tableCell, styles.boldText]}
               >
                 {runningScore}
               </ThemedText>
@@ -114,18 +100,21 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
 
 const styles = StyleSheet.create({
   roundCard: {
-    padding: 16,
-    borderRadius: 12,
+    padding: Theme.spacing.md,
+    borderRadius: Theme.borderRadius.md,
     borderWidth: 1,
-    marginBottom: 16,
+    marginBottom: Theme.spacing.md,
+  },
+  roundCardThemed: {
+    backgroundColor: Theme.colors.background,
+    borderColor: Theme.colors.card.border,
     ...Platform.select({
       ios: {
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        ...Theme.shadows.lg,
+        shadowColor: Theme.colors.text,
       },
       android: {
-        elevation: 4,
+        elevation: 6,
       },
     }),
   },
@@ -133,18 +122,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
-    paddingBottom: 12,
+    marginBottom: Theme.spacing.md,
+    paddingBottom: Theme.spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8D5C0',
+    borderBottomColor: Theme.colors.card.border,
+  },
+  bidText: {
+    color: Theme.colors.textSecondary,
   },
   scoreTable: {
-    gap: 8,
+    gap: Theme.spacing.xs,
   },
   tableRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: Theme.spacing.xs / 2,
   },
   tableCell: {
     flex: 1,
@@ -153,5 +145,13 @@ const styles = StyleSheet.create({
   teamCell: {
     flex: 2,
     textAlign: 'left',
+  },
+  bidWinnerText: {
+    color: Theme.colors.primary,
+  },
+  boldText: {
+    fontSize: Theme.typography.fontSizes.sm,
+    lineHeight:
+      Theme.typography.fontSizes.sm * Theme.typography.lineHeights.normal,
   },
 });

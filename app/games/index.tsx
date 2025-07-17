@@ -6,11 +6,14 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
+import {Theme} from '../../constants/Theme';
 import {useGame} from '../../contexts/GameContext';
 import {useTheme} from '../../hooks/useTheme';
 import {Game} from '../../types/game';
@@ -95,10 +98,8 @@ export default function GamesScreen() {
         key={game.id}
         style={[
           styles.gameCard,
-          {
-            backgroundColor: theme.colors.card.background,
-            shadowColor: theme.colors.card.shadow,
-          },
+          styles.gameCardThemed,
+          selectedGames.includes(game.id) && styles.selectedGameCard,
         ]}
         onPress={() =>
           router.push(isCompleted ? `/games/${game.id}` : '/games/current')
@@ -124,10 +125,7 @@ export default function GamesScreen() {
                 />
               </TouchableOpacity>
             )}
-            <ThemedText
-              type="label"
-              style={[styles.date, {color: theme.colors.textSecondary}]}
-            >
+            <ThemedText type="label" style={[styles.date, styles.dateText]}>
               {formatDate(game.timestamp)}
             </ThemedText>
           </View>
@@ -135,7 +133,7 @@ export default function GamesScreen() {
             type="label"
             style={[
               isCompleted ? styles.winner : styles.status,
-              {color: theme.colors.primary},
+              styles.winnerText,
             ]}
           >
             {isCompleted ? `${winner.name} Won!` : 'In Progress'}
@@ -144,16 +142,10 @@ export default function GamesScreen() {
         <View style={styles.teams}>
           {game.teams.map(team => (
             <View key={team.id} style={styles.teamScore}>
-              <ThemedText
-                type="subtitle"
-                style={[styles.teamName, {color: theme.colors.text}]}
-              >
+              <ThemedText type="subtitle" style={styles.teamName}>
                 {team.name}
               </ThemedText>
-              <ThemedText
-                type="score"
-                style={[styles.score, {color: theme.colors.text}]}
-              >
+              <ThemedText type="score" style={styles.score}>
                 {scores[team.id]} points
               </ThemedText>
             </View>
@@ -165,7 +157,7 @@ export default function GamesScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
+      style={[styles.container, styles.containerThemed]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -285,24 +277,31 @@ export default function GamesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
+    padding: Theme.spacing.md,
+  } as ViewStyle,
+  containerThemed: {
+    backgroundColor: Theme.colors.background,
+  } as ViewStyle,
   section: {
-    marginBottom: 24,
-  },
+    marginBottom: Theme.spacing.md,
+  } as ViewStyle,
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
-  },
+    marginBottom: Theme.spacing.sm,
+  } as ViewStyle,
   sectionTitle: {
-    marginBottom: 16,
-  },
+    marginBottom: Theme.spacing.sm,
+  } as TextStyle,
   gameCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    padding: Theme.spacing.md,
+    borderRadius: Theme.borderRadius.md,
+    marginBottom: Theme.spacing.md,
+  } as ViewStyle,
+  gameCardThemed: {
+    backgroundColor: Theme.colors.card.background,
+    shadowColor: Theme.colors.card.shadow,
     ...Platform.select({
       ios: {
         shadowOffset: {width: 0, height: 2},
@@ -313,73 +312,127 @@ const styles = StyleSheet.create({
         elevation: 4,
       },
     }),
-  },
+  } as ViewStyle,
+  selectedGameCard: {
+    borderWidth: 2,
+    borderColor: Theme.colors.primary,
+  } as ViewStyle,
   gameHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-  },
+    marginBottom: Theme.spacing.sm,
+  } as ViewStyle,
   gameHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
+    gap: Theme.spacing.xs,
+  } as ViewStyle,
   date: {
-    marginBottom: 4,
-  },
+    marginBottom: Theme.spacing.xs,
+  } as TextStyle,
+  dateText: {
+    color: Theme.colors.textSecondary,
+  } as TextStyle,
   teams: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
+    justifyContent: 'space-between',
+    marginTop: Theme.spacing.sm,
+  } as ViewStyle,
   teamScore: {
+    flex: 1,
     alignItems: 'center',
-  },
+  } as ViewStyle,
   teamName: {
-    marginBottom: 4,
-  },
+    marginBottom: Theme.spacing.xs,
+    color: Theme.colors.text,
+  } as TextStyle,
   score: {
-    marginBottom: 4,
-  },
+    color: Theme.colors.text,
+  } as TextStyle,
   winner: {
     fontWeight: '600',
-  },
+  } as TextStyle,
   status: {
     fontWeight: '500',
-  },
+  } as TextStyle,
+  winnerText: {
+    color: Theme.colors.primary,
+  } as TextStyle,
   emptyStateCard: {
-    padding: 16,
-    borderRadius: 12,
+    padding: Theme.spacing.md,
+    borderRadius: Theme.borderRadius.md,
     alignItems: 'center',
-    marginBottom: 16,
-  },
+    marginBottom: Theme.spacing.md,
+  } as ViewStyle,
   emptyStateText: {
     textAlign: 'center',
-  },
+  } as TextStyle,
   completedGamesActions: {
     flexDirection: 'row',
-    gap: 8,
-  },
+    gap: Theme.spacing.sm,
+  } as ViewStyle,
   actionButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
+    paddingVertical: Theme.spacing.xs,
+    paddingHorizontal: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.sm,
+  } as ViewStyle,
   actionButtonText: {
-    fontSize: 14,
-  },
+    fontSize: Theme.typography.fontSizes.sm,
+  } as TextStyle,
   checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
+    width: Theme.spacing.sm,
+    height: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.sm,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-  },
+  } as ViewStyle,
   checkboxInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 2,
+    width: Theme.spacing.xs,
+    height: Theme.spacing.xs,
+    borderRadius: Theme.borderRadius.sm,
     borderWidth: 1,
-  },
+  } as ViewStyle,
+  actionBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: Theme.spacing.md,
+    backgroundColor: Theme.colors.surface,
+  } as ViewStyle,
+  actionText: {
+    color: Theme.colors.textSecondary,
+  } as TextStyle,
+  actionButtons: {
+    flexDirection: 'row',
+    gap: Theme.spacing.sm,
+  } as ViewStyle,
+  primaryButton: {
+    backgroundColor: Theme.colors.primary,
+    padding: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.sm,
+  } as ViewStyle,
+  primaryButtonText: {
+    color: Theme.colors.button.text,
+  } as TextStyle,
+  secondaryButton: {
+    backgroundColor: Theme.colors.textSecondary,
+    padding: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.sm,
+  } as ViewStyle,
+  secondaryButtonText: {
+    color: Theme.colors.button.text,
+  } as TextStyle,
+  deleteButton: {
+    backgroundColor: Theme.colors.error,
+    padding: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.sm,
+  } as ViewStyle,
+  deleteButtonText: {
+    color: Theme.colors.button.text,
+  } as TextStyle,
+  noGamesText: {
+    textAlign: 'center',
+    marginTop: Theme.spacing.xl,
+  } as TextStyle,
 });

@@ -5,8 +5,10 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import {Collapsible} from '../../components/Collapsible';
 import {RoundCard} from '../../components/RoundCard';
@@ -14,6 +16,7 @@ import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
 import {ThemedView} from '../../components/ThemedView';
 import VictoryScreen from '../../components/VictoryScreen';
+import {Theme} from '../../constants/Theme';
 import {useGame} from '../../contexts/GameContext';
 import {useTheme} from '../../hooks/useTheme';
 import {calculateTeamScore} from '../../utils/scoring';
@@ -180,21 +183,24 @@ export default function CurrentGameScreen() {
                 {
                   backgroundColor:
                     bidTeamId === team.id
-                      ? theme.colors.primary
-                      : theme.colors.button.secondary,
-                  borderColor: theme.colors.primary,
+                      ? styles.teamButtonPrimary.backgroundColor
+                      : styles.teamButtonSecondary.backgroundColor,
+                  borderColor:
+                    bidTeamId === team.id
+                      ? styles.teamButtonPrimary.borderColor
+                      : styles.teamButtonSecondary.borderColor,
                 },
               ]}
               onPress={() => setBidTeamId(team.id)}
             >
               <ThemedText
                 style={[
-                  styles.teamButtonText,
+                  styles.teamButtonTextPrimary,
                   {
                     color:
                       bidTeamId === team.id
-                        ? theme.colors.button.text
-                        : theme.colors.button.textSecondary,
+                        ? styles.teamButtonTextPrimary.color
+                        : styles.teamButtonTextSecondary.color,
                   },
                 ]}
               >
@@ -206,14 +212,7 @@ export default function CurrentGameScreen() {
 
         <ThemedText type="label">Bid Amount</ThemedText>
         <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: theme.colors.input.background,
-              borderColor: theme.colors.input.border,
-              color: theme.colors.input.text,
-            },
-          ]}
+          style={[styles.input, styles.inputThemed]}
           value={bidAmount}
           onChangeText={setBidAmount}
           keyboardType="number-pad"
@@ -236,14 +235,7 @@ export default function CurrentGameScreen() {
             <View style={styles.inputGroup}>
               <ThemedText type="label">Meld Points</ThemedText>
               <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.colors.input.background,
-                    borderColor: theme.colors.input.border,
-                    color: theme.colors.input.text,
-                  },
-                ]}
+                style={[styles.input, styles.inputThemed]}
                 value={meldPoints[team.id] || ''}
                 onChangeText={value =>
                   setMeldPoints(prev => ({...prev, [team.id]: value}))
@@ -318,9 +310,7 @@ export default function CurrentGameScreen() {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
-    >
+    <ScrollView style={[styles.container, styles.containerThemed]}>
       <View style={styles.scoreHeader}>
         <ThemedText type="title">Current Game</ThemedText>
         {currentGame.teams.map(team => (
@@ -362,120 +352,136 @@ export default function CurrentGameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
+    padding: Theme.spacing.md,
+  } as ViewStyle,
+  containerThemed: {
+    backgroundColor: Theme.colors.background,
+  } as ViewStyle,
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontWeight: Theme.typography.fontWeights.bold,
+    marginBottom: Theme.spacing.md,
     textAlign: 'center',
-  },
+  } as TextStyle,
   scoreHeader: {
-    marginBottom: 24,
-  },
+    marginBottom: Theme.spacing.xl,
+  } as ViewStyle,
   teamScore: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-  },
+    marginBottom: Theme.spacing.xs,
+  } as ViewStyle,
   roundInput: {
     flex: 1,
-  },
+  } as ViewStyle,
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
+    fontSize: Theme.typography.fontSizes.lg,
+    fontWeight: Theme.typography.fontWeights.semibold,
+    marginBottom: Theme.spacing.md,
+  } as TextStyle,
   phaseContainer: {
-    marginBottom: 24,
-  },
+    marginBottom: Theme.spacing.xl,
+  } as ViewStyle,
   phaseTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
+    fontSize: Theme.typography.fontSizes.md,
+    fontWeight: Theme.typography.fontWeights.semibold,
+    marginBottom: Theme.spacing.md,
+  } as TextStyle,
   bidSection: {
-    gap: 16,
-  },
+    gap: Theme.spacing.md,
+  } as ViewStyle,
   teamButtons: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Theme.spacing.xs,
     flexWrap: 'wrap',
-  },
+  } as ViewStyle,
   teamButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: Theme.spacing.xs,
+    paddingHorizontal: Theme.spacing.md,
+    borderRadius: Theme.borderRadius.sm,
     borderWidth: 1,
-  },
-  selectedTeam: {
-    backgroundColor: '#007AFF',
-  },
-  teamButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  selectedTeamText: {
-    color: '#fff',
-  },
+  } as ViewStyle,
+  teamButtonPrimary: {
+    backgroundColor: Theme.colors.button.primary,
+    borderColor: Theme.colors.button.primary,
+  } as ViewStyle,
+  teamButtonSecondary: {
+    backgroundColor: Theme.colors.button.secondary,
+    borderColor: Theme.colors.button.primary,
+  } as ViewStyle,
+  teamButtonTextPrimary: {
+    color: Theme.colors.button.text,
+    fontSize: Theme.typography.fontSizes.sm,
+    fontWeight: Theme.typography.fontWeights.medium,
+  } as TextStyle,
+  teamButtonTextSecondary: {
+    color: Theme.colors.button.textSecondary,
+    fontSize: Theme.typography.fontSizes.sm,
+    fontWeight: Theme.typography.fontWeights.medium,
+  } as TextStyle,
   label: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
+    fontSize: Theme.typography.fontSizes.sm,
+    marginBottom: Theme.spacing.xs,
+  } as TextStyle,
   input: {
     height: 40,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    fontSize: 16,
-  },
+    borderRadius: Theme.borderRadius.sm,
+    paddingHorizontal: Theme.spacing.sm,
+    fontSize: Theme.typography.fontSizes.sm,
+  } as TextStyle,
+  inputThemed: {
+    backgroundColor: Theme.colors.input.background,
+    borderColor: Theme.colors.input.border,
+    color: Theme.colors.input.text,
+  } as TextStyle,
   submitButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: Theme.colors.primary,
+    paddingVertical: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.sm,
     alignItems: 'center',
-  },
+  } as ViewStyle,
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+    color: Theme.colors.button.text,
+    fontSize: Theme.typography.fontSizes.sm,
+    fontWeight: Theme.typography.fontWeights.semibold,
+  } as TextStyle,
   teamInput: {
-    marginBottom: 16,
-  },
+    marginBottom: Theme.spacing.md,
+  } as ViewStyle,
   teamName: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
+    fontSize: Theme.typography.fontSizes.md,
+    fontWeight: Theme.typography.fontWeights.semibold,
+    marginBottom: Theme.spacing.xs,
+  } as TextStyle,
   pointsInput: {
-    marginTop: 8,
-  },
+    marginTop: Theme.spacing.xs,
+  } as ViewStyle,
   inputGroup: {
-    gap: 8,
-  },
+    gap: Theme.spacing.xs,
+  } as ViewStyle,
   requiredTricksInfo: {
-    marginTop: 16,
-    marginBottom: 16,
-  },
+    marginTop: Theme.spacing.md,
+    marginBottom: Theme.spacing.md,
+  } as ViewStyle,
   infoText: {
-    fontSize: 16,
-    color: '#666',
-  },
+    fontSize: Theme.typography.fontSizes.sm,
+    color: Theme.colors.textSecondary,
+  } as TextStyle,
   score: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
+    fontSize: Theme.typography.fontSizes.md,
+    fontWeight: Theme.typography.fontWeights.medium,
+  } as TextStyle,
   button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginTop: 16,
-  },
+    backgroundColor: Theme.colors.primary,
+    paddingHorizontal: Theme.spacing.md,
+    paddingVertical: Theme.spacing.xs,
+    borderRadius: Theme.borderRadius.sm,
+    marginTop: Theme.spacing.md,
+  } as ViewStyle,
   roundsContainer: {
-    gap: 16,
-    marginTop: 16,
-  },
+    gap: Theme.spacing.md,
+    marginTop: Theme.spacing.md,
+  } as ViewStyle,
 });

@@ -1,4 +1,5 @@
-import {StyleSheet, Text, type TextProps} from 'react-native';
+import {StyleSheet, Text, TextStyle, type TextProps} from 'react-native';
+import {Theme} from '../constants/Theme';
 import {useTheme} from '../hooks/useTheme';
 
 export type ThemedTextProps = TextProps & {
@@ -41,39 +42,46 @@ export function ThemedText({
 
 const styles = StyleSheet.create({
   default: {
-    fontFamily: 'CrimsonText',
-    fontSize: 16,
-    lineHeight: 24,
-  },
+    fontFamily: Theme.typography.fonts.regular,
+    fontSize: Theme.typography.fontSizes.sm,
+    lineHeight:
+      Theme.typography.fontSizes.sm * Theme.typography.lineHeights.normal,
+  } as TextStyle,
   title: {
-    fontFamily: 'CrimsonText-Bold',
-    fontSize: 40,
-    lineHeight: 48,
-  },
+    fontFamily: Theme.typography.fonts.bold,
+    fontSize: Theme.typography.fontSizes.xxxl,
+    lineHeight:
+      Theme.typography.fontSizes.xxxl * Theme.typography.lineHeights.tight,
+  } as TextStyle,
   heading: {
-    fontFamily: 'CrimsonText-Bold',
-    fontSize: 32,
-    lineHeight: 40,
-  },
+    fontFamily: Theme.typography.fonts.bold,
+    fontSize: Theme.typography.fontSizes.xl,
+    lineHeight:
+      Theme.typography.fontSizes.xl * Theme.typography.lineHeights.tight,
+  } as TextStyle,
   score: {
-    fontFamily: 'CrimsonText-Bold',
-    fontSize: 24,
-    lineHeight: 32,
-  },
+    fontFamily: Theme.typography.fonts.bold,
+    fontSize: Theme.typography.fontSizes.lg,
+    lineHeight:
+      Theme.typography.fontSizes.lg * Theme.typography.lineHeights.normal,
+  } as TextStyle,
   label: {
-    fontFamily: 'CrimsonText',
-    fontSize: 18,
-    lineHeight: 24,
-  },
+    fontFamily: Theme.typography.fonts.regular,
+    fontSize: Theme.typography.fontSizes.md,
+    lineHeight:
+      Theme.typography.fontSizes.md * Theme.typography.lineHeights.normal,
+  } as TextStyle,
   subtitle: {
-    fontFamily: 'CrimsonText-Bold',
-    fontSize: 20,
-    lineHeight: 28,
-  },
+    fontFamily: Theme.typography.fonts.bold,
+    fontSize: Theme.typography.fontSizes.md,
+    lineHeight:
+      Theme.typography.fontSizes.md * Theme.typography.lineHeights.normal,
+  } as TextStyle,
   link: {
-    fontFamily: 'CrimsonText',
-    fontSize: 16,
-    lineHeight: 24,
+    fontFamily: Theme.typography.fonts.regular,
+    fontSize: Theme.typography.fontSizes.sm,
+    lineHeight:
+      Theme.typography.fontSizes.sm * Theme.typography.lineHeights.normal,
     textDecorationLine: 'underline',
-  },
+  } as TextStyle,
 });
