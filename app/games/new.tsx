@@ -19,17 +19,10 @@ export default function NewGameScreen() {
   const {startNewGame} = useGame();
   const [team1Name, setTeam1Name] = useState('');
   const [team2Name, setTeam2Name] = useState('');
-  const [winningScore, setWinningScore] = useState('');
 
   const handleStartGame = async () => {
-    if (!team1Name || !team2Name || !winningScore) {
+    if (!team1Name || !team2Name) {
       Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    const score = parseInt(winningScore);
-    if (isNaN(score) || score <= 0) {
-      Alert.alert('Error', 'Please enter a valid winning score');
       return;
     }
 
@@ -65,18 +58,6 @@ export default function NewGameScreen() {
             onChangeText={setTeam2Name}
             placeholder="Enter team 2 name"
             placeholderTextColor={Theme.colors.input.placeholder}
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <ThemedText type="label">Winning Score</ThemedText>
-          <TextInput
-            style={[styles.input, styles.inputThemed]}
-            value={winningScore}
-            onChangeText={setWinningScore}
-            placeholder="Enter winning score"
-            placeholderTextColor={Theme.colors.input.placeholder}
-            keyboardType="number-pad"
           />
         </View>
 

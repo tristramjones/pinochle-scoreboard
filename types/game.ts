@@ -38,4 +38,4 @@ export interface StorageKeys {
   CURRENT_GAME: 'pinochle_current_game';
   GAME_HISTORY: 'pinochle_game_history';
   GAME_SETTINGS: 'pinochle_game_settings';
-} 
+}
