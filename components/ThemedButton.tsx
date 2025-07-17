@@ -29,13 +29,15 @@ export function ThemedButton({
   disabled,
   ...rest
 }: ThemedButtonProps) {
-  const {theme, colors} = useTheme();
+  const theme = useTheme();
 
   const buttonStyles = [
     styles.base,
     {
       backgroundColor:
-        variant === 'primary' ? colors.button.primary : colors.button.secondary,
+        variant === 'primary'
+          ? theme.colors.button.primary
+          : theme.colors.button.secondary,
       paddingVertical:
         theme.spacing[size === 'sm' ? 'xs' : size === 'lg' ? 'lg' : 'md'],
       paddingHorizontal:
@@ -51,8 +53,8 @@ export function ThemedButton({
     {
       color:
         variant === 'primary'
-          ? colors.button.text
-          : colors.button.textSecondary,
+          ? theme.colors.button.text
+          : theme.colors.button.textSecondary,
       fontSize:
         theme.typography.fontSizes[
           size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'

@@ -19,7 +19,7 @@ import * as Storage from '../../utils/storage';
 export default function GamesScreen() {
   const router = useRouter();
   const {currentGame} = useGame();
-  const {theme, colors} = useTheme();
+  const theme = useTheme();
   const [completedGames, setCompletedGames] = useState<Game[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -95,8 +95,8 @@ export default function GamesScreen() {
         style={[
           styles.gameCard,
           {
-            backgroundColor: colors.card.background,
-            shadowColor: colors.card.shadow,
+            backgroundColor: theme.colors.card.background,
+            shadowColor: theme.colors.card.shadow,
           },
         ]}
         onPress={() =>
@@ -114,23 +114,23 @@ export default function GamesScreen() {
                   style={[
                     styles.checkboxInner,
                     {
-                      borderColor: colors.primary,
+                      borderColor: theme.colors.primary,
                       backgroundColor: selectedGames.includes(game.id)
-                        ? colors.primary
+                        ? theme.colors.primary
                         : 'transparent',
                     },
                   ]}
                 />
               </TouchableOpacity>
             )}
-            <Text style={[styles.date, {color: colors.textSecondary}]}>
+            <Text style={[styles.date, {color: theme.colors.textSecondary}]}>
               {formatDate(game.timestamp)}
             </Text>
           </View>
           <Text
             style={[
               isCompleted ? styles.winner : styles.status,
-              {color: colors.primary},
+              {color: theme.colors.primary},
             ]}
           >
             {isCompleted ? `${winner.name} Won!` : 'In Progress'}
@@ -139,10 +139,10 @@ export default function GamesScreen() {
         <View style={styles.teams}>
           {game.teams.map(team => (
             <View key={team.id} style={styles.teamScore}>
-              <Text style={[styles.teamName, {color: colors.text}]}>
+              <Text style={[styles.teamName, {color: theme.colors.text}]}>
                 {team.name}
               </Text>
-              <Text style={[styles.score, {color: colors.text}]}>
+              <Text style={[styles.score, {color: theme.colors.text}]}>
                 {scores[team.id]} points
               </Text>
             </View>
@@ -154,23 +154,29 @@ export default function GamesScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: colors.background}]}
+      style={[styles.container, {backgroundColor: theme.colors.background}]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, {color: colors.text}]}>
+        <Text style={[styles.sectionTitle, {color: theme.colors.text}]}>
           Current Game
         </Text>
         {currentGame ? (
           renderGameCard(currentGame)
         ) : (
           <View
-            style={[styles.emptyStateCard, {backgroundColor: colors.surface}]}
+            style={[
+              styles.emptyStateCard,
+              {backgroundColor: theme.colors.surface},
+            ]}
           >
             <Text
-              style={[styles.emptyStateText, {color: colors.textSecondary}]}
+              style={[
+                styles.emptyStateText,
+                {color: theme.colors.textSecondary},
+              ]}
             >
               No game in progress
             </Text>
@@ -186,7 +192,7 @@ export default function GamesScreen() {
       {completedGames.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, {color: colors.text}]}>
+            <Text style={[styles.sectionTitle, {color: theme.colors.text}]}>
               Completed Games
             </Text>
             <View style={styles.completedGamesActions}>
@@ -195,7 +201,7 @@ export default function GamesScreen() {
                   <TouchableOpacity
                     style={[
                       styles.actionButton,
-                      {backgroundColor: colors.primary},
+                      {backgroundColor: theme.colors.primary},
                     ]}
                     onPress={toggleSelectAll}
                   >
@@ -208,7 +214,7 @@ export default function GamesScreen() {
                   <TouchableOpacity
                     style={[
                       styles.actionButton,
-                      {backgroundColor: colors.textSecondary},
+                      {backgroundColor: theme.colors.textSecondary},
                     ]}
                     onPress={() => {
                       setIsDeleting(false);
@@ -220,7 +226,7 @@ export default function GamesScreen() {
                   <TouchableOpacity
                     style={[
                       styles.actionButton,
-                      {backgroundColor: colors.error},
+                      {backgroundColor: theme.colors.error},
                     ]}
                     onPress={handleDeleteSelected}
                     disabled={selectedGames.length === 0}

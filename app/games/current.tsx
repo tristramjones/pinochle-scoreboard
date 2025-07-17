@@ -10,6 +10,9 @@ import {
   View,
 } from 'react-native';
 import {Collapsible} from '../../components/Collapsible';
+import {ThemedButton} from '../../components/ThemedButton';
+import {ThemedText} from '../../components/ThemedText';
+import {ThemedView} from '../../components/ThemedView';
 import VictoryScreen from '../../components/VictoryScreen';
 import {useGame} from '../../contexts/GameContext';
 import {useTheme} from '../../hooks/useTheme';
@@ -19,7 +22,7 @@ import {calculateTeamScore} from '../../utils/scoring';
 type RoundPhase = 'bid' | 'meld' | 'tricks';
 
 export default function CurrentGameScreen() {
-  const {colors} = useTheme();
+  const theme = useTheme();
   const {currentGame, addRound} = useGame();
 
   const router = useRouter();
@@ -35,12 +38,10 @@ export default function CurrentGameScreen() {
 
   if (!currentGame) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>No Current Game</Text>
-        <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-          <Text style={styles.buttonText}>Back to Games</Text>
-        </TouchableOpacity>
-      </View>
+      <ThemedView style={styles.container}>
+        <ThemedText type="title">No Current Game</ThemedText>
+        <ThemedButton title="Back to Games" onPress={() => router.back()} />
+      </ThemedView>
     );
   }
 
@@ -168,23 +169,34 @@ export default function CurrentGameScreen() {
 
   const renderBidPhase = () => (
     <View style={styles.phaseContainer}>
-      <Text style={styles.phaseTitle}>Phase 1: Bid</Text>
+      <ThemedText type="heading">Phase 1: Bid</ThemedText>
       <View style={styles.bidSection}>
-        <Text style={styles.label}>Bid Winner</Text>
+        <ThemedText type="label">Bid Winner</ThemedText>
         <View style={styles.teamButtons}>
           {currentGame.teams.map(team => (
             <TouchableOpacity
               key={team.id}
               style={[
                 styles.teamButton,
-                bidTeamId === team.id && styles.selectedTeam,
+                {
+                  backgroundColor:
+                    bidTeamId === team.id
+                      ? theme.colors.primary
+                      : theme.colors.button.secondary,
+                  borderColor: theme.colors.primary,
+                },
               ]}
               onPress={() => setBidTeamId(team.id)}
             >
               <Text
                 style={[
                   styles.teamButtonText,
-                  bidTeamId === team.id && styles.selectedTeamText,
+                  {
+                    color:
+                      bidTeamId === team.id
+                        ? theme.colors.button.text
+                        : theme.colors.button.textSecondary,
+                  },
                 ]}
               >
                 {team.name}
@@ -193,39 +205,53 @@ export default function CurrentGameScreen() {
           ))}
         </View>
 
-        <Text style={styles.label}>Bid Amount</Text>
+        <ThemedText type="label">Bid Amount</ThemedText>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.colors.input.background,
+              borderColor: theme.colors.input.border,
+              color: theme.colors.input.text,
+            },
+          ]}
           value={bidAmount}
           onChangeText={setBidAmount}
           keyboardType="number-pad"
           placeholder="Enter bid amount"
+          placeholderTextColor={theme.colors.input.placeholder}
         />
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmitBid}>
-          <Text style={styles.buttonText}>Submit Bid</Text>
-        </TouchableOpacity>
+        <ThemedButton title="Submit Bid" onPress={handleSubmitBid} />
       </View>
     </View>
   );
 
   const renderMeldPhase = () => (
     <View style={styles.phaseContainer}>
-      <Text style={styles.phaseTitle}>Phase 2: Meld</Text>
+      <ThemedText type="heading">Phase 2: Meld</ThemedText>
       {currentGame.teams.map(team => (
         <View key={team.id} style={styles.teamInput}>
-          <Text style={styles.teamName}>{team.name}</Text>
+          <ThemedText type="label">{team.name}</ThemedText>
           <View style={styles.pointsInput}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Meld Points</Text>
+              <ThemedText type="label">Meld Points</ThemedText>
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.colors.input.background,
+                    borderColor: theme.colors.input.border,
+                    color: theme.colors.input.text,
+                  },
+                ]}
                 value={meldPoints[team.id] || ''}
                 onChangeText={value =>
                   setMeldPoints(prev => ({...prev, [team.id]: value}))
                 }
                 keyboardType="number-pad"
                 placeholder="Enter meld points"
+                placeholderTextColor={theme.colors.input.placeholder}
               />
             </View>
           </View>
@@ -236,17 +262,15 @@ export default function CurrentGameScreen() {
         bidAmount &&
         Object.keys(meldPoints).length === currentGame.teams.length && (
           <View style={styles.requiredTricksInfo}>
-            <Text style={styles.infoText}>
+            <ThemedText>
               {currentGame.teams.find(t => t.id === bidTeamId)?.name} needs{' '}
               {calculateRequiredTricks()} trick points to make their bid of{' '}
               {bidAmount}
-            </Text>
+            </ThemedText>
           </View>
         )}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmitMeld}>
-        <Text style={styles.buttonText}>Submit Meld</Text>
-      </TouchableOpacity>
+      <ThemedButton title="Submit Meld" onPress={handleSubmitMeld} />
     </View>
   );
 
@@ -267,13 +291,13 @@ export default function CurrentGameScreen() {
 
     return (
       <View style={styles.phaseContainer}>
-        <Text style={styles.phaseTitle}>Phase 3: Tricks</Text>
+        <ThemedText type="heading">Phase 3: Tricks</ThemedText>
         {currentGame.teams.map((team, index) => (
           <View key={team.id} style={styles.teamInput}>
-            <Text style={styles.teamName}>{team.name}</Text>
+            <ThemedText type="label">{team.name}</ThemedText>
             <View style={styles.pointsInput}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Trick Points</Text>
+                <ThemedText type="label">Trick Points</ThemedText>
                 <TextInput
                   style={styles.input}
                   value={trickPoints[team.id] || ''}
@@ -289,12 +313,7 @@ export default function CurrentGameScreen() {
           </View>
         ))}
 
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmitTricks}
-        >
-          <Text style={styles.buttonText}>Submit Round</Text>
-        </TouchableOpacity>
+        <ThemedButton title="Submit Round" onPress={handleSubmitTricks} />
       </View>
     );
   };
@@ -307,27 +326,27 @@ export default function CurrentGameScreen() {
 
     return (
       <View key={round.id} style={styles.roundCard}>
-        <Text style={styles.roundTitle}>Round {roundNumber}</Text>
+        <ThemedText type="heading">Round {roundNumber}</ThemedText>
 
         <View style={styles.bidInfo}>
-          <Text style={styles.bidText}>
+          <ThemedText type="label">
             {bidWinningTeam?.name} bid {round.bid}
-          </Text>
+          </ThemedText>
           {round.meld[round.bidWinner] + round.trickPoints[round.bidWinner] >=
           round.bid ? (
-            <Text style={styles.madeBid}>Made Bid</Text>
+            <ThemedText type="label">Made Bid</ThemedText>
           ) : (
-            <Text style={styles.setBid}>Went set</Text>
+            <ThemedText type="label">Went set</ThemedText>
           )}
         </View>
 
         <View style={styles.pointsTable}>
           <View style={styles.tableHeader}>
-            <Text style={styles.tableCell}>Team</Text>
-            <Text style={styles.tableCell}>Meld</Text>
-            <Text style={styles.tableCell}>Tricks</Text>
-            <Text style={styles.tableCell}>Total</Text>
-            <Text style={styles.tableCell}>Game Score</Text>
+            <ThemedText type="label">Team</ThemedText>
+            <ThemedText type="label">Meld</ThemedText>
+            <ThemedText type="label">Tricks</ThemedText>
+            <ThemedText type="label">Total</ThemedText>
+            <ThemedText type="label">Game Score</ThemedText>
           </View>
           {currentGame.teams.map(team => {
             const meldPoints = round.meld[team.id] || 0;
@@ -351,13 +370,13 @@ export default function CurrentGameScreen() {
 
             return (
               <View key={team.id} style={styles.tableRow}>
-                <Text style={styles.tableCell}>{team.name}</Text>
-                <Text style={styles.tableCell}>{meldPoints}</Text>
-                <Text style={styles.tableCell}>{trickPoints}</Text>
-                <Text style={styles.tableCell}>{roundTotal}</Text>
-                <Text style={[styles.tableCell, styles.gameScoreCell]}>
+                <ThemedText type="label">{team.name}</ThemedText>
+                <ThemedText type="label">{meldPoints}</ThemedText>
+                <ThemedText type="label">{trickPoints}</ThemedText>
+                <ThemedText type="label">{roundTotal}</ThemedText>
+                <ThemedText type="label" style={styles.gameScoreCell}>
                   {gameScore}
-                </Text>
+                </ThemedText>
               </View>
             );
           })}
@@ -367,47 +386,39 @@ export default function CurrentGameScreen() {
   };
 
   return (
-    <>
-      <ScrollView
-        style={[styles.container, {backgroundColor: colors.background}]}
-      >
-        <View style={styles.scoreHeader}>
-          <Text style={[styles.title, {color: colors.text}]}>Current Game</Text>
-          {currentGame.teams.map(team => (
-            <View key={team.id} style={styles.teamScore}>
-              <Text style={[styles.teamName, {color: colors.text}]}>
-                {team.name}
-              </Text>
-              <Text style={[styles.score, {color: colors.text}]}>
-                Score: {calculateTeamScore(currentGame, team.id)}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.roundInput}>
-          <Text style={[styles.sectionTitle, {color: colors.text}]}>
-            New Round
-          </Text>
-          {phase === 'bid' && renderBidPhase()}
-          {phase === 'meld' && renderMeldPhase()}
-          {phase === 'tricks' && renderTricksPhase()}
-        </View>
-
-        {currentGame?.rounds?.length > 0 && (
-          <View>
-            <Collapsible title="Previous Rounds">
-              <View style={styles.roundsContainer}>
-                {currentGame.rounds.map((round, index) =>
-                  renderRound(round, index),
-                )}
-              </View>
-            </Collapsible>
+    <ScrollView
+      style={[styles.container, {backgroundColor: theme.colors.background}]}
+    >
+      <View style={styles.scoreHeader}>
+        <ThemedText type="title">Current Game</ThemedText>
+        {currentGame.teams.map(team => (
+          <View key={team.id} style={styles.teamScore}>
+            <ThemedText type="label">{team.name}</ThemedText>
+            <ThemedText type="label">
+              Score: {calculateTeamScore(currentGame, team.id)}
+            </ThemedText>
           </View>
-        )}
-      </ScrollView>
+        ))}
+      </View>
+
+      <View style={styles.roundInput}>
+        <ThemedText type="heading">New Round</ThemedText>
+        {phase === 'bid' && renderBidPhase()}
+        {phase === 'meld' && renderMeldPhase()}
+        {phase === 'tricks' && renderTricksPhase()}
+      </View>
+
+      {currentGame?.rounds?.length > 0 && (
+        <Collapsible title="Previous Rounds">
+          <View style={styles.roundsContainer}>
+            {currentGame.rounds.map((round, index) =>
+              renderRound(round, index),
+            )}
+          </View>
+        </Collapsible>
+      )}
       {winningTeam && <VictoryScreen winningTeam={winningTeam} />}
-    </>
+    </ScrollView>
   );
 }
 
@@ -448,24 +459,25 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   bidSection: {
-    marginBottom: 16,
+    gap: 16,
   },
   teamButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 16,
+    gap: 8,
+    flexWrap: 'wrap',
   },
   teamButton: {
-    paddingHorizontal: 16,
     paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 8,
+    borderWidth: 1,
   },
   selectedTeam: {
     backgroundColor: '#007AFF',
   },
   teamButtonText: {
     fontSize: 16,
-    color: '#000',
+    fontWeight: '500',
   },
   selectedTeamText: {
     color: '#fff',
@@ -475,12 +487,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
+    height: 40,
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
-    padding: 12,
+    paddingHorizontal: 12,
     fontSize: 16,
-    marginBottom: 16,
   },
   submitButton: {
     backgroundColor: '#007AFF',
@@ -502,16 +513,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   pointsInput: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    marginTop: 8,
   },
   inputGroup: {
-    flex: 1,
+    gap: 8,
   },
   requiredTricksInfo: {
-    backgroundColor: '#f8f8f8',
-    padding: 16,
-    borderRadius: 8,
+    marginTop: 16,
     marginBottom: 16,
   },
   infoText: {
