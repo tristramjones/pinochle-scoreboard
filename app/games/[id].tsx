@@ -1,7 +1,8 @@
 import {useLocalSearchParams, useNavigation, useRouter} from 'expo-router';
 import React, {useCallback, useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {ThemedButton} from '../../components/ThemedButton';
+import {ThemedText} from '../../components/ThemedText';
 import {useTheme} from '../../hooks/useTheme';
 import {Game} from '../../types/game';
 import {calculateTeamScores} from '../../utils/scoring';
@@ -11,7 +12,7 @@ export default function GameDetailsScreen() {
   const {id} = useLocalSearchParams();
   const router = useRouter();
   const navigation = useNavigation();
-  const {colors} = useTheme();
+  const theme = useTheme();
   const [game, setGame] = useState<Game | null>(null);
 
   const loadGame = useCallback(async () => {
@@ -42,8 +43,10 @@ export default function GameDetailsScreen() {
 
   if (!game) {
     return (
-      <View style={[styles.container, {backgroundColor: colors.background}]}>
-        <Text style={[styles.title, {color: colors.text}]}>Game not found</Text>
+      <View
+        style={[styles.container, {backgroundColor: theme.colors.background}]}
+      >
+        <ThemedText type="heading">Game not found</ThemedText>
         <ThemedButton
           title="Back to Games"
           onPress={() => router.back()}
@@ -60,41 +63,44 @@ export default function GameDetailsScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: colors.background}]}
+      style={[styles.container, {backgroundColor: theme.colors.background}]}
     >
       <View style={styles.header}>
-        <Text style={[styles.date, {color: colors.textSecondary}]}>
+        <ThemedText
+          type="label"
+          style={[styles.date, {color: theme.colors.textSecondary}]}
+        >
           {formatDate(game.timestamp)}
-        </Text>
+        </ThemedText>
         <View style={styles.teams}>
           {game.teams.map(team => (
             <View key={team.id} style={styles.teamScore}>
-              <Text
+              <ThemedText
+                type="subtitle"
                 style={[
                   styles.teamName,
-                  {color: colors.text},
-                  team.id === winner.id && {color: colors.primary},
+                  team.id === winner.id && {color: theme.colors.primary},
                 ]}
               >
                 {team.name}
                 {team.id === winner.id && ' 🏆'}
-              </Text>
-              <Text
+              </ThemedText>
+              <ThemedText
+                type="score"
                 style={[
                   styles.score,
-                  {color: colors.text},
-                  team.id === winner.id && {color: colors.primary},
+                  team.id === winner.id && {color: theme.colors.primary},
                 ]}
               >
                 {scores[team.id]} points
-              </Text>
+              </ThemedText>
             </View>
           ))}
         </View>
       </View>
 
       <View style={styles.rounds}>
-        <Text style={[styles.sectionTitle, {color: colors.text}]}>Rounds</Text>
+        <ThemedText type="heading">Rounds</ThemedText>
         {game.rounds.map((round, index) => {
           const bidWinningTeam = game.teams.find(
             team => team.id === round.bidWinner,
@@ -107,57 +113,54 @@ export default function GameDetailsScreen() {
               style={[
                 styles.roundCard,
                 {
-                  backgroundColor: colors.card.background,
-                  borderColor: colors.card.border,
-                  shadowColor: colors.card.shadow,
+                  backgroundColor: theme.colors.card.background,
+                  borderColor: theme.colors.card.border,
+                  shadowColor: theme.colors.card.shadow,
                 },
               ]}
             >
-              <Text style={[styles.roundTitle, {color: colors.text}]}>
-                Round {roundNumber}
-              </Text>
+              <ThemedText type="subtitle">Round {roundNumber}</ThemedText>
 
               <View style={styles.bidInfo}>
-                <Text style={[styles.bidText, {color: colors.textSecondary}]}>
+                <ThemedText
+                  type="label"
+                  style={{color: theme.colors.textSecondary}}
+                >
                   {bidWinningTeam?.name} bid {round.bid}
-                </Text>
+                </ThemedText>
                 {round.meld[round.bidWinner] +
                   round.trickPoints[round.bidWinner] >=
                 round.bid ? (
-                  <Text style={[styles.madeBid, {color: colors.success}]}>
+                  <ThemedText
+                    type="label"
+                    style={{color: theme.colors.success}}
+                  >
                     Made bid
-                  </Text>
+                  </ThemedText>
                 ) : (
-                  <Text style={[styles.setBid, {color: colors.error}]}>
+                  <ThemedText type="label" style={{color: theme.colors.error}}>
                     Went set
-                  </Text>
+                  </ThemedText>
                 )}
               </View>
 
               <View
-                style={[styles.pointsTable, {backgroundColor: colors.surface}]}
+                style={[
+                  styles.pointsTable,
+                  {backgroundColor: theme.colors.surface},
+                ]}
               >
                 <View
                   style={[
                     styles.tableHeader,
-                    {backgroundColor: colors.surface},
+                    {backgroundColor: theme.colors.surface},
                   ]}
                 >
-                  <Text style={[styles.tableCell, {color: colors.text}]}>
-                    Team
-                  </Text>
-                  <Text style={[styles.tableCell, {color: colors.text}]}>
-                    Meld
-                  </Text>
-                  <Text style={[styles.tableCell, {color: colors.text}]}>
-                    Tricks
-                  </Text>
-                  <Text style={[styles.tableCell, {color: colors.text}]}>
-                    Total
-                  </Text>
-                  <Text style={[styles.tableCell, {color: colors.text}]}>
-                    Game Score
-                  </Text>
+                  <ThemedText type="label">Team</ThemedText>
+                  <ThemedText type="label">Meld</ThemedText>
+                  <ThemedText type="label">Tricks</ThemedText>
+                  <ThemedText type="label">Total</ThemedText>
+                  <ThemedText type="label">Game Score</ThemedText>
                 </View>
                 {game.teams.map(team => {
                   const meldPoints = round.meld[team.id] || 0;
@@ -181,29 +184,24 @@ export default function GameDetailsScreen() {
                   return (
                     <View
                       key={team.id}
-                      style={[styles.tableRow, {borderTopColor: colors.border}]}
+                      style={[
+                        styles.tableRow,
+                        {borderTopColor: theme.colors.border},
+                      ]}
                     >
-                      <Text style={[styles.tableCell, {color: colors.text}]}>
-                        {team.name}
-                      </Text>
-                      <Text style={[styles.tableCell, {color: colors.text}]}>
-                        {meldPoints}
-                      </Text>
-                      <Text style={[styles.tableCell, {color: colors.text}]}>
-                        {trickPoints}
-                      </Text>
-                      <Text style={[styles.tableCell, {color: colors.text}]}>
-                        {roundTotal}
-                      </Text>
-                      <Text
+                      <ThemedText type="label">{team.name}</ThemedText>
+                      <ThemedText type="label">{meldPoints}</ThemedText>
+                      <ThemedText type="label">{trickPoints}</ThemedText>
+                      <ThemedText type="label">{roundTotal}</ThemedText>
+                      <ThemedText
+                        type="label"
                         style={[
-                          styles.tableCell,
                           styles.gameScoreCell,
-                          {color: colors.primary},
+                          {color: theme.colors.primary},
                         ]}
                       >
                         {gameScore}
-                      </Text>
+                      </ThemedText>
                     </View>
                   );
                 })}
@@ -226,13 +224,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   date: {
-    fontSize: 14,
     marginBottom: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
   },
   teams: {
     flexDirection: 'row',
@@ -245,52 +237,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   teamName: {
-    fontSize: 18,
-    fontWeight: '600',
     marginBottom: 4,
   },
   score: {
-    fontSize: 20,
-    fontWeight: '500',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 16,
+    marginBottom: 4,
   },
   rounds: {
-    flex: 1,
+    gap: 16,
   },
   roundCard: {
-    borderRadius: 12,
     padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
     marginBottom: 16,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  roundTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
+    ...Platform.select({
+      ios: {
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   bidInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 8,
     marginBottom: 16,
-  },
-  bidText: {
-    fontSize: 16,
-  },
-  madeBid: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  setBid: {
-    fontSize: 14,
-    fontWeight: '600',
   },
   pointsTable: {
     borderRadius: 8,
@@ -298,19 +274,20 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    paddingVertical: 8,
+    padding: 12,
   },
   tableRow: {
     flexDirection: 'row',
+    padding: 12,
     borderTopWidth: 1,
-    paddingVertical: 8,
   },
   tableCell: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 16,
   },
   gameScoreCell: {
+    flex: 1,
+    textAlign: 'center',
     fontWeight: '600',
   },
 });

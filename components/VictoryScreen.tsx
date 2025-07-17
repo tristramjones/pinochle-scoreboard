@@ -1,9 +1,10 @@
 import * as Haptics from 'expo-haptics';
 import {useRouter} from 'expo-router';
 import React, {useEffect, useRef} from 'react';
-import {Animated, StyleSheet, Text, View} from 'react-native';
+import {Animated, StyleSheet, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import {useTheme} from '../hooks/useTheme';
+import {ThemedText} from './ThemedText';
 
 interface VictoryScreenProps {
   winningTeam: {
@@ -15,7 +16,7 @@ interface VictoryScreenProps {
 export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
   const router = useRouter();
   const opacity = useRef(new Animated.Value(0)).current;
-  const {theme, colors} = useTheme();
+  const theme = useTheme();
 
   useEffect(() => {
     // Play haptic feedback
@@ -60,13 +61,15 @@ export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
       ]}
     >
       <View style={styles.content}>
-        <Text style={[styles.title, {color: colors.text}]}>🎉 Victory! 🎉</Text>
-        <Text style={[styles.teamName, {color: colors.text}]}>
+        <ThemedText type="title" style={styles.title}>
+          🎉 Victory! 🎉
+        </ThemedText>
+        <ThemedText type="heading" style={styles.teamName}>
           {winningTeam.name}
-        </Text>
-        <Text style={[styles.score, {color: colors.text}]}>
+        </ThemedText>
+        <ThemedText type="score" style={styles.score}>
           Final Score: {winningTeam.score}
-        </Text>
+        </ThemedText>
       </View>
       <ConfettiCannon
         count={200}
@@ -93,16 +96,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
     marginBottom: 20,
   },
   teamName: {
-    fontSize: 48,
-    fontWeight: 'bold',
     marginBottom: 16,
   },
   score: {
-    fontSize: 24,
+    marginBottom: 8,
   },
 });

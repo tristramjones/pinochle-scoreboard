@@ -21,7 +21,8 @@ const appTheme = {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    CrimsonText: require('../assets/fonts/CrimsonText-Regular.ttf'),
+    'CrimsonText-Bold': require('../assets/fonts/CrimsonText-Bold.ttf'),
   });
 
   if (!loaded) {

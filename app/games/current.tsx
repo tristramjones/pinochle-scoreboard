@@ -4,7 +4,6 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -188,7 +187,7 @@ export default function CurrentGameScreen() {
               ]}
               onPress={() => setBidTeamId(team.id)}
             >
-              <Text
+              <ThemedText
                 style={[
                   styles.teamButtonText,
                   {
@@ -200,7 +199,7 @@ export default function CurrentGameScreen() {
                 ]}
               >
                 {team.name}
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           ))}
         </View>

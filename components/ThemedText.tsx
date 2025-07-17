@@ -41,35 +41,37 @@ export function ThemedText({
 
 const styles = StyleSheet.create({
   default: {
+    fontFamily: 'CrimsonText',
     fontSize: 16,
     lineHeight: 24,
   },
   title: {
+    fontFamily: 'CrimsonText-Bold',
     fontSize: 40,
-    fontWeight: 'bold',
     lineHeight: 48,
   },
   heading: {
+    fontFamily: 'CrimsonText-Bold',
     fontSize: 32,
-    fontWeight: '600',
     lineHeight: 40,
   },
   score: {
+    fontFamily: 'CrimsonText-Bold',
     fontSize: 24,
-    fontWeight: '600',
     lineHeight: 32,
   },
   label: {
+    fontFamily: 'CrimsonText',
     fontSize: 18,
-    fontWeight: '500',
     lineHeight: 24,
   },
   subtitle: {
+    fontFamily: 'CrimsonText-Bold',
     fontSize: 20,
-    fontWeight: '600',
     lineHeight: 28,
   },
   link: {
+    fontFamily: 'CrimsonText',
     fontSize: 16,
     lineHeight: 24,
     textDecorationLine: 'underline',

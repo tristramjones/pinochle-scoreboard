@@ -6,12 +6,12 @@
 export const Theme = {
   colors: {
     // Core colors
-    primary: '#1B3B25', // Dark forest green
-    background: '#F5E6D3', // Warm cream background
-    surface: '#FFF8E7', // Lighter cream for cards
-    text: '#1B3B25', // Dark forest green for text
+    primary: '#1C3823', // Dark forest green from the image
+    background: '#F6E6D3', // Warm cream background from the image
+    surface: '#FFFFFF', // White for cards
+    text: '#1C3823', // Dark forest green for text
     textSecondary: '#2D4A35', // Slightly lighter green
-    border: '#1B3B25', // Dark green borders
+    border: '#1C3823', // Dark green borders
 
     // Status colors
     success: '#2D4A35', // Forest green success
@@ -20,20 +20,20 @@ export const Theme = {
 
     // Component specific
     card: {
-      background: '#FFF8E7', // Light cream
-      border: '#1B3B25', // Dark green border
-      shadow: 'rgba(27, 59, 37, 0.2)', // Semi-transparent green shadow
+      background: '#FFFFFF', // White background for cards
+      border: '#E8D5C0', // Light brown border from the image
+      shadow: 'rgba(28, 56, 35, 0.1)', // Semi-transparent green shadow
     },
     button: {
-      primary: '#1B3B25', // Dark forest green
-      secondary: '#F5E6D3', // Cream background
-      text: '#FFF8E7', // Light cream text
-      textSecondary: '#1B3B25', // Dark green text
+      primary: '#1C3823', // Dark forest green
+      secondary: '#F6E6D3', // Cream background
+      text: '#FFFFFF', // White text
+      textSecondary: '#1C3823', // Dark green text
     },
     input: {
-      background: '#FFF8E7', // Light cream
-      border: '#1B3B25', // Dark green border
-      text: '#1B3B25', // Dark green text
+      background: '#FFFFFF', // White
+      border: '#E8D5C0', // Light brown border
+      text: '#1C3823', // Dark green text
       placeholder: '#2D4A35', // Lighter green
     },
     accent: {
@@ -42,10 +42,14 @@ export const Theme = {
   },
 
   typography: {
+    fonts: {
+      regular: 'CrimsonText-Regular',
+      bold: 'CrimsonText-Bold',
+    },
     fontSizes: {
       xs: 14,
       sm: 16,
-      md: 18,
+      md: 20,
       lg: 24,
       xl: 32,
       xxl: 40,
@@ -84,17 +88,17 @@ export const Theme = {
   shadows: {
     sm: {
       shadowOffset: {width: 0, height: 2},
-      shadowOpacity: 0.1,
+      shadowOpacity: 0.05,
       shadowRadius: 4,
     },
     md: {
       shadowOffset: {width: 0, height: 4},
-      shadowOpacity: 0.15,
+      shadowOpacity: 0.08,
       shadowRadius: 8,
     },
     lg: {
       shadowOffset: {width: 0, height: 6},
-      shadowOpacity: 0.2,
+      shadowOpacity: 0.1,
       shadowRadius: 12,
     },
   },

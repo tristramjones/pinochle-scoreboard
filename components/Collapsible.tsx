@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useTheme} from '../hooks/useTheme';
+import {ThemedText} from './ThemedText';
 
 interface CollapsibleProps {
   title: string;
@@ -9,7 +10,7 @@ interface CollapsibleProps {
 
 export function Collapsible({title, children}: CollapsibleProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const {colors} = useTheme();
+  const theme = useTheme();
 
   return (
     <View>
@@ -17,9 +18,9 @@ export function Collapsible({title, children}: CollapsibleProps) {
         style={styles.heading}
         onPress={() => setIsExpanded(!isExpanded)}
       >
-        <Text style={[styles.title, {color: colors.primary}]}>
-          {isExpanded ? '▼' : '▶'} {title}
-        </Text>
+        <ThemedText style={[styles.title, {color: theme.colors.primary}]}>
+          {isExpanded ? '▾' : '▸'} {title}
+        </ThemedText>
       </TouchableOpacity>
       {isExpanded && <View style={styles.content}>{children}</View>}
     </View>
@@ -38,6 +39,5 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
   },
 });

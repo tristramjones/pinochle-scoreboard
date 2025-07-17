@@ -1,5 +1,5 @@
 import {Stack} from 'expo-router';
-import {Text} from 'react-native';
+import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
 
 export default function GamesLayout() {
@@ -16,7 +16,7 @@ export default function GamesLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          headerTitle: () => <Text>Game Details</Text>,
+          headerTitle: () => <ThemedText>Game Details</ThemedText>,
         }}
       />
     </Stack>

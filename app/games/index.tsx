@@ -2,14 +2,15 @@ import {useRouter} from 'expo-router';
 import React, {useCallback, useState} from 'react';
 import {
   Alert,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {ThemedButton} from '../../components/ThemedButton';
+import {ThemedText} from '../../components/ThemedText';
 import {useGame} from '../../contexts/GameContext';
 import {useTheme} from '../../hooks/useTheme';
 import {Game} from '../../types/game';
@@ -123,28 +124,38 @@ export default function GamesScreen() {
                 />
               </TouchableOpacity>
             )}
-            <Text style={[styles.date, {color: theme.colors.textSecondary}]}>
+            <ThemedText
+              type="label"
+              style={[styles.date, {color: theme.colors.textSecondary}]}
+            >
               {formatDate(game.timestamp)}
-            </Text>
+            </ThemedText>
           </View>
-          <Text
+          <ThemedText
+            type="label"
             style={[
               isCompleted ? styles.winner : styles.status,
               {color: theme.colors.primary},
             ]}
           >
             {isCompleted ? `${winner.name} Won!` : 'In Progress'}
-          </Text>
+          </ThemedText>
         </View>
         <View style={styles.teams}>
           {game.teams.map(team => (
             <View key={team.id} style={styles.teamScore}>
-              <Text style={[styles.teamName, {color: theme.colors.text}]}>
+              <ThemedText
+                type="subtitle"
+                style={[styles.teamName, {color: theme.colors.text}]}
+              >
                 {team.name}
-              </Text>
-              <Text style={[styles.score, {color: theme.colors.text}]}>
+              </ThemedText>
+              <ThemedText
+                type="score"
+                style={[styles.score, {color: theme.colors.text}]}
+              >
                 {scores[team.id]} points
-              </Text>
+              </ThemedText>
             </View>
           ))}
         </View>
@@ -160,9 +171,9 @@ export default function GamesScreen() {
       }
     >
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, {color: theme.colors.text}]}>
+        <ThemedText type="heading" style={styles.sectionTitle}>
           Current Game
-        </Text>
+        </ThemedText>
         {currentGame ? (
           renderGameCard(currentGame)
         ) : (
@@ -172,14 +183,15 @@ export default function GamesScreen() {
               {backgroundColor: theme.colors.surface},
             ]}
           >
-            <Text
+            <ThemedText
+              type="label"
               style={[
                 styles.emptyStateText,
                 {color: theme.colors.textSecondary},
               ]}
             >
               No game in progress
-            </Text>
+            </ThemedText>
           </View>
         )}
         <ThemedButton
@@ -192,9 +204,9 @@ export default function GamesScreen() {
       {completedGames.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, {color: theme.colors.text}]}>
+            <ThemedText type="heading" style={styles.sectionTitle}>
               Completed Games
-            </Text>
+            </ThemedText>
             <View style={styles.completedGamesActions}>
               {isDeleting ? (
                 <>
@@ -205,11 +217,16 @@ export default function GamesScreen() {
                     ]}
                     onPress={toggleSelectAll}
                   >
-                    <Text style={styles.actionButtonText}>
+                    <ThemedText
+                      style={[
+                        styles.actionButtonText,
+                        {color: theme.colors.button.text},
+                      ]}
+                    >
                       {selectedGames.length === completedGames.length
                         ? 'Deselect All'
                         : 'Select All'}
-                    </Text>
+                    </ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
@@ -221,7 +238,14 @@ export default function GamesScreen() {
                       setSelectedGames([]);
                     }}
                   >
-                    <Text style={styles.actionButtonText}>Cancel</Text>
+                    <ThemedText
+                      style={[
+                        styles.actionButtonText,
+                        {color: theme.colors.button.text},
+                      ]}
+                    >
+                      Cancel
+                    </ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
@@ -231,7 +255,14 @@ export default function GamesScreen() {
                     onPress={handleDeleteSelected}
                     disabled={selectedGames.length === 0}
                   >
-                    <Text style={styles.actionButtonText}>Delete</Text>
+                    <ThemedText
+                      style={[
+                        styles.actionButtonText,
+                        {color: theme.colors.button.text},
+                      ]}
+                    >
+                      Delete
+                    </ThemedText>
                   </TouchableOpacity>
                 </>
               ) : (
@@ -259,31 +290,29 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
     marginBottom: 16,
   },
   gameCard: {
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  emptyStateCard: {
-    borderRadius: 12,
-    padding: 24,
-    marginBottom: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyStateText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 8,
+    ...Platform.select({
+      ios: {
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   gameHeader: {
     flexDirection: 'row',
@@ -291,76 +320,66 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  gameHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   date: {
-    fontSize: 14,
-  },
-  status: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  winner: {
-    fontSize: 14,
-    fontWeight: '600',
+    marginBottom: 4,
   },
   teams: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
   },
   teamScore: {
-    flex: 1,
     alignItems: 'center',
   },
   teamName: {
-    fontSize: 16,
-    fontWeight: '600',
     marginBottom: 4,
   },
   score: {
-    fontSize: 18,
+    marginBottom: 4,
+  },
+  winner: {
+    fontWeight: '600',
+  },
+  status: {
     fontWeight: '500',
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  emptyStateCard: {
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
     marginBottom: 16,
+  },
+  emptyStateText: {
+    textAlign: 'center',
   },
   completedGamesActions: {
     flexDirection: 'row',
     gap: 8,
   },
   actionButton: {
-    paddingHorizontal: 12,
     paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: 6,
   },
   actionButtonText: {
-    color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
-  },
-  gameHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  gameHeaderRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
   },
   checkbox: {
-    padding: 4,
-  },
-  checkboxInner: {
     width: 20,
     height: 20,
-    borderWidth: 1,
     borderRadius: 4,
-  },
-  teamRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    borderWidth: 2,
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  checkboxInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 2,
+    borderWidth: 1,
   },
 });

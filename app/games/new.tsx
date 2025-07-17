@@ -1,14 +1,15 @@
 import {useRouter} from 'expo-router';
 import React, {useState} from 'react';
-import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {ScrollView, StyleSheet, TextInput, View} from 'react-native';
 import {ThemedButton} from '../../components/ThemedButton';
+import {ThemedText} from '../../components/ThemedText';
 import {useGame} from '../../contexts/GameContext';
 import {useTheme} from '../../hooks/useTheme';
 
 export default function NewGameScreen() {
   const router = useRouter();
   const {startNewGame} = useGame();
-  const {colors} = useTheme();
+  const theme = useTheme();
   const [team1Name, setTeam1Name] = useState('');
   const [team2Name, setTeam2Name] = useState('');
 
@@ -25,48 +26,58 @@ export default function NewGameScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: colors.background}]}
+      style={[styles.container, {backgroundColor: theme.colors.background}]}
     >
-      <Text style={[styles.title, {color: colors.text}]}>New Game</Text>
+      <ThemedText type="title" style={styles.title}>
+        New Game
+      </ThemedText>
 
       <View style={styles.teamSection}>
-        <Text style={[styles.sectionTitle, {color: colors.text}]}>Team 1</Text>
+        <ThemedText type="heading" style={styles.sectionTitle}>
+          Team 1
+        </ThemedText>
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, {color: colors.text}]}>Team Name</Text>
+          <ThemedText type="label" style={styles.label}>
+            Team Name
+          </ThemedText>
           <TextInput
             style={[
               styles.input,
               {
-                backgroundColor: colors.input.background,
-                borderColor: colors.input.border,
-                color: colors.input.text,
+                backgroundColor: theme.colors.input.background,
+                borderColor: theme.colors.input.border,
+                color: theme.colors.input.text,
               },
             ]}
             value={team1Name}
             onChangeText={setTeam1Name}
             placeholder="Enter team name"
-            placeholderTextColor={colors.input.placeholder}
+            placeholderTextColor={theme.colors.input.placeholder}
           />
         </View>
       </View>
 
       <View style={styles.teamSection}>
-        <Text style={[styles.sectionTitle, {color: colors.text}]}>Team 2</Text>
+        <ThemedText type="heading" style={styles.sectionTitle}>
+          Team 2
+        </ThemedText>
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, {color: colors.text}]}>Team Name</Text>
+          <ThemedText type="label" style={styles.label}>
+            Team Name
+          </ThemedText>
           <TextInput
             style={[
               styles.input,
               {
-                backgroundColor: colors.input.background,
-                borderColor: colors.input.border,
-                color: colors.input.text,
+                backgroundColor: theme.colors.input.background,
+                borderColor: theme.colors.input.border,
+                color: theme.colors.input.text,
               },
             ]}
             value={team2Name}
             onChangeText={setTeam2Name}
             placeholder="Enter team name"
-            placeholderTextColor={colors.input.placeholder}
+            placeholderTextColor={theme.colors.input.placeholder}
           />
         </View>
       </View>
@@ -82,8 +93,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -91,7 +100,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 16,
     marginBottom: 8,
   },
   input: {
@@ -105,8 +113,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
     marginBottom: 16,
   },
 });

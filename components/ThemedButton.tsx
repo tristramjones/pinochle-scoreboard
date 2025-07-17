@@ -2,13 +2,13 @@ import React from 'react';
 import {
   StyleProp,
   StyleSheet,
-  Text,
   TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
   ViewStyle,
 } from 'react-native';
 import {useTheme} from '../hooks/useTheme';
+import {ThemedText} from './ThemedText';
 
 export type ThemedButtonVariant = 'primary' | 'secondary';
 
@@ -59,15 +59,13 @@ export function ThemedButton({
         theme.typography.fontSizes[
           size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'
         ],
-      fontWeight: theme.typography.fontWeights
-        .semibold as TextStyle['fontWeight'],
     },
     textStyle,
   ];
 
   return (
     <TouchableOpacity style={buttonStyles} disabled={disabled} {...rest}>
-      <Text style={textStyles}>{title}</Text>
+      <ThemedText style={textStyles}>{title}</ThemedText>
     </TouchableOpacity>
   );
 }
