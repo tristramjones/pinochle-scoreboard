@@ -45,6 +45,7 @@ export const Theme = {
       border: '#8B3A2B', // burgundy
       text: '#1C3823', // forest green
       placeholder: '#8B3A2B80', // semi-transparent burgundy
+      height: 40,
     },
   },
 
@@ -88,6 +89,9 @@ export const Theme = {
     md: 8,
     lg: 16,
     full: 9999,
+  },
+  input: {
+    height: 40,
   },
   animation: {
     duration: {

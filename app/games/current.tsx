@@ -2,6 +2,7 @@ import {useRouter} from 'expo-router';
 import React, {useState} from 'react';
 import {
   Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -213,52 +214,65 @@ export default function CurrentGameScreen() {
   const renderBidPhase = () => (
     <View style={styles.phaseContainer}>
       <View style={styles.bidSection}>
-        <ThemedText type="label">Bid Winner</ThemedText>
-        <View style={styles.teamButtons}>
-          {currentGame.teams.map(team => (
-            <TouchableOpacity
-              key={team.id}
-              style={[
-                styles.teamButton,
-                {
-                  backgroundColor:
-                    bidTeamId === team.id
-                      ? styles.teamButtonPrimary.backgroundColor
-                      : styles.teamButtonSecondary.backgroundColor,
-                  borderColor:
-                    bidTeamId === team.id
-                      ? styles.teamButtonPrimary.borderColor
-                      : styles.teamButtonSecondary.borderColor,
-                },
-              ]}
-              onPress={() => setBidTeamId(team.id)}
-            >
-              <ThemedText
-                style={[
-                  styles.teamButtonTextPrimary,
-                  {
-                    color:
-                      bidTeamId === team.id
-                        ? styles.teamButtonTextPrimary.color
-                        : styles.teamButtonTextSecondary.color,
-                  },
-                ]}
-              >
-                {team.name}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <View style={styles.bidInputRow}>
+          <View style={styles.bidAmountContainer}>
+            <ThemedText type="label">Bid Amount</ThemedText>
+            <TextInput
+              style={[styles.bidAmountInput, styles.inputThemed]}
+              value={bidAmount}
+              onChangeText={text => {
+                // Only allow numbers and limit to 4 characters
+                const numericText = text.replace(/[^0-9]/g, '');
+                if (numericText.length <= 4) {
+                  setBidAmount(numericText);
+                }
+              }}
+              keyboardType="number-pad"
+              placeholder="250"
+              maxLength={4}
+              placeholderTextColor={theme.colors.input.placeholder}
+            />
+          </View>
 
-        <ThemedText type="label">Bid Amount</ThemedText>
-        <TextInput
-          style={[styles.input, styles.inputThemed]}
-          value={bidAmount}
-          onChangeText={setBidAmount}
-          keyboardType="number-pad"
-          placeholder="Enter bid amount"
-          placeholderTextColor={theme.colors.input.placeholder}
-        />
+          <View style={styles.bidWinnerContainer}>
+            <ThemedText type="label">Bid Winner</ThemedText>
+            <View style={styles.teamButtons}>
+              {currentGame.teams.map(team => (
+                <TouchableOpacity
+                  key={team.id}
+                  style={[
+                    styles.teamButton,
+                    {
+                      backgroundColor:
+                        bidTeamId === team.id
+                          ? styles.teamButtonPrimary.backgroundColor
+                          : styles.teamButtonSecondary.backgroundColor,
+                      borderColor:
+                        bidTeamId === team.id
+                          ? styles.teamButtonPrimary.borderColor
+                          : styles.teamButtonSecondary.borderColor,
+                    },
+                  ]}
+                  onPress={() => setBidTeamId(team.id)}
+                >
+                  <ThemedText
+                    style={[
+                      styles.teamButtonTextPrimary,
+                      {
+                        color:
+                          bidTeamId === team.id
+                            ? styles.teamButtonTextPrimary.color
+                            : styles.teamButtonTextSecondary.color,
+                      },
+                    ]}
+                  >
+                    {team.name}
+                  </ThemedText>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
 
         <ThemedButton
           title="Submit Bid"
@@ -525,6 +539,20 @@ const styles = StyleSheet.create({
   } as TextStyle,
   scoreHeader: {
     marginBottom: Theme.spacing.xl,
+    padding: Theme.spacing.md,
+    backgroundColor: Theme.colors.card.background,
+    borderRadius: Theme.borderRadius.md,
+    ...Platform.select({
+      ios: {
+        shadowColor: Theme.colors.card.shadow,
+        shadowOffset: {width: 2, height: 3},
+        shadowOpacity: 0.6,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   } as ViewStyle,
   teamScore: {
     flexDirection: 'row',
@@ -557,10 +585,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   } as ViewStyle,
   teamButton: {
-    paddingVertical: Theme.spacing.xs,
+    height: Theme.input.height,
     paddingHorizontal: Theme.spacing.md,
     borderRadius: Theme.borderRadius.sm,
     borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   } as ViewStyle,
   teamButtonPrimary: {
     backgroundColor: Theme.colors.button.primary,
@@ -585,11 +615,11 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.xs,
   } as TextStyle,
   input: {
-    height: 40,
+    height: Theme.input.height,
     borderWidth: 1,
     borderRadius: Theme.borderRadius.sm,
     paddingHorizontal: Theme.spacing.sm,
-    fontSize: Theme.typography.fontSizes.sm,
+    fontSize: Theme.typography.fontSizes.lg,
   } as TextStyle,
   inputThemed: {
     backgroundColor: Theme.colors.input.background,
@@ -649,5 +679,28 @@ const styles = StyleSheet.create({
   } as TextStyle,
   buttonContainer: {
     gap: Theme.spacing.md,
+  } as ViewStyle,
+  bidInputRow: {
+    flexDirection: 'row',
+    gap: Theme.spacing.md,
+    marginBottom: Theme.spacing.md,
+  } as ViewStyle,
+
+  bidAmountContainer: {
+    flex: 1,
+  } as ViewStyle,
+
+  bidAmountInput: {
+    height: Theme.input.height,
+    width: 80,
+    borderWidth: 1,
+    borderRadius: Theme.borderRadius.sm,
+    paddingHorizontal: Theme.spacing.sm,
+    fontSize: Theme.typography.fontSizes.lg,
+    textAlign: 'center',
+  } as TextStyle,
+
+  bidWinnerContainer: {
+    flex: 2,
   } as ViewStyle,
 });

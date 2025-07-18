@@ -10,7 +10,6 @@ import {
   ViewStyle,
 } from 'react-native';
 import {ThemedButton} from '../../components/ThemedButton';
-import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
 import {useGame} from '../../contexts/GameContext';
 
@@ -41,7 +40,6 @@ export default function NewGameScreen() {
     <ScrollView style={[styles.container, styles.containerThemed]}>
       <View style={styles.form}>
         <View style={styles.inputGroup}>
-          <ThemedText type="label">Team 1 Name</ThemedText>
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team1Name}
@@ -52,7 +50,6 @@ export default function NewGameScreen() {
         </View>
 
         <View style={styles.inputGroup}>
-          <ThemedText type="label">Team 2 Name</ThemedText>
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team2Name}
@@ -88,11 +85,11 @@ const styles = StyleSheet.create({
     gap: Theme.spacing.xs,
   } as ViewStyle,
   input: {
-    height: Theme.spacing.xl,
+    height: Theme.input.height,
     borderWidth: 1,
     borderRadius: Theme.borderRadius.sm,
     paddingHorizontal: Theme.spacing.sm,
-    fontSize: Theme.typography.fontSizes.sm,
+    fontSize: Theme.typography.fontSizes.lg,
   } as TextStyle,
   inputThemed: {
     backgroundColor: Theme.colors.input.background,
