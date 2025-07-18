@@ -1,91 +1,134 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Game, GameSettings, StorageKeys } from '../types/game';
+import {Game} from '../types/game';
 
-const STORAGE_KEYS: StorageKeys = {
+const STORAGE_KEYS = {
   CURRENT_GAME: 'pinochle_current_game',
   GAME_HISTORY: 'pinochle_game_history',
-  GAME_SETTINGS: 'pinochle_game_settings',
 };
 
-export const saveCurrentGame = async (game: Game): Promise<void> => {
+// Add backup functionality
+export const backupData = async () => {
   try {
-    await AsyncStorage.setItem(STORAGE_KEYS.CURRENT_GAME, JSON.stringify(game));
+    const currentGame = await AsyncStorage.getItem(STORAGE_KEYS.CURRENT_GAME);
+    const gameHistory = await AsyncStorage.getItem(STORAGE_KEYS.GAME_HISTORY);
+
+    // Store backup with timestamp
+    const backup = {
+      timestamp: Date.now(),
+      currentGame: currentGame ? JSON.parse(currentGame) : null,
+      gameHistory: gameHistory ? JSON.parse(gameHistory) : [],
+    };
+
+    await AsyncStorage.setItem('pinochle_data_backup', JSON.stringify(backup));
+    return true;
   } catch (error) {
-    console.error('Error saving current game:', error);
-    throw error;
+    console.error('Error creating backup:', error);
+    return false;
+  }
+};
+
+// Add restore functionality
+export const restoreFromBackup = async () => {
+  try {
+    const backupData = await AsyncStorage.getItem('pinochle_data_backup');
+    if (!backupData) return false;
+
+    const backup = JSON.parse(backupData);
+    if (backup.currentGame) {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.CURRENT_GAME,
+        JSON.stringify(backup.currentGame),
+      );
+    }
+    if (backup.gameHistory) {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.GAME_HISTORY,
+        JSON.stringify(backup.gameHistory),
+      );
+    }
+    return true;
+  } catch (error) {
+    console.error('Error restoring from backup:', error);
+    return false;
   }
 };
 
 export const getCurrentGame = async (): Promise<Game | null> => {
   try {
-    const gameString = await AsyncStorage.getItem(STORAGE_KEYS.CURRENT_GAME);
-    return gameString ? JSON.parse(gameString) : null;
+    const gameData = await AsyncStorage.getItem(STORAGE_KEYS.CURRENT_GAME);
+    return gameData ? JSON.parse(gameData) : null;
   } catch (error) {
     console.error('Error getting current game:', error);
-    throw error;
+    // Try to restore from backup
+    const restored = await restoreFromBackup();
+    if (restored) {
+      return getCurrentGame();
+    }
+    return null;
   }
 };
 
-export const saveGameToHistory = async (game: Game): Promise<void> => {
+export const setCurrentGame = async (game: Game | null): Promise<void> => {
   try {
-    const historyString = await AsyncStorage.getItem(STORAGE_KEYS.GAME_HISTORY);
-    const history: Game[] = historyString ? JSON.parse(historyString) : [];
-    history.push(game);
-    await AsyncStorage.setItem(STORAGE_KEYS.GAME_HISTORY, JSON.stringify(history));
+    if (game) {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.CURRENT_GAME,
+        JSON.stringify(game),
+      );
+    } else {
+      await AsyncStorage.removeItem(STORAGE_KEYS.CURRENT_GAME);
+    }
+    // Create backup after successful save
+    await backupData();
   } catch (error) {
-    console.error('Error saving game to history:', error);
+    console.error('Error setting current game:', error);
     throw error;
   }
 };
 
 export const getGameHistory = async (): Promise<Game[]> => {
   try {
-    const historyString = await AsyncStorage.getItem(STORAGE_KEYS.GAME_HISTORY);
-    return historyString ? JSON.parse(historyString) : [];
+    const historyData = await AsyncStorage.getItem(STORAGE_KEYS.GAME_HISTORY);
+    return historyData ? JSON.parse(historyData) : [];
   } catch (error) {
     console.error('Error getting game history:', error);
-    throw error;
-  }
-};
-
-export const saveGameSettings = async (settings: GameSettings): Promise<void> => {
-  try {
-    await AsyncStorage.setItem(STORAGE_KEYS.GAME_SETTINGS, JSON.stringify(settings));
-  } catch (error) {
-    console.error('Error saving game settings:', error);
-    throw error;
-  }
-};
-
-export const getGameSettings = async (): Promise<GameSettings | null> => {
-  try {
-    const settingsString = await AsyncStorage.getItem(STORAGE_KEYS.GAME_SETTINGS);
-    return settingsString ? JSON.parse(settingsString) : null;
-  } catch (error) {
-    console.error('Error getting game settings:', error);
-    throw error;
-  }
-};
-
-export const clearCurrentGame = async (): Promise<void> => {
-  try {
-    await AsyncStorage.removeItem(STORAGE_KEYS.CURRENT_GAME);
-  } catch (error) {
-    console.error('Error clearing current game:', error);
-    throw error;
+    // Try to restore from backup
+    const restored = await restoreFromBackup();
+    if (restored) {
+      return getGameHistory();
+    }
+    return [];
   }
 };
 
 export const saveGameHistory = async (games: Game[]): Promise<void> => {
   try {
-    await AsyncStorage.setItem(STORAGE_KEYS.GAME_HISTORY, JSON.stringify(games));
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.GAME_HISTORY,
+      JSON.stringify(games),
+    );
+    // Create backup after successful save
+    await backupData();
   } catch (error) {
     console.error('Error saving game history:', error);
     throw error;
   }
 };
 
-export const deleteGamesFromHistory = async (gameIds: string[]): Promise<void> => {
+export const addGameToHistory = async (game: Game): Promise<void> => {
+  try {
+    const history = await getGameHistory();
+    history.push(game);
+    await saveGameHistory(history);
+  } catch (error) {
+    console.error('Error adding game to history:', error);
+    throw error;
+  }
+};
+
+export const deleteGamesFromHistory = async (
+  gameIds: string[],
+): Promise<void> => {
   try {
     const history = await getGameHistory();
     const updatedHistory = history.filter(game => !gameIds.includes(game.id));
@@ -94,4 +137,4 @@ export const deleteGamesFromHistory = async (gameIds: string[]): Promise<void> =
     console.error('Error deleting games from history:', error);
     throw error;
   }
-}; 
+};

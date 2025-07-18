@@ -29,24 +29,20 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   default: {
     backgroundColor: Theme.colors.background,
-    borderWidth: 1,
-    borderColor: Theme.colors.border + '20', // very transparent border
   } as ViewStyle,
   card: {
     backgroundColor: Theme.colors.card.background,
-    borderWidth: 1,
-    borderColor: Theme.colors.card.border,
     borderRadius: Theme.borderRadius.md,
     padding: Theme.spacing.md,
     ...Platform.select({
       ios: {
         shadowColor: Theme.colors.card.shadow,
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        shadowOffset: {width: 2, height: 3},
+        shadowOpacity: 0.6,
+        shadowRadius: 6,
       },
       android: {
-        elevation: 5,
+        elevation: 8,
       },
     }),
   } as ViewStyle,

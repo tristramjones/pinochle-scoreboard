@@ -1,7 +1,12 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {Alert} from 'react-native';
-import {Game, GameSettings, Round, Team} from '../types/game';
-import {calculateTeamScores} from '../utils/scoring';
+import {Game, GameSettings, Round} from '../types/game';
 import * as Storage from '../utils/storage';
 
 interface GameContextType {
@@ -22,52 +27,48 @@ export const useGame = () => {
   return context;
 };
 
-export const GameProvider: React.FC<{children: React.ReactNode}> = ({
-  children,
-}) => {
+export function GameProvider({children}: {children: React.ReactNode}) {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
+  // Load current game on mount
   useEffect(() => {
+    const loadCurrentGame = async () => {
+      try {
+        const game = await Storage.getCurrentGame();
+        setCurrentGame(game);
+      } catch (error) {
+        console.error('Error loading current game:', error);
+        Alert.alert(
+          'Error',
+          'There was an error loading your game. Would you like to try restoring from backup?',
+          [
+            {
+              text: 'Yes',
+              onPress: async () => {
+                const restored = await Storage.restoreFromBackup();
+                if (restored) {
+                  const game = await Storage.getCurrentGame();
+                  setCurrentGame(game);
+                  Alert.alert('Success', 'Game data restored from backup');
+                } else {
+                  Alert.alert('Error', 'Could not restore from backup');
+                }
+              },
+            },
+            {text: 'No'},
+          ],
+        );
+      }
+    };
+
     loadCurrentGame();
   }, []);
 
-  const loadCurrentGame = async () => {
+  const startNewGame = useCallback(async (settings: GameSettings) => {
     try {
-      const game = await Storage.getCurrentGame();
-      console.log('Loaded current game:', game ? 'exists' : 'null');
-      if (game) {
-        const scores = calculateTeamScores(game);
-        console.log('Current game scores:', scores);
-      }
-      setCurrentGame(game);
-    } catch (error) {
-      console.error('Error loading current game:', error);
-      Alert.alert('Error', 'Failed to load game data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const startNewGame = async (settings: GameSettings) => {
-    try {
-      // First check if there's really a current game
-      const existingGame = await Storage.getCurrentGame();
-      console.log(
-        'Starting new game, existing game:',
-        existingGame ? 'exists' : 'null',
-      );
-
-      if (existingGame) {
-        // Save it to history before starting new game
-        await Storage.saveGameToHistory(existingGame);
-        await Storage.clearCurrentGame();
-      }
-
-      const teams: Team[] = settings.teamNames.map((name, index) => ({
+      const teams = settings.teamNames.map((name, index) => ({
         id: `team-${index + 1}`,
         name,
-        players: [],
       }));
 
       const newGame: Game = {
@@ -78,104 +79,49 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({
         timestamp: Date.now(),
       };
 
-      await Storage.saveCurrentGame(newGame);
-      console.log('New game created and saved');
+      await Storage.setCurrentGame(newGame);
       setCurrentGame(newGame);
     } catch (error) {
       console.error('Error starting new game:', error);
-      Alert.alert('Error', 'Failed to start new game');
       throw error;
     }
-  };
+  }, []);
 
-  const addRound = async (roundData: Omit<Round, 'id' | 'timestamp'>) => {
-    if (!currentGame) return;
+  const addRound = useCallback(
+    async (roundData: Round) => {
+      if (!currentGame) return;
 
-    try {
-      const newRound: Round = {
-        ...roundData,
-        id: `round-${currentGame.rounds.length + 1}`,
-        timestamp: Date.now(),
-      };
+      try {
+        const updatedGame = {
+          ...currentGame,
+          rounds: [...currentGame.rounds, roundData],
+        };
 
-      const updatedGame: Game = {
-        ...currentGame,
-        rounds: [...currentGame.rounds, newRound],
-      };
-
-      // Calculate scores before saving
-      const teamScores = calculateTeamScores(updatedGame);
-      console.log('Team scores after round:', teamScores);
-
-      // Save the updated game first
-      await Storage.saveCurrentGame(updatedGame);
-      setCurrentGame(updatedGame);
-
-      // Check if game is over
-      const winningTeam = Object.entries(teamScores).find(
-        ([_, score]) => score >= updatedGame.winningScore,
-      );
-
-      if (winningTeam) {
-        console.log(
-          'Game over - winning team:',
-          winningTeam[0],
-          'with score:',
-          winningTeam[1],
-        );
-        // The game will be ended after the victory screen is shown
-        // The VictoryScreen component will navigate to the games screen
-        // which will trigger the useEffect in GamesScreen to reload games
-        setTimeout(async () => {
-          try {
-            await endGame(updatedGame);
-          } catch (error) {
-            console.error('Error ending game:', error);
-          }
-        }, 3500); // Slightly longer than the victory screen duration
+        await Storage.setCurrentGame(updatedGame);
+        setCurrentGame(updatedGame);
+      } catch (error) {
+        console.error('Error adding round:', error);
+        throw error;
       }
-    } catch (error) {
-      console.error('Error adding round:', error);
-      Alert.alert('Error', 'Failed to add round');
-      throw error;
-    }
-  };
+    },
+    [currentGame],
+  );
 
-  const endGame = async (finalGameState?: Game) => {
-    const gameToEnd = finalGameState || currentGame;
-    if (!gameToEnd) {
-      console.log('No game to end');
-      return;
-    }
-
+  const endGame = useCallback(async (game: Game) => {
     try {
-      const finalScores = calculateTeamScores(gameToEnd);
-      console.log('Ending game:', gameToEnd.id);
-      console.log('Final scores:', finalScores);
-
-      // Save to history first
-      await Storage.saveGameToHistory(gameToEnd);
-      console.log('Game saved to history');
-
-      // Then clear current game
-      await Storage.clearCurrentGame();
-      console.log('Current game cleared');
-
-      // Finally update state
+      await Storage.addGameToHistory(game);
+      await Storage.setCurrentGame(null);
       setCurrentGame(null);
-      console.log('Game ended successfully');
     } catch (error) {
       console.error('Error ending game:', error);
-      Alert.alert('Error', 'Failed to end game');
       throw error;
     }
-  };
+  }, []);
 
   return (
     <GameContext.Provider
       value={{
         currentGame,
-        isLoading,
         startNewGame,
         addRound,
         endGame,
@@ -184,4 +130,4 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({
       {children}
     </GameContext.Provider>
   );
-};
+}

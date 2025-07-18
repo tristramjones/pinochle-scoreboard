@@ -11,6 +11,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import {BackgroundPattern} from '../../components/BackgroundPattern';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
@@ -155,133 +156,118 @@ export default function GamesScreen() {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, styles.containerThemed]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.section}>
-        <ThemedText type="heading" style={styles.sectionTitle}>
-          Current Game
-        </ThemedText>
-        {currentGame ? (
-          renderGameCard(currentGame)
-        ) : (
-          <View
-            style={[
-              styles.emptyStateCard,
-              {backgroundColor: theme.colors.surface},
-            ]}
-          >
-            <ThemedText
-              type="label"
-              style={[
-                styles.emptyStateText,
-                {color: theme.colors.textSecondary},
-              ]}
-            >
+    <BackgroundPattern>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.section}>
+          <ThemedText type="heading" style={styles.sectionTitle}>
+            Current Game
+          </ThemedText>
+          {currentGame ? (
+            renderGameCard(currentGame)
+          ) : (
+            <ThemedText type="subtitle" style={styles.emptyStateText}>
               No game in progress
             </ThemedText>
+          )}
+          <ThemedButton
+            title="New Game"
+            onPress={() => router.push('/games/new')}
+            variant="primary"
+            size="md"
+            style={{marginTop: theme.spacing.sm}}
+          />
+        </View>
+
+        {completedGames.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <ThemedText type="heading" style={styles.sectionTitle}>
+                Completed Games
+              </ThemedText>
+              <View style={styles.completedGamesActions}>
+                {isDeleting ? (
+                  <>
+                    <TouchableOpacity
+                      style={[
+                        styles.actionButton,
+                        {backgroundColor: theme.colors.primary},
+                      ]}
+                      onPress={toggleSelectAll}
+                    >
+                      <ThemedText
+                        style={[
+                          styles.actionButtonText,
+                          {color: theme.colors.button.text},
+                        ]}
+                      >
+                        {selectedGames.length === completedGames.length
+                          ? 'Deselect All'
+                          : 'Select All'}
+                      </ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.actionButton,
+                        {backgroundColor: theme.colors.textSecondary},
+                      ]}
+                      onPress={() => {
+                        setIsDeleting(false);
+                        setSelectedGames([]);
+                      }}
+                    >
+                      <ThemedText
+                        style={[
+                          styles.actionButtonText,
+                          {color: theme.colors.button.text},
+                        ]}
+                      >
+                        Cancel
+                      </ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.actionButton,
+                        {backgroundColor: theme.colors.error},
+                      ]}
+                      onPress={handleDeleteSelected}
+                      disabled={selectedGames.length === 0}
+                    >
+                      <ThemedText
+                        style={[
+                          styles.actionButtonText,
+                          {color: theme.colors.button.text},
+                        ]}
+                      >
+                        Delete
+                      </ThemedText>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <ThemedButton
+                    title="Delete Games"
+                    onPress={() => setIsDeleting(true)}
+                    variant="secondary"
+                    size="sm"
+                  />
+                )}
+              </View>
+            </View>
+            {completedGames.map(game => renderGameCard(game, true))}
           </View>
         )}
-        <ThemedButton
-          title="New Game"
-          onPress={() => router.push('/games/new')}
-          variant="primary"
-          size="md"
-          style={{marginTop: theme.spacing.sm}}
-        />
-      </View>
-
-      {completedGames.length > 0 && (
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <ThemedText type="heading" style={styles.sectionTitle}>
-              Completed Games
-            </ThemedText>
-            <View style={styles.completedGamesActions}>
-              {isDeleting ? (
-                <>
-                  <TouchableOpacity
-                    style={[
-                      styles.actionButton,
-                      {backgroundColor: theme.colors.primary},
-                    ]}
-                    onPress={toggleSelectAll}
-                  >
-                    <ThemedText
-                      style={[
-                        styles.actionButtonText,
-                        {color: theme.colors.button.text},
-                      ]}
-                    >
-                      {selectedGames.length === completedGames.length
-                        ? 'Deselect All'
-                        : 'Select All'}
-                    </ThemedText>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.actionButton,
-                      {backgroundColor: theme.colors.textSecondary},
-                    ]}
-                    onPress={() => {
-                      setIsDeleting(false);
-                      setSelectedGames([]);
-                    }}
-                  >
-                    <ThemedText
-                      style={[
-                        styles.actionButtonText,
-                        {color: theme.colors.button.text},
-                      ]}
-                    >
-                      Cancel
-                    </ThemedText>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.actionButton,
-                      {backgroundColor: theme.colors.error},
-                    ]}
-                    onPress={handleDeleteSelected}
-                    disabled={selectedGames.length === 0}
-                  >
-                    <ThemedText
-                      style={[
-                        styles.actionButtonText,
-                        {color: theme.colors.button.text},
-                      ]}
-                    >
-                      Delete
-                    </ThemedText>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <ThemedButton
-                  title="Delete Games"
-                  onPress={() => setIsDeleting(true)}
-                  variant="secondary"
-                  size="sm"
-                />
-              )}
-            </View>
-          </View>
-          {completedGames.map(game => renderGameCard(game, true))}
-        </View>
-      )}
-    </ScrollView>
+      </ScrollView>
+    </BackgroundPattern>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Theme.spacing.md,
-  } as ViewStyle,
-  containerThemed: {
-    backgroundColor: Theme.colors.background,
   } as ViewStyle,
   section: {
     marginBottom: Theme.spacing.md,
@@ -367,6 +353,9 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   emptyStateText: {
     textAlign: 'center',
+    marginVertical: Theme.spacing.xl,
+    fontSize: Theme.typography.fontSizes.lg,
+    color: Theme.colors.textSecondary,
   } as TextStyle,
   completedGamesActions: {
     flexDirection: 'row',

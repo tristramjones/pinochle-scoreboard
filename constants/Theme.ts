@@ -15,8 +15,9 @@ export const Theme = {
     },
 
     // Background colors
-    background: '#E8D5B0', // aged parchment
-    surface: '#E2CCA3', // darker parchment
+    background: '#F2E4B6', // warm yellow parchment
+    backgroundGrain: '#E8D5A0', // slightly darker for texture
+    surface: '#F7EAC3', // lighter warm parchment
 
     // Text colors
     text: '#1C3823', // forest green
@@ -29,18 +30,18 @@ export const Theme = {
 
     // Component specific
     card: {
-      background: '#E8D5B0', // aged parchment
+      background: '#F7EAC3', // light warm parchment
       border: '#8B3A2B', // burgundy
       shadow: '#1C382348', // semi-transparent green
     },
     button: {
       primary: '#1C3823', // forest green
-      secondary: '#E8D5B0', // parchment
-      text: '#E8D5B0', // parchment
+      secondary: '#F7EAC3', // parchment
+      text: '#F7EAC3', // parchment
       textSecondary: '#1C3823', // forest green
     },
     input: {
-      background: '#E8D5B0', // parchment
+      background: '#F7EAC3', // parchment
       border: '#8B3A2B', // burgundy
       text: '#1C3823', // forest green
       placeholder: '#8B3A2B80', // semi-transparent burgundy
