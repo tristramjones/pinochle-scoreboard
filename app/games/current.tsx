@@ -166,7 +166,6 @@ export default function CurrentGameScreen() {
 
   const renderBidPhase = () => (
     <View style={styles.phaseContainer}>
-      <ThemedText type="heading">Phase 1: Bid</ThemedText>
       <View style={styles.bidSection}>
         <ThemedText type="label">Bid Winner</ThemedText>
         <View style={styles.teamButtons}>
@@ -227,8 +226,6 @@ export default function CurrentGameScreen() {
 
   const renderMeldPhase = () => (
     <View style={styles.phaseContainer}>
-      <ThemedText type="heading">Phase 2: Meld</ThemedText>
-
       <View style={styles.teamButtons}>
         <TouchableOpacity
           style={[
