@@ -93,6 +93,9 @@ export const Theme = {
   input: {
     height: 40,
   },
+  button: {
+    height: 48,
+  },
   animation: {
     duration: {
       fast: 200,

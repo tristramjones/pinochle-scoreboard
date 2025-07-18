@@ -241,7 +241,7 @@ export default function CurrentGameScreen() {
                 <TouchableOpacity
                   key={team.id}
                   style={[
-                    styles.teamButton,
+                    styles.bidTeamButton,
                     {
                       backgroundColor:
                         bidTeamId === team.id
@@ -286,71 +286,74 @@ export default function CurrentGameScreen() {
 
   const renderMeldPhase = () => (
     <View style={styles.phaseContainer}>
-      <View style={styles.teamButtons}>
-        <TouchableOpacity
-          style={[
-            styles.teamButton,
-            {
-              backgroundColor: moonShotAttempted
-                ? styles.teamButtonPrimary.backgroundColor
-                : styles.teamButtonSecondary.backgroundColor,
-              borderColor: moonShotAttempted
-                ? styles.teamButtonPrimary.borderColor
-                : styles.teamButtonSecondary.borderColor,
-            },
-          ]}
-          onPress={() => {
-            setMoonShotAttempted(true);
-            setPhase('tricks');
-          }}
-        >
-          <ThemedText
-            style={[
-              styles.teamButtonTextPrimary,
-              {
-                color: moonShotAttempted
-                  ? styles.teamButtonTextPrimary.color
-                  : styles.teamButtonTextSecondary.color,
-              },
-            ]}
-          >
-            Shoot the Moon
-          </ThemedText>
-        </TouchableOpacity>
-      </View>
-
       {!moonShotAttempted && (
         <>
           {currentGame.teams.map(team => (
             <View key={team.id} style={styles.teamInput}>
-              <ThemedText type="label">{team.name}</ThemedText>
+              <ThemedText type="subtitle" style={styles.meldTeamName}>
+                {team.name}
+              </ThemedText>
               <View style={styles.pointsInput}>
-                <View style={styles.inputGroup}>
-                  <ThemedText type="label">Meld Points</ThemedText>
-                  <TextInput
-                    style={[styles.input, styles.inputThemed]}
-                    value={meldPoints[team.id] || ''}
-                    onChangeText={value =>
-                      setMeldPoints(prev => ({...prev, [team.id]: value}))
-                    }
-                    keyboardType="number-pad"
-                    placeholder="Enter meld points"
-                    placeholderTextColor={theme.colors.input.placeholder}
-                  />
-                </View>
+                <TextInput
+                  style={[styles.input, styles.inputThemed]}
+                  value={meldPoints[team.id] || ''}
+                  onChangeText={value =>
+                    setMeldPoints(prev => ({...prev, [team.id]: value}))
+                  }
+                  keyboardType="number-pad"
+                  placeholder="Enter meld points"
+                  placeholderTextColor={theme.colors.input.placeholder}
+                />
               </View>
             </View>
           ))}
-        </>
-      )}
 
-      {!moonShotAttempted && (
-        <ThemedButton
-          title="Submit Meld"
-          onPress={handleSubmitMeld}
-          variant="primary"
-          size="md"
-        />
+          <View style={styles.meldActions}>
+            <ThemedButton
+              title="Submit Meld"
+              onPress={handleSubmitMeld}
+              variant="primary"
+              size="md"
+            />
+
+            <View style={styles.orDivider}>
+              <ThemedText type="subtitle" style={styles.orText}>
+                or
+              </ThemedText>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.teamButton,
+                {
+                  backgroundColor: moonShotAttempted
+                    ? styles.teamButtonPrimary.backgroundColor
+                    : styles.teamButtonSecondary.backgroundColor,
+                  borderColor: moonShotAttempted
+                    ? styles.teamButtonPrimary.borderColor
+                    : styles.teamButtonSecondary.borderColor,
+                },
+              ]}
+              onPress={() => {
+                setMoonShotAttempted(true);
+                setPhase('tricks');
+              }}
+            >
+              <ThemedText
+                style={[
+                  styles.buttonText,
+                  {
+                    color: moonShotAttempted
+                      ? Theme.colors.button.text
+                      : Theme.colors.button.textSecondary,
+                  },
+                ]}
+              >
+                Shoot the Moon
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
     </View>
   );
@@ -372,17 +375,13 @@ export default function CurrentGameScreen() {
 
     return (
       <View style={styles.phaseContainer}>
-        <ThemedText type="heading">
-          {moonShotAttempted ? 'Moon Shot Result' : 'Phase 3: Tricks'}
-        </ThemedText>
-
         {moonShotAttempted ? (
-          <>
-            <ThemedText type="label">
+          <View style={styles.moonShotResult}>
+            <ThemedText type="subtitle" style={styles.moonShotQuestion}>
               Did {currentGame.teams.find(t => t.id === bidTeamId)?.name} make
               the moon shot?
             </ThemedText>
-            <View style={styles.teamButtons}>
+            <View style={styles.moonShotButtons}>
               <TouchableOpacity
                 style={[
                   styles.teamButton,
@@ -401,12 +400,12 @@ export default function CurrentGameScreen() {
               >
                 <ThemedText
                   style={[
-                    styles.teamButtonTextPrimary,
+                    styles.buttonText,
                     {
                       color:
                         trickPoints[bidTeamId!] === '1'
-                          ? styles.teamButtonTextPrimary.color
-                          : styles.teamButtonTextSecondary.color,
+                          ? Theme.colors.button.text
+                          : Theme.colors.button.textSecondary,
                     },
                   ]}
                 >
@@ -431,12 +430,12 @@ export default function CurrentGameScreen() {
               >
                 <ThemedText
                   style={[
-                    styles.teamButtonTextPrimary,
+                    styles.buttonText,
                     {
                       color:
                         trickPoints[bidTeamId!] === '0'
-                          ? styles.teamButtonTextPrimary.color
-                          : styles.teamButtonTextSecondary.color,
+                          ? Theme.colors.button.text
+                          : Theme.colors.button.textSecondary,
                     },
                   ]}
                 >
@@ -444,7 +443,7 @@ export default function CurrentGameScreen() {
                 </ThemedText>
               </TouchableOpacity>
             </View>
-          </>
+          </View>
         ) : (
           <>
             {currentGame.teams.map((team, index) => (
@@ -475,6 +474,7 @@ export default function CurrentGameScreen() {
           onPress={handleSubmitTricks}
           variant="primary"
           size="md"
+          style={styles.submitButton}
         />
       </View>
     );
@@ -483,15 +483,18 @@ export default function CurrentGameScreen() {
   return (
     <ScrollView style={[styles.container, styles.containerThemed]}>
       <View style={styles.scoreHeader}>
-        <ThemedText type="title">Current Game</ThemedText>
-        {currentGame.teams.map(team => (
-          <View key={team.id} style={styles.teamScore}>
-            <ThemedText type="label">{team.name}</ThemedText>
-            <ThemedText type="label">
-              Score: {calculateTeamScore(currentGame, team.id)}
-            </ThemedText>
-          </View>
-        ))}
+        <View style={styles.scoreboardTeams}>
+          {currentGame.teams.map(team => (
+            <View key={team.id} style={styles.teamScoreContainer}>
+              <ThemedText type="subtitle" style={styles.teamScoreName}>
+                {team.name}
+              </ThemedText>
+              <ThemedText type="title" style={styles.teamScoreValue}>
+                {calculateTeamScore(currentGame, team.id)}
+              </ThemedText>
+            </View>
+          ))}
+        </View>
       </View>
 
       <View style={styles.roundInput}>
@@ -526,7 +529,8 @@ export default function CurrentGameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Theme.spacing.sm,
+    padding: Theme.spacing.md,
+    marginBottom: Theme.spacing.xl,
   } as ViewStyle,
   containerThemed: {
     backgroundColor: Theme.colors.background,
@@ -539,7 +543,7 @@ const styles = StyleSheet.create({
   } as TextStyle,
   scoreHeader: {
     marginBottom: Theme.spacing.xl,
-    padding: Theme.spacing.md,
+    padding: Theme.spacing.lg,
     backgroundColor: Theme.colors.card.background,
     borderRadius: Theme.borderRadius.md,
     ...Platform.select({
@@ -554,6 +558,26 @@ const styles = StyleSheet.create({
       },
     }),
   } as ViewStyle,
+  scoreboardTeams: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  } as ViewStyle,
+  teamScoreContainer: {
+    alignItems: 'center',
+    gap: Theme.spacing.xs,
+  } as ViewStyle,
+  teamScoreName: {
+    fontSize: Theme.typography.fontSizes.lg,
+    color: Theme.colors.textSecondary,
+    textAlign: 'center',
+  } as TextStyle,
+  teamScoreValue: {
+    fontSize: Theme.typography.fontSizes.xxl,
+    fontFamily: Theme.typography.fonts.bold,
+    color: Theme.colors.text,
+    textAlign: 'center',
+  } as TextStyle,
   teamScore: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -585,7 +609,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   } as ViewStyle,
   teamButton: {
-    height: Theme.input.height,
+    height: Theme.button.height,
     paddingHorizontal: Theme.spacing.md,
     borderRadius: Theme.borderRadius.sm,
     borderWidth: 1,
@@ -633,12 +657,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   } as ViewStyle,
   buttonText: {
-    color: Theme.colors.button.text,
-    fontSize: Theme.typography.fontSizes.sm,
-    fontWeight: Theme.typography.fontWeights.semibold,
+    fontSize: Theme.typography.fontSizes.lg,
+    textAlign: 'center',
   } as TextStyle,
   teamInput: {
-    marginBottom: Theme.spacing.md,
+    marginBottom: Theme.spacing.lg,
   } as ViewStyle,
   teamName: {
     fontSize: Theme.typography.fontSizes.md,
@@ -702,5 +725,59 @@ const styles = StyleSheet.create({
 
   bidWinnerContainer: {
     flex: 2,
+  } as ViewStyle,
+
+  moonShotContainer: {
+    paddingVertical: Theme.spacing.xl,
+    alignItems: 'center',
+  } as ViewStyle,
+
+  meldTeamName: {
+    fontSize: Theme.typography.fontSizes.lg,
+    marginBottom: Theme.spacing.sm,
+    color: Theme.colors.text,
+  } as TextStyle,
+
+  meldActions: {
+    gap: Theme.spacing.md,
+    marginTop: Theme.spacing.lg,
+  } as ViewStyle,
+
+  orDivider: {
+    alignItems: 'center',
+    paddingVertical: Theme.spacing.xs,
+  } as ViewStyle,
+
+  orText: {
+    color: Theme.colors.textSecondary,
+  } as TextStyle,
+
+  bidTeamButton: {
+    height: Theme.input.height,
+    paddingHorizontal: Theme.spacing.md,
+    borderRadius: Theme.borderRadius.sm,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  } as ViewStyle,
+
+  moonShotResult: {
+    gap: Theme.spacing.xl,
+    marginBottom: Theme.spacing.xl,
+  } as ViewStyle,
+
+  moonShotQuestion: {
+    fontSize: Theme.typography.fontSizes.lg,
+    textAlign: 'center',
+    color: Theme.colors.text,
+    lineHeight:
+      Theme.typography.lineHeights.normal * Theme.typography.fontSizes.lg,
+  } as TextStyle,
+
+  moonShotButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: Theme.spacing.md,
+    marginBottom: Theme.spacing.xl,
   } as ViewStyle,
 });

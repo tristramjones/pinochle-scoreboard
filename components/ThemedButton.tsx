@@ -38,8 +38,7 @@ export function ThemedButton({
         variant === 'primary'
           ? theme.colors.button.primary
           : theme.colors.button.secondary,
-      paddingVertical:
-        theme.spacing[size === 'sm' ? 'xs' : size === 'lg' ? 'lg' : 'md'],
+      height: theme.button.height,
       paddingHorizontal:
         theme.spacing[size === 'sm' ? 'sm' : size === 'lg' ? 'xl' : 'lg'],
       borderRadius: theme.borderRadius[size === 'sm' ? 'sm' : 'md'],
