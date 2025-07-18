@@ -1,5 +1,4 @@
 import {Stack} from 'expo-router';
-import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
 
 export default function GamesLayout() {
@@ -14,9 +13,28 @@ export default function GamesLayout() {
       }}
     >
       <Stack.Screen
+        name="index"
+        options={{
+          headerShown: true,
+          headerTitle: '',
+        }}
+      />
+      <Stack.Screen
         name="[id]"
         options={{
-          headerTitle: () => <ThemedText>Game Details</ThemedText>,
+          headerTitle: '',
+        }}
+      />
+      <Stack.Screen
+        name="new"
+        options={{
+          headerTitle: '',
+        }}
+      />
+      <Stack.Screen
+        name="current"
+        options={{
+          headerTitle: '',
         }}
       />
     </Stack>

@@ -6,26 +6,20 @@ import React, {
   useState,
 } from 'react';
 import {Alert} from 'react-native';
-import {Game, GameSettings, Round} from '../types/game';
+import {Game, GameSettings, Round, Team} from '../types/game';
+import {calculateTeamScore} from '../utils/scoring';
 import * as Storage from '../utils/storage';
 
 interface GameContextType {
   currentGame: Game | null;
-  isLoading: boolean;
   startNewGame: (settings: GameSettings) => Promise<void>;
   addRound: (round: Omit<Round, 'id' | 'timestamp'>) => Promise<void>;
   endGame: (finalGameState?: Game) => Promise<void>;
 }
 
-const GameContext = createContext<GameContextType | undefined>(undefined);
-
-export const useGame = () => {
-  const context = useContext(GameContext);
-  if (!context) {
-    throw new Error('useGame must be used within a GameProvider');
-  }
-  return context;
-};
+export const GameContext = createContext<GameContextType | undefined>(
+  undefined,
+);
 
 export function GameProvider({children}: {children: React.ReactNode}) {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
@@ -66,9 +60,10 @@ export function GameProvider({children}: {children: React.ReactNode}) {
 
   const startNewGame = useCallback(async (settings: GameSettings) => {
     try {
-      const teams = settings.teamNames.map((name, index) => ({
+      const teams: Team[] = settings.teamNames.map((name, index) => ({
         id: `team-${index + 1}`,
         name,
+        players: [], // Empty players array since we don't use it
       }));
 
       const newGame: Game = {
@@ -87,47 +82,84 @@ export function GameProvider({children}: {children: React.ReactNode}) {
     }
   }, []);
 
-  const addRound = useCallback(
-    async (roundData: Round) => {
-      if (!currentGame) return;
-
+  const endGame = useCallback(
+    async (finalGameState?: Game) => {
       try {
-        const updatedGame = {
-          ...currentGame,
-          rounds: [...currentGame.rounds, roundData],
-        };
+        const gameToEnd = finalGameState || currentGame;
+        if (!gameToEnd) return;
 
-        await Storage.setCurrentGame(updatedGame);
-        setCurrentGame(updatedGame);
+        // First add to history
+        await Storage.addGameToHistory(gameToEnd);
+        // Then clear current game
+        await Storage.setCurrentGame(null);
+        // Finally update state
+        setCurrentGame(null);
       } catch (error) {
-        console.error('Error adding round:', error);
-        throw error;
+        console.error('Error ending game:', error);
+        Alert.alert('Error', 'Failed to end game. Please try again.');
       }
     },
     [currentGame],
   );
 
-  const endGame = useCallback(async (game: Game) => {
-    try {
-      await Storage.addGameToHistory(game);
-      await Storage.setCurrentGame(null);
-      setCurrentGame(null);
-    } catch (error) {
-      console.error('Error ending game:', error);
-      throw error;
-    }
-  }, []);
+  const addRound = useCallback(
+    async (roundData: Omit<Round, 'id' | 'timestamp'>) => {
+      if (!currentGame) return;
+
+      try {
+        const newRound: Round = {
+          ...roundData,
+          id: `round-${Date.now()}`,
+          timestamp: Date.now(),
+        };
+
+        const updatedGame = {
+          ...currentGame,
+          rounds: [...currentGame.rounds, newRound],
+        };
+
+        // Check if any team has won
+        const winningTeam = updatedGame.teams.find(team => {
+          const score = calculateTeamScore(updatedGame, team.id);
+          return score >= 1500;
+        });
+
+        if (winningTeam) {
+          // If there's a winning team, save the final state but don't update current game
+          await Storage.setCurrentGame(updatedGame);
+          // Give time for the victory screen to show, then end the game
+          setTimeout(() => {
+            endGame(updatedGame).catch(error => {
+              console.error('Error ending game after victory:', error);
+              Alert.alert('Error', 'Failed to end game. Please try again.');
+            });
+          }, 3500);
+        } else {
+          // If no winner, update normally
+          await Storage.setCurrentGame(updatedGame);
+          setCurrentGame(updatedGame);
+        }
+      } catch (error) {
+        console.error('Error adding round:', error);
+        Alert.alert('Error', 'Failed to add round. Please try again.');
+      }
+    },
+    [currentGame, endGame],
+  );
 
   return (
     <GameContext.Provider
-      value={{
-        currentGame,
-        startNewGame,
-        addRound,
-        endGame,
-      }}
+      value={{currentGame, startNewGame, addRound, endGame}}
     >
       {children}
     </GameContext.Provider>
   );
+}
+
+export function useGame() {
+  const context = useContext(GameContext);
+  if (context === undefined) {
+    throw new Error('useGame must be used within a GameProvider');
+  }
+  return context;
 }

@@ -1,3 +1,4 @@
+import {useFocusEffect} from '@react-navigation/native';
 import {useRouter} from 'expo-router';
 import React, {useCallback, useState} from 'react';
 import {
@@ -49,9 +50,12 @@ export default function GamesScreen() {
     }
   }, [loadCompletedGames]);
 
-  React.useEffect(() => {
-    loadCompletedGames();
-  }, [loadCompletedGames]);
+  // Load completed games on focus
+  useFocusEffect(
+    useCallback(() => {
+      loadCompletedGames();
+    }, [loadCompletedGames]),
+  );
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString();

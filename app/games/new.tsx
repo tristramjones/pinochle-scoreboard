@@ -22,7 +22,7 @@ export default function NewGameScreen() {
 
   const handleStartGame = async () => {
     if (!team1Name || !team2Name) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('Error', 'Please enter names for both teams');
       return;
     }
 
@@ -30,9 +30,10 @@ export default function NewGameScreen() {
       await startNewGame({
         teamNames: [team1Name, team2Name],
       });
-      router.back();
+      router.replace('/games/current');
     } catch (error) {
-      Alert.alert('Error', 'Failed to start new game');
+      console.error('Error starting game:', error);
+      Alert.alert('Error', 'Failed to start game');
     }
   };
 

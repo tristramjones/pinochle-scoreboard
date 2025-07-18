@@ -4,7 +4,6 @@ import React, {useEffect, useRef} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import {Theme} from '../constants/Theme';
-import {useTheme} from '../hooks/useTheme';
 import {ThemedText} from './ThemedText';
 
 interface VictoryScreenProps {
@@ -17,7 +16,6 @@ interface VictoryScreenProps {
 export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
   const router = useRouter();
   const opacity = useRef(new Animated.Value(0)).current;
-  const theme = useTheme();
 
   useEffect(() => {
     // Play haptic feedback

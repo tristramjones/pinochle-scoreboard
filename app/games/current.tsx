@@ -24,7 +24,7 @@ type RoundPhase = 'bid' | 'meld' | 'tricks';
 
 export default function CurrentGameScreen() {
   const theme = useTheme();
-  const {currentGame, addRound} = useGame();
+  const {currentGame, addRound, endGame} = useGame();
 
   const router = useRouter();
   const [phase, setPhase] = useState<RoundPhase>('bid');
@@ -43,6 +43,50 @@ export default function CurrentGameScreen() {
       <ThemedView style={styles.container}>
         <ThemedText type="title">No Current Game</ThemedText>
         <ThemedButton title="Back to Games" onPress={() => router.back()} />
+      </ThemedView>
+    );
+  }
+
+  // Check if game should have ended
+  const shouldHaveEnded = currentGame.teams.some(
+    team => calculateTeamScore(currentGame, team.id) >= 1500,
+  );
+
+  if (shouldHaveEnded) {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="subtitle" style={styles.errorText}>
+          This game has a winner but didn&apos;t end properly.
+        </ThemedText>
+        <View style={styles.buttonContainer}>
+          <ThemedButton
+            title="Force End Game"
+            onPress={async () => {
+              try {
+                const winningTeam = currentGame.teams.reduce((prev, curr) => {
+                  const prevScore = calculateTeamScore(currentGame, prev.id);
+                  const currScore = calculateTeamScore(currentGame, curr.id);
+                  return currScore > prevScore ? curr : prev;
+                });
+                const finalScore = calculateTeamScore(
+                  currentGame,
+                  winningTeam.id,
+                );
+                setWinningTeam({
+                  name: winningTeam.name,
+                  score: finalScore,
+                });
+                await endGame(currentGame);
+                router.replace('/games');
+              } catch (error) {
+                console.error('Error forcing game end:', error);
+                Alert.alert('Error', 'Failed to end game. Please try again.');
+              }
+            }}
+            variant="primary"
+          />
+          <ThemedButton title="Back to Games" onPress={() => router.back()} />
+        </View>
       </ThemedView>
     );
   }
@@ -598,5 +642,12 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   roundsContainer: {
     gap: Theme.spacing.sm,
+  } as ViewStyle,
+  errorText: {
+    marginVertical: Theme.spacing.md,
+    textAlign: 'center',
+  } as TextStyle,
+  buttonContainer: {
+    gap: Theme.spacing.md,
   } as ViewStyle,
 });

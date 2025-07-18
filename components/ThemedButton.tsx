@@ -55,10 +55,7 @@ export function ThemedButton({
         variant === 'primary'
           ? theme.colors.button.text
           : theme.colors.button.textSecondary,
-      fontSize:
-        theme.typography.fontSizes[
-          size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'
-        ],
+      fontSize: theme.typography.fontSizes['lg'],
     },
     textStyle,
   ];
@@ -77,5 +74,5 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-  },
+  } as TextStyle,
 });
