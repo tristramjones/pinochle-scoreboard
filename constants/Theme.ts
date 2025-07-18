@@ -5,40 +5,52 @@
 
 export const Theme = {
   colors: {
-    // Core colors
-    primary: '#1C3823', // Dark forest green from the image
-    background: '#F6E6D3', // Warm cream background from the image
-    surface: '#FFFFFF', // White for cards
-    text: '#1C3823', // Dark forest green for text
-    textSecondary: '#2D4A35', // Slightly lighter green
-    border: '#1C3823', // Dark green borders
-
-    // Status colors
-    success: '#2D4A35', // Forest green success
-    error: '#8B1E1E', // Deep red for errors
-    warning: '#8B4513', // Saddle brown for warnings
-
-    // Component specific
+    primary: '#1C3823', // deep forest green from the card
+    secondary: '#8B3A2B', // rich burgundy/rust red
+    background: '#E8D5B0', // aged parchment/gold
+    surface: '#E2CCA3', // slightly darker parchment for contrast
+    text: '#1C3823', // forest green for text
+    textSecondary: '#8B3A2B', // burgundy for secondary text
+    border: '#8B3A2B', // burgundy for borders
+    success: '#1C3823', // forest green
+    error: '#8B3A2B', // burgundy
+    warning: '#D4B355', // gold
     card: {
-      background: '#FFFFFF', // White background for cards
-      border: '#E8D5C0', // Light brown border from the image
-      shadow: 'rgba(28, 56, 35, 0.1)', // Semi-transparent green shadow
+      background: '#E8D5B0', // aged parchment
+      border: '#8B3A2B', // burgundy border
+      shadow: '#1C382348', // lighter shadow with 28% base opacity
     },
     button: {
-      primary: '#1C3823', // Dark forest green
-      secondary: '#F6E6D3', // Cream background
-      text: '#FFFFFF', // White text
-      textSecondary: '#1C3823', // Dark green text
+      primary: '#1C3823', // forest green
+      secondary: '#E8D5B0', // parchment
+      text: '#E8D5B0', // parchment text
+      textSecondary: '#1C3823', // forest green text
     },
     input: {
-      background: '#FFFFFF', // White
-      border: '#E8D5C0', // Light brown border
-      text: '#1C3823', // Dark green text
-      placeholder: '#2D4A35', // Lighter green
+      background: '#E8D5B0', // parchment
+      border: '#8B3A2B', // burgundy
+      text: '#1C3823', // forest green
+      placeholder: '#8B3A2B80', // semi-transparent burgundy
     },
     accent: {
-      burgundy: '#8B1E1E', // For special elements like the joker card
+      burgundy: '#8B3A2B',
+      green: '#1C3823',
+      gold: '#D4B355',
     },
+  },
+  patterns: {
+    background: `repeating-linear-gradient(
+      45deg,
+      #E6D5A7,
+      #E6D5A7 10px,
+      #E2D1A3 10px,
+      #E2D1A3 20px
+    )`, // subtle diagonal pattern
+    card: `linear-gradient(
+      to bottom right,
+      #F5EAC6,
+      #F0E2B6
+    )`, // subtle gradient for cards
   },
 
   typography: {

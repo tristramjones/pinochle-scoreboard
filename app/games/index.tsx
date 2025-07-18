@@ -98,7 +98,6 @@ export default function GamesScreen() {
         key={game.id}
         style={[
           styles.gameCard,
-          styles.gameCardThemed,
           selectedGames.includes(game.id) && styles.selectedGameCard,
         ]}
         onPress={() =>
@@ -297,25 +296,24 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.sm,
   } as TextStyle,
   gameCard: {
-    padding: Theme.spacing.md,
     borderRadius: Theme.borderRadius.md,
-    marginBottom: Theme.spacing.md,
-  } as ViewStyle,
-  gameCardThemed: {
+    padding: Theme.spacing.md,
     backgroundColor: Theme.colors.card.background,
-    shadowColor: Theme.colors.card.shadow,
+    marginBottom: Theme.spacing.md,
     ...Platform.select({
       ios: {
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowColor: Theme.colors.card.shadow,
+        shadowOffset: {width: 2, height: 3}, // More shadow on right and bottom
+        shadowOpacity: 0.6,
+        shadowRadius: 6, // Slightly smaller radius for more directional shadow
       },
       android: {
-        elevation: 4,
+        elevation: 8,
       },
     }),
   } as ViewStyle,
   selectedGameCard: {
+    backgroundColor: Theme.colors.surface,
     borderWidth: 2,
     borderColor: Theme.colors.primary,
   } as ViewStyle,

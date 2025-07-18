@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, StyleSheet, View} from 'react-native';
+import {Platform, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {Theme} from '../constants/Theme';
 import {Game} from '../types/game';
 import {Round} from '../types/round';
@@ -15,7 +15,7 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
   const bidWinningTeam = game.teams.find(team => team.id === round.bidWinner);
 
   return (
-    <View style={[styles.roundCard, styles.roundCardThemed]}>
+    <View style={styles.roundCard}>
       <View style={styles.roundHeader}>
         <ThemedText type="subtitle">Round {roundNumber}</ThemedText>
         <ThemedText type="label" style={styles.bidText}>
@@ -100,58 +100,50 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
 
 const styles = StyleSheet.create({
   roundCard: {
-    padding: Theme.spacing.md,
     borderRadius: Theme.borderRadius.md,
-    borderWidth: 1,
+    padding: Theme.spacing.md,
+    backgroundColor: Theme.colors.card.background,
     marginBottom: Theme.spacing.md,
-  },
-  roundCardThemed: {
-    backgroundColor: Theme.colors.background,
-    borderColor: Theme.colors.card.border,
     ...Platform.select({
       ios: {
-        ...Theme.shadows.lg,
-        shadowColor: Theme.colors.text,
+        shadowColor: Theme.colors.card.shadow,
+        shadowOffset: {width: 2, height: 3}, // More shadow on right and bottom
+        shadowOpacity: 0.6,
+        shadowRadius: 6, // Slightly smaller radius for more directional shadow
       },
       android: {
-        elevation: 6,
+        elevation: 8,
       },
     }),
-  },
+  } as ViewStyle,
   roundHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: Theme.spacing.md,
-    paddingBottom: Theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.card.border,
-  },
+  } as ViewStyle,
   bidText: {
     color: Theme.colors.textSecondary,
-  },
+  } as TextStyle,
   scoreTable: {
-    gap: Theme.spacing.xs,
-  },
+    gap: Theme.spacing.sm,
+  } as ViewStyle,
   tableRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: Theme.spacing.xs / 2,
-  },
+  } as ViewStyle,
   tableCell: {
     flex: 1,
     textAlign: 'center',
-  },
+  } as TextStyle,
   teamCell: {
-    flex: 2,
+    flex: 1.5,
     textAlign: 'left',
-  },
+  } as TextStyle,
   bidWinnerText: {
-    color: Theme.colors.primary,
-  },
+    color: Theme.colors.accent.burgundy,
+  } as TextStyle,
   boldText: {
-    fontSize: Theme.typography.fontSizes.sm,
-    lineHeight:
-      Theme.typography.fontSizes.sm * Theme.typography.lineHeights.normal,
-  },
+    fontFamily: Theme.typography.fonts.bold,
+  } as TextStyle,
 });
