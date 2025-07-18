@@ -512,7 +512,7 @@ export default function CurrentGameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Theme.spacing.md,
+    padding: Theme.spacing.sm,
   } as ViewStyle,
   containerThemed: {
     backgroundColor: Theme.colors.background,
