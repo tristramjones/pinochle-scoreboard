@@ -77,32 +77,53 @@ export default function CurrentGameScreen() {
     setPhase('tricks');
   };
 
-  const handleSubmitTricks = async () => {
-    if (!bidTeamId || !bidAmount) return;
+  const handleSubmitTricks = () => {
+    if (!currentGame || !bidTeamId) return;
 
+    if (moonShotAttempted) {
+      const roundData = {
+        id: `round-${Date.now()}`,
+        bidWinner: bidTeamId,
+        bid: parseInt(bidAmount),
+        meld: {},
+        trickPoints: {},
+        moonShotAttempted: true,
+        moonShotSuccessful: trickPoints[bidTeamId] === '1',
+      };
+
+      // Calculate the new score after moon shot
+      const bidTeam = currentGame.teams.find(team => team.id === bidTeamId);
+      if (bidTeam) {
+        const currentScore = calculateTeamScore(currentGame, bidTeamId);
+        const moonShotPoints = trickPoints[bidTeamId] === '1' ? 1500 : -1500;
+        const newScore = currentScore + moonShotPoints;
+
+        // Check if this would win the game
+        if (newScore >= 1500) {
+          setWinningTeam({
+            name: bidTeam.name,
+            score: newScore,
+          });
+        }
+      }
+
+      addRound(roundData);
+      return;
+    }
+
+    // Regular round handling
     const meldValues: {[key: string]: number} = {};
     const trickValues: {[key: string]: number} = {};
-    let totalTricks = 0;
 
-    if (!moonShotAttempted) {
-      for (const team of currentGame.teams) {
-        const meld = parseInt(meldPoints[team.id] || '0');
-        const tricks = parseInt(trickPoints[team.id] || '0');
-
-        if (isNaN(meld) || isNaN(tricks) || tricks < 0) {
-          Alert.alert('Error', 'Please enter valid points for all teams');
-          return;
-        }
-
-        meldValues[team.id] = meld;
-        trickValues[team.id] = tricks;
-        totalTricks += tricks;
-      }
-
-      if (totalTricks !== 250) {
-        Alert.alert('Error', 'Total trick points must equal 250');
+    for (const team of currentGame.teams) {
+      const meld = parseInt(meldPoints[team.id] || '0');
+      const tricks = parseInt(trickPoints[team.id] || '0');
+      if (isNaN(meld) || isNaN(tricks) || meld < 0 || tricks < 0) {
+        Alert.alert('Error', 'Please enter valid points for all teams');
         return;
       }
+      meldValues[team.id] = meld;
+      trickValues[team.id] = tricks;
     }
 
     const roundData = {
@@ -111,46 +132,27 @@ export default function CurrentGameScreen() {
       bid: parseInt(bidAmount),
       meld: meldValues,
       trickPoints: trickValues,
-      moonShotAttempted,
-      moonShotSuccessful: moonShotAttempted
-        ? trickPoints[bidTeamId] === '1'
-        : undefined,
-      timestamp: Date.now(),
+      moonShotAttempted: false,
     };
 
-    try {
-      await addRound(roundData);
+    // Check if this round would win the game
+    const bidTeam = currentGame.teams.find(team => team.id === bidTeamId);
+    if (bidTeam) {
+      const currentScore = calculateTeamScore(currentGame, bidTeamId);
+      const roundTotal = meldValues[bidTeamId] + trickValues[bidTeamId];
+      const newScore =
+        currentScore +
+        (roundTotal >= parseInt(bidAmount) ? roundTotal : -parseInt(bidAmount));
 
-      if (moonShotAttempted && trickPoints[bidTeamId] === '1') {
-        const bidWinnerTeam = currentGame.teams.find(t => t.id === bidTeamId);
-        // Calculate new total score after moon shot
-        const updatedGame = {
-          ...currentGame,
-          rounds: [...currentGame.rounds, roundData],
-        };
-        const newScore = calculateTeamScore(updatedGame, bidTeamId);
-
-        // Only trigger victory if total score is >= 1500
-        if (newScore >= 1500) {
-          setWinningTeam({
-            name: bidWinnerTeam!.name,
-            score: newScore,
-          });
-        }
+      if (newScore >= 1500) {
+        setWinningTeam({
+          name: bidTeam.name,
+          score: newScore,
+        });
       }
-
-      // Reset form if game isn't over
-      if (!winningTeam) {
-        setBidAmount('');
-        setBidTeamId(null);
-        setMeldPoints({});
-        setTrickPoints({});
-        setPhase('bid');
-        setMoonShotAttempted(false);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to submit round');
     }
+
+    addRound(roundData);
   };
 
   const calculateRequiredTricks = () => {

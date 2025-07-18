@@ -53,7 +53,15 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
           const runningScore = game.rounds
             .slice(0, roundNumber)
             .reduce((sum, r) => {
-              const roundPoints = r.meld[team.id] + r.trickPoints[team.id];
+              if (r.moonShotAttempted) {
+                if (r.bidWinner === team.id) {
+                  return sum + (r.moonShotSuccessful ? 1500 : -1500);
+                }
+                return sum;
+              }
+
+              const roundPoints =
+                (r.meld[team.id] || 0) + (r.trickPoints[team.id] || 0);
               if (r.bidWinner === team.id && roundPoints < r.bid) {
                 return sum - r.bid;
               }

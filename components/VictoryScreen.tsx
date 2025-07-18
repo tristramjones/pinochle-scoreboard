@@ -3,6 +3,7 @@ import {useRouter} from 'expo-router';
 import React, {useEffect, useRef} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import {Theme} from '../constants/Theme';
 import {useTheme} from '../hooks/useTheme';
 import {ThemedText} from './ThemedText';
 
@@ -25,14 +26,14 @@ export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
     // Fade in animation
     const fadeIn = Animated.timing(opacity, {
       toValue: 1,
-      duration: theme.animation.duration.normal,
+      duration: Theme.animation.duration.normal,
       useNativeDriver: true,
     });
 
     // Fade out animation
     const fadeOut = Animated.timing(opacity, {
       toValue: 0,
-      duration: theme.animation.duration.normal,
+      duration: Theme.animation.duration.normal,
       useNativeDriver: true,
     });
 
@@ -48,7 +49,7 @@ export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [opacity, router, theme.animation.duration.normal]);
+  }, [opacity, router]);
 
   return (
     <Animated.View
@@ -83,25 +84,24 @@ export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   content: {
     alignItems: 'center',
+    padding: Theme.spacing.lg,
   },
   title: {
-    marginBottom: 20,
+    marginBottom: Theme.spacing.md,
+    textAlign: 'center',
   },
   teamName: {
-    marginBottom: 16,
+    marginBottom: Theme.spacing.sm,
+    textAlign: 'center',
   },
   score: {
-    marginBottom: 8,
+    textAlign: 'center',
   },
 });

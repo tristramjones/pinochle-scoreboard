@@ -89,6 +89,13 @@ export const Theme = {
     lg: 16,
     full: 9999,
   },
+  animation: {
+    duration: {
+      fast: 200,
+      normal: 300,
+      slow: 500,
+    },
+  },
 };
 
 // Type definitions for theme
