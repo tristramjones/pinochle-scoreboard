@@ -10,7 +10,6 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {Collapsible} from '../../components/Collapsible';
 import {RoundCard} from '../../components/RoundCard';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
@@ -446,7 +445,10 @@ export default function CurrentGameScreen() {
       </View>
 
       {currentGame?.rounds?.length > 0 && (
-        <Collapsible title="Previous Rounds">
+        <View>
+          <ThemedText type="heading" style={styles.sectionTitle}>
+            Previous Rounds
+          </ThemedText>
           <View style={styles.roundsContainer}>
             {currentGame.rounds.map((round, index) => (
               <RoundCard
@@ -457,7 +459,7 @@ export default function CurrentGameScreen() {
               />
             ))}
           </View>
-        </Collapsible>
+        </View>
       )}
       {winningTeam && <VictoryScreen winningTeam={winningTeam} />}
     </ScrollView>
@@ -596,7 +598,6 @@ const styles = StyleSheet.create({
     marginTop: Theme.spacing.md,
   } as ViewStyle,
   roundsContainer: {
-    gap: Theme.spacing.md,
-    marginTop: Theme.spacing.md,
+    gap: Theme.spacing.sm,
   } as ViewStyle,
 });
