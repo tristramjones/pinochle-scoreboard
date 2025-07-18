@@ -19,6 +19,8 @@ export interface Round {
   trickPoints: {
     [teamId: string]: number;
   };
+  moonShotAttempted?: boolean;
+  moonShotSuccessful?: boolean;
   timestamp: number;
 }
 

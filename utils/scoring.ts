@@ -1,7 +1,14 @@
-import { Game } from '../types/game';
+import {Game} from '../types/game';
 
 export const calculateTeamScore = (game: Game, teamId: string): number => {
   return game.rounds.reduce((total, round) => {
+    if (round.moonShotAttempted) {
+      if (round.bidWinner === teamId) {
+        return total + (round.moonShotSuccessful ? 1500 : -1500);
+      }
+      return total;
+    }
+
     // Get base points (meld + tricks)
     const meldPoints = round.meld[teamId] || 0;
     const trickPoints = round.trickPoints[teamId] || 0;
@@ -24,10 +31,10 @@ export const calculateTeamScore = (game: Game, teamId: string): number => {
   }, 0);
 };
 
-export const calculateTeamScores = (game: Game): { [teamId: string]: number } => {
-  const scores: { [teamId: string]: number } = {};
+export const calculateTeamScores = (game: Game): {[teamId: string]: number} => {
+  const scores: {[teamId: string]: number} = {};
   game.teams.forEach(team => {
     scores[team.id] = calculateTeamScore(game, team.id);
   });
   return scores;
-}; 
+};

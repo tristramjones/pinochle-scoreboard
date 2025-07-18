@@ -37,6 +37,7 @@ export default function CurrentGameScreen() {
     name: string;
     score: number;
   } | null>(null);
+  const [moonShotAttempted, setMoonShotAttempted] = useState(false);
 
   if (!currentGame) {
     return (
@@ -84,74 +85,69 @@ export default function CurrentGameScreen() {
     const trickValues: {[key: string]: number} = {};
     let totalTricks = 0;
 
-    for (const team of currentGame.teams) {
-      const meld = parseInt(meldPoints[team.id] || '0');
-      const tricks = parseInt(trickPoints[team.id] || '0');
+    if (!moonShotAttempted) {
+      for (const team of currentGame.teams) {
+        const meld = parseInt(meldPoints[team.id] || '0');
+        const tricks = parseInt(trickPoints[team.id] || '0');
 
-      if (isNaN(meld) || isNaN(tricks) || tricks < 0) {
-        Alert.alert('Error', 'Please enter valid points for all teams');
+        if (isNaN(meld) || isNaN(tricks) || tricks < 0) {
+          Alert.alert('Error', 'Please enter valid points for all teams');
+          return;
+        }
+
+        meldValues[team.id] = meld;
+        trickValues[team.id] = tricks;
+        totalTricks += tricks;
+      }
+
+      if (totalTricks !== 250) {
+        Alert.alert('Error', 'Total trick points must equal 250');
         return;
       }
-
-      meldValues[team.id] = meld;
-      trickValues[team.id] = tricks;
-      totalTricks += tricks;
     }
-
-    // Validate total trick points
-    if (totalTricks !== 250) {
-      Alert.alert('Error', 'Total trick points must equal 250');
-      return;
-    }
-
-    // For each team that got no tricks, their meld doesn't count
-    currentGame.teams.forEach(team => {
-      if (trickValues[team.id] === 0) {
-        meldValues[team.id] = 0;
-      }
-    });
 
     const roundData = {
+      id: `round-${Date.now()}`,
       bidWinner: bidTeamId,
       bid: parseInt(bidAmount),
       meld: meldValues,
       trickPoints: trickValues,
+      moonShotAttempted,
+      moonShotSuccessful: moonShotAttempted
+        ? trickPoints[bidTeamId] === '1'
+        : undefined,
+      timestamp: Date.now(),
     };
-
-    // Calculate new scores after this round
-    const updatedGame = {
-      ...currentGame,
-      rounds: [
-        ...currentGame.rounds,
-        {...roundData, id: 'temp', timestamp: Date.now()},
-      ],
-    };
-
-    const scores = currentGame.teams.reduce((acc, team) => {
-      acc[team.id] = calculateTeamScore(updatedGame, team.id);
-      return acc;
-    }, {} as {[key: string]: number});
-
-    // Check if any team won
-    const winner = currentGame.teams.find(
-      team => scores[team.id] >= currentGame.winningScore,
-    );
 
     try {
       await addRound(roundData);
 
-      if (winner) {
-        setWinningTeam({
-          name: winner.name,
-          score: scores[winner.id],
-        });
-      } else {
-        // Reset form only if game isn't over
+      if (moonShotAttempted && trickPoints[bidTeamId] === '1') {
+        const bidWinnerTeam = currentGame.teams.find(t => t.id === bidTeamId);
+        // Calculate new total score after moon shot
+        const updatedGame = {
+          ...currentGame,
+          rounds: [...currentGame.rounds, roundData],
+        };
+        const newScore = calculateTeamScore(updatedGame, bidTeamId);
+
+        // Only trigger victory if total score is >= 1500
+        if (newScore >= 1500) {
+          setWinningTeam({
+            name: bidWinnerTeam!.name,
+            score: newScore,
+          });
+        }
+      }
+
+      // Reset form if game isn't over
+      if (!winningTeam) {
         setBidAmount('');
         setBidTeamId(null);
         setMeldPoints({});
         setTrickPoints({});
         setPhase('bid');
+        setMoonShotAttempted(false);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to submit round');
@@ -233,45 +229,73 @@ export default function CurrentGameScreen() {
   const renderMeldPhase = () => (
     <View style={styles.phaseContainer}>
       <ThemedText type="heading">Phase 2: Meld</ThemedText>
-      {currentGame.teams.map(team => (
-        <View key={team.id} style={styles.teamInput}>
-          <ThemedText type="label">{team.name}</ThemedText>
-          <View style={styles.pointsInput}>
-            <View style={styles.inputGroup}>
-              <ThemedText type="label">Meld Points</ThemedText>
-              <TextInput
-                style={[styles.input, styles.inputThemed]}
-                value={meldPoints[team.id] || ''}
-                onChangeText={value =>
-                  setMeldPoints(prev => ({...prev, [team.id]: value}))
-                }
-                keyboardType="number-pad"
-                placeholder="Enter meld points"
-                placeholderTextColor={theme.colors.input.placeholder}
-              />
+
+      <View style={styles.teamButtons}>
+        <TouchableOpacity
+          style={[
+            styles.teamButton,
+            {
+              backgroundColor: moonShotAttempted
+                ? styles.teamButtonPrimary.backgroundColor
+                : styles.teamButtonSecondary.backgroundColor,
+              borderColor: moonShotAttempted
+                ? styles.teamButtonPrimary.borderColor
+                : styles.teamButtonSecondary.borderColor,
+            },
+          ]}
+          onPress={() => {
+            setMoonShotAttempted(true);
+            setPhase('tricks');
+          }}
+        >
+          <ThemedText
+            style={[
+              styles.teamButtonTextPrimary,
+              {
+                color: moonShotAttempted
+                  ? styles.teamButtonTextPrimary.color
+                  : styles.teamButtonTextSecondary.color,
+              },
+            ]}
+          >
+            Shoot the Moon
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
+
+      {!moonShotAttempted && (
+        <>
+          {currentGame.teams.map(team => (
+            <View key={team.id} style={styles.teamInput}>
+              <ThemedText type="label">{team.name}</ThemedText>
+              <View style={styles.pointsInput}>
+                <View style={styles.inputGroup}>
+                  <ThemedText type="label">Meld Points</ThemedText>
+                  <TextInput
+                    style={[styles.input, styles.inputThemed]}
+                    value={meldPoints[team.id] || ''}
+                    onChangeText={value =>
+                      setMeldPoints(prev => ({...prev, [team.id]: value}))
+                    }
+                    keyboardType="number-pad"
+                    placeholder="Enter meld points"
+                    placeholderTextColor={theme.colors.input.placeholder}
+                  />
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-      ))}
+          ))}
+        </>
+      )}
 
-      {bidTeamId &&
-        bidAmount &&
-        Object.keys(meldPoints).length === currentGame.teams.length && (
-          <View style={styles.requiredTricksInfo}>
-            <ThemedText>
-              {currentGame.teams.find(t => t.id === bidTeamId)?.name} needs{' '}
-              {calculateRequiredTricks()} trick points to make their bid of{' '}
-              {bidAmount}
-            </ThemedText>
-          </View>
-        )}
-
-      <ThemedButton
-        title="Submit Meld"
-        onPress={handleSubmitMeld}
-        variant="primary"
-        size="md"
-      />
+      {!moonShotAttempted && (
+        <ThemedButton
+          title="Submit Meld"
+          onPress={handleSubmitMeld}
+          variant="primary"
+          size="md"
+        />
+      )}
     </View>
   );
 
@@ -292,27 +316,103 @@ export default function CurrentGameScreen() {
 
     return (
       <View style={styles.phaseContainer}>
-        <ThemedText type="heading">Phase 3: Tricks</ThemedText>
-        {currentGame.teams.map((team, index) => (
-          <View key={team.id} style={styles.teamInput}>
-            <ThemedText type="label">{team.name}</ThemedText>
-            <View style={styles.pointsInput}>
-              <View style={styles.inputGroup}>
-                <ThemedText type="label">Trick Points</ThemedText>
-                <TextInput
-                  style={styles.input}
-                  value={trickPoints[team.id] || ''}
-                  onChangeText={value =>
-                    handleTrickPointsChange(team.id, value)
-                  }
-                  keyboardType="number-pad"
-                  placeholder="Enter trick points"
-                  editable={index === 0} // Only first team can edit
-                />
-              </View>
+        <ThemedText type="heading">
+          {moonShotAttempted ? 'Moon Shot Result' : 'Phase 3: Tricks'}
+        </ThemedText>
+
+        {moonShotAttempted ? (
+          <>
+            <ThemedText type="label">
+              Did {currentGame.teams.find(t => t.id === bidTeamId)?.name} make
+              the moon shot?
+            </ThemedText>
+            <View style={styles.teamButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.teamButton,
+                  {
+                    backgroundColor:
+                      trickPoints[bidTeamId!] === '1'
+                        ? styles.teamButtonPrimary.backgroundColor
+                        : styles.teamButtonSecondary.backgroundColor,
+                    borderColor:
+                      trickPoints[bidTeamId!] === '1'
+                        ? styles.teamButtonPrimary.borderColor
+                        : styles.teamButtonSecondary.borderColor,
+                  },
+                ]}
+                onPress={() => setTrickPoints({[bidTeamId!]: '1'})}
+              >
+                <ThemedText
+                  style={[
+                    styles.teamButtonTextPrimary,
+                    {
+                      color:
+                        trickPoints[bidTeamId!] === '1'
+                          ? styles.teamButtonTextPrimary.color
+                          : styles.teamButtonTextSecondary.color,
+                    },
+                  ]}
+                >
+                  Yes
+                </ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.teamButton,
+                  {
+                    backgroundColor:
+                      trickPoints[bidTeamId!] === '0'
+                        ? styles.teamButtonPrimary.backgroundColor
+                        : styles.teamButtonSecondary.backgroundColor,
+                    borderColor:
+                      trickPoints[bidTeamId!] === '0'
+                        ? styles.teamButtonPrimary.borderColor
+                        : styles.teamButtonSecondary.borderColor,
+                  },
+                ]}
+                onPress={() => setTrickPoints({[bidTeamId!]: '0'})}
+              >
+                <ThemedText
+                  style={[
+                    styles.teamButtonTextPrimary,
+                    {
+                      color:
+                        trickPoints[bidTeamId!] === '0'
+                          ? styles.teamButtonTextPrimary.color
+                          : styles.teamButtonTextSecondary.color,
+                    },
+                  ]}
+                >
+                  No
+                </ThemedText>
+              </TouchableOpacity>
             </View>
-          </View>
-        ))}
+          </>
+        ) : (
+          <>
+            {currentGame.teams.map((team, index) => (
+              <View key={team.id} style={styles.teamInput}>
+                <ThemedText type="label">{team.name}</ThemedText>
+                <View style={styles.pointsInput}>
+                  <View style={styles.inputGroup}>
+                    <ThemedText type="label">Trick Points</ThemedText>
+                    <TextInput
+                      style={styles.input}
+                      value={trickPoints[team.id] || ''}
+                      onChangeText={value =>
+                        handleTrickPointsChange(team.id, value)
+                      }
+                      keyboardType="number-pad"
+                      placeholder="Enter trick points"
+                      editable={index === 0} // Only first team can edit
+                    />
+                  </View>
+                </View>
+              </View>
+            ))}
+          </>
+        )}
 
         <ThemedButton
           title="Submit Round"
