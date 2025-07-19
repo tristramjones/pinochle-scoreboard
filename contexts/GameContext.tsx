@@ -145,6 +145,7 @@ export function GameProvider({children}: {children: React.ReactNode}) {
               await Storage.addGameToHistory(updatedGame);
               await Storage.setCurrentGame(null);
               setCurrentGame(null);
+              // No need to navigate here - the VictoryScreen component handles navigation
             } catch (error) {
               console.error('Error ending game:', error);
             }
