@@ -42,6 +42,13 @@ export default function GamesLayout() {
           gestureEnabled: false,
         }}
       />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          headerTitle: '',
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

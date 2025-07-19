@@ -1,4 +1,4 @@
-import {useLocalSearchParams, useNavigation, useRouter} from 'expo-router';
+import {useLocalSearchParams, useRouter} from 'expo-router';
 import React, {useCallback, useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {RoundCard} from '../../components/RoundCard';
@@ -12,7 +12,6 @@ import * as Storage from '../../utils/storage';
 export default function GameDetailsScreen() {
   const {id} = useLocalSearchParams();
   const router = useRouter();
-  const navigation = useNavigation();
   const [game, setGame] = useState<Game | null>(null);
 
   const loadGame = useCallback(async () => {
@@ -20,18 +19,10 @@ export default function GameDetailsScreen() {
       const history = await Storage.getGameHistory();
       const foundGame = history.find(g => g.id === id);
       setGame(foundGame || null);
-
-      if (foundGame) {
-        const title = `${foundGame.teams[0].name} vs ${foundGame.teams[1].name}`;
-        navigation.setOptions({
-          title,
-          headerTitle: title,
-        });
-      }
     } catch (error) {
       console.error('Error loading game:', error);
     }
-  }, [id, navigation]);
+  }, [id]);
 
   useEffect(() => {
     loadGame();
