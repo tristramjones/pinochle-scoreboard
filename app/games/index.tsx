@@ -23,10 +23,10 @@ import {calculateTeamScores} from '../../utils/scoring';
 import * as Storage from '../../utils/storage';
 
 const cardImages = [
-  require('../../assets/images/borderless_ace_hearts.png'),
-  require('../../assets/images/borderless_jack_diamonds.png'),
-  require('../../assets/images/borderless_king_clubs.png'),
-  require('../../assets/images/borderless_queen_spades.png'),
+  require('../../assets/images/hearts_ace.png'),
+  require('../../assets/images/diamonds_jack.png'),
+  require('../../assets/images/clubs_king.png'),
+  require('../../assets/images/spades_queen.png'),
 ];
 
 export default function GamesScreen() {
