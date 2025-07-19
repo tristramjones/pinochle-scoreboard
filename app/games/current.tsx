@@ -1,13 +1,6 @@
 import {useRouter} from 'expo-router';
 import React from 'react';
-import {
-  Platform,
-  ScrollView,
-  StyleSheet,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native';
+import {ScrollView, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {RoundCard} from '../../components/RoundCard';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
@@ -91,20 +84,9 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   scoreHeader: {
     marginBottom: Theme.spacing.xl,
-    padding: Theme.spacing.lg,
-    backgroundColor: Theme.colors.card.background,
-    borderRadius: Theme.borderRadius.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: Theme.colors.card.shadow,
-        shadowOffset: {width: 2, height: 3},
-        shadowOpacity: 0.6,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    paddingBottom: Theme.spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: Theme.colors.card.border,
   } as ViewStyle,
   scoreboardTeams: {
     flexDirection: 'row',
