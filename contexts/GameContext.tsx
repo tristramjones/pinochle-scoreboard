@@ -118,33 +118,44 @@ export function GameProvider({children}: {children: React.ReactNode}) {
           rounds: [...currentGame.rounds, newRound],
         };
 
-        // Check if any team has won
-        const winningTeam = updatedGame.teams.find(team => {
-          const score = calculateTeamScore(updatedGame, team.id);
-          return score >= 1500;
-        });
+        // Save the updated game first
+        await Storage.setCurrentGame(updatedGame);
+        setCurrentGame(updatedGame);
 
-        if (winningTeam) {
-          // If there's a winning team, save the final state but don't update current game
-          await Storage.setCurrentGame(updatedGame);
-          // Give time for the victory screen to show, then end the game
-          setTimeout(() => {
-            endGame(updatedGame).catch(error => {
-              console.error('Error ending game after victory:', error);
-              Alert.alert('Error', 'Failed to end game. Please try again.');
-            });
-          }, 3500);
+        // Calculate if this round resulted in a win
+        let gameIsOver = false;
+        if (roundData.moonShotAttempted) {
+          // For moon shots, check if the bidding team's total score is >= 1500
+          const bidTeamScore = calculateTeamScore(
+            updatedGame,
+            roundData.bidWinner,
+          );
+          gameIsOver = bidTeamScore >= 1500;
         } else {
-          // If no winner, update normally
-          await Storage.setCurrentGame(updatedGame);
-          setCurrentGame(updatedGame);
+          // For regular rounds, check if any team's total score is >= 1500
+          gameIsOver = updatedGame.teams.some(
+            team => calculateTeamScore(updatedGame, team.id) >= 1500,
+          );
+        }
+
+        // If game is over, move it to history after a delay
+        if (gameIsOver) {
+          setTimeout(async () => {
+            try {
+              await Storage.addGameToHistory(updatedGame);
+              await Storage.setCurrentGame(null);
+              setCurrentGame(null);
+            } catch (error) {
+              console.error('Error ending game:', error);
+            }
+          }, 3500); // Delay to allow victory screen to show
         }
       } catch (error) {
         console.error('Error adding round:', error);
-        Alert.alert('Error', 'Failed to add round. Please try again.');
+        throw error;
       }
     },
-    [currentGame, endGame],
+    [currentGame],
   );
 
   return (
