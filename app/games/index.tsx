@@ -5,7 +5,6 @@ import {
   Alert,
   Image,
   ImageStyle,
-  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -170,17 +169,8 @@ const styles = StyleSheet.create({
     padding: Theme.spacing.md,
     backgroundColor: Theme.colors.card.background,
     marginBottom: Theme.spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: Theme.colors.card.shadow,
-        shadowOffset: {width: 2, height: 3},
-        shadowOpacity: 0.6,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    borderWidth: 1,
+    borderColor: Theme.colors.card.border,
   } as ViewStyle,
   cardContent: {
     flexDirection: 'row',
@@ -197,7 +187,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   dateText: {
     color: Theme.colors.textSecondary,
-    marginBottom: Theme.spacing.lg, // Increased from sm to lg
+    marginBottom: Theme.spacing.lg,
     textAlign: 'right',
   } as TextStyle,
   teamsContainer: {

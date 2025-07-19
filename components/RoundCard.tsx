@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
+import {StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {Theme} from '../constants/Theme';
 import {Game} from '../types/game';
 import {Round} from '../types/round';
@@ -121,17 +121,8 @@ const styles = StyleSheet.create({
     padding: Theme.spacing.md,
     backgroundColor: Theme.colors.card.background,
     marginBottom: Theme.spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: Theme.colors.card.shadow,
-        shadowOffset: {width: 2, height: 3},
-        shadowOpacity: 0.6,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    borderWidth: 1,
+    borderColor: Theme.colors.card.border,
   } as ViewStyle,
   roundHeader: {
     flexDirection: 'row',
