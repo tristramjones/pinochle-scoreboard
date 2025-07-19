@@ -1,3 +1,4 @@
+import {router} from 'expo-router';
 import React, {
   createContext,
   useCallback,
@@ -23,6 +24,14 @@ export const GameContext = createContext<GameContextType | undefined>(
 
 export function GameProvider({children}: {children: React.ReactNode}) {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
+  const [shouldNavigateToVictory, setShouldNavigateToVictory] = useState(false);
+
+  useEffect(() => {
+    if (shouldNavigateToVictory) {
+      router.replace('/games/victory');
+      setShouldNavigateToVictory(false);
+    }
+  }, [shouldNavigateToVictory]);
 
   // Load current game on mount
   useEffect(() => {
@@ -118,10 +127,6 @@ export function GameProvider({children}: {children: React.ReactNode}) {
           rounds: [...currentGame.rounds, newRound],
         };
 
-        // Save the updated game first
-        await Storage.setCurrentGame(updatedGame);
-        setCurrentGame(updatedGame);
-
         // Calculate if this round resulted in a win
         let gameIsOver = false;
         if (roundData.moonShotAttempted) {
@@ -138,18 +143,19 @@ export function GameProvider({children}: {children: React.ReactNode}) {
           );
         }
 
-        // If game is over, move it to history after a delay
         if (gameIsOver) {
-          setTimeout(async () => {
-            try {
-              await Storage.addGameToHistory(updatedGame);
-              await Storage.setCurrentGame(null);
-              setCurrentGame(null);
-              // No need to navigate here - the VictoryScreen component handles navigation
-            } catch (error) {
-              console.error('Error ending game:', error);
-            }
-          }, 3500); // Delay to allow victory screen to show
+          // Save to history first
+          await Storage.addGameToHistory(updatedGame);
+          // Clear current game
+          await Storage.setCurrentGame(null);
+          // Update state
+          setCurrentGame(null);
+          // Trigger navigation via effect
+          setShouldNavigateToVictory(true);
+        } else {
+          // Just save the updated game
+          await Storage.setCurrentGame(updatedGame);
+          setCurrentGame(updatedGame);
         }
       } catch (error) {
         console.error('Error adding round:', error);

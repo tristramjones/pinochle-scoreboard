@@ -81,7 +81,7 @@ export default function NewRoundScreen() {
         };
 
         await addRound(roundData);
-        router.back();
+        router.back(); // Return to current game screen
         return;
       }
 
@@ -110,7 +110,7 @@ export default function NewRoundScreen() {
       };
 
       await addRound(roundData);
-      router.back();
+      router.back(); // Return to current game screen
     } catch (error) {
       console.error('Error submitting round:', error);
       Alert.alert('Error', 'Failed to submit round. Please try again.');
