@@ -5,22 +5,35 @@ import {StyleSheet, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
-import {Game} from '../../types/game';
 import {calculateTeamScore} from '../../utils/scoring';
 import * as Storage from '../../utils/storage';
 
 export default function VictoryScreen() {
   const router = useRouter();
-  const [game, setGame] = useState<Game | null>(null);
+  const [winningTeam, setWinningTeam] = useState<{
+    name: string;
+    score: number;
+  } | null>(null);
 
   useEffect(() => {
-    const loadGame = async () => {
+    const loadWinningTeam = async () => {
       try {
         // Get the most recent game from history
         const history = await Storage.getGameHistory();
         if (history.length > 0) {
           const lastGame = history[history.length - 1];
-          setGame(lastGame);
+          // Find the winning team
+          const scores = lastGame.teams.map(team => ({
+            team,
+            score: calculateTeamScore(lastGame, team.id),
+          }));
+          const winner = scores.reduce((prev, curr) =>
+            curr.score > prev.score ? curr : prev,
+          );
+          setWinningTeam({
+            name: winner.team.name,
+            score: winner.score,
+          });
         } else {
           router.replace('/games');
         }
@@ -30,7 +43,7 @@ export default function VictoryScreen() {
       }
     };
 
-    loadGame();
+    loadWinningTeam();
 
     // Play haptic feedback
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -43,16 +56,7 @@ export default function VictoryScreen() {
     return () => clearTimeout(timer);
   }, [router]);
 
-  if (!game) return null;
-
-  // Find the winning team (highest score)
-  const scores = game.teams.map(team => ({
-    team,
-    score: calculateTeamScore(game, team.id),
-  }));
-  const winner = scores.reduce((prev, curr) =>
-    curr.score > prev.score ? curr : prev,
-  );
+  if (!winningTeam) return null;
 
   return (
     <View style={styles.container}>
@@ -61,15 +65,11 @@ export default function VictoryScreen() {
           🎉 Victory! 🎉
         </ThemedText>
         <ThemedText type="heading" style={styles.winner}>
-          {winner.team.name} Wins!
+          {winningTeam.name} Wins!
         </ThemedText>
-        <View style={styles.scores}>
-          {scores.map(({team, score}) => (
-            <ThemedText key={team.id} type="heading" style={styles.score}>
-              {team.name}: {score}
-            </ThemedText>
-          ))}
-        </View>
+        <ThemedText type="score" style={styles.score}>
+          {winningTeam.score} points
+        </ThemedText>
       </View>
       <ConfettiCannon
         count={200}
@@ -100,10 +100,6 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.lg,
     textAlign: 'center',
     color: Theme.colors.primary,
-  },
-  scores: {
-    alignItems: 'center',
-    gap: Theme.spacing.sm,
   },
   score: {
     textAlign: 'center',

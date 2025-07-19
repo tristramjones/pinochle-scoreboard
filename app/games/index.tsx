@@ -125,17 +125,19 @@ export default function GamesScreen() {
         {currentGame ? (
           renderGameCard(currentGame)
         ) : (
-          <ThemedText type="subtitle" style={styles.emptyStateText}>
-            No game in progress
-          </ThemedText>
+          <>
+            <ThemedText type="subtitle" style={styles.emptyStateText}>
+              No game in progress
+            </ThemedText>
+            <ThemedButton
+              title="New Game"
+              onPress={() => router.push('/games/new')}
+              variant="primary"
+              size="md"
+              style={{marginTop: Theme.spacing.sm}}
+            />
+          </>
         )}
-        <ThemedButton
-          title="New Game"
-          onPress={() => router.push('/games/new')}
-          variant="primary"
-          size="md"
-          style={{marginTop: Theme.spacing.sm}}
-        />
       </View>
 
       {completedGames.length > 0 && (

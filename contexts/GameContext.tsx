@@ -1,5 +1,13 @@
-import {createContext, PropsWithChildren, useContext, useState} from 'react';
+import {useRouter} from 'expo-router';
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {Game, Team} from '../types/game';
+import {calculateTeamScore} from '../utils/scoring';
 import * as Storage from '../utils/storage';
 
 interface GameContextValue {
@@ -13,6 +21,30 @@ const GameContext = createContext<GameContextValue | null>(null);
 
 export function GameProvider({children}: PropsWithChildren) {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
+  const [shouldNavigateToVictory, setShouldNavigateToVictory] = useState(false);
+  const router = useRouter();
+
+  // Handle victory navigation
+  useEffect(() => {
+    if (shouldNavigateToVictory) {
+      router.replace('/games/victory');
+      setShouldNavigateToVictory(false);
+    }
+  }, [shouldNavigateToVictory, router]);
+
+  // Load current game on mount
+  useEffect(() => {
+    const loadCurrentGame = async () => {
+      try {
+        const game = await Storage.getCurrentGame();
+        setCurrentGame(game);
+      } catch (error) {
+        console.error('Error loading current game:', error);
+      }
+    };
+
+    loadCurrentGame();
+  }, []);
 
   const startNewGame = async ({teamNames}: {teamNames: string[]}) => {
     const teams: Team[] = teamNames.map(name => ({
@@ -42,8 +74,37 @@ export function GameProvider({children}: PropsWithChildren) {
       rounds: [...currentGame.rounds, roundData],
     };
 
-    setCurrentGame(updatedGame);
-    await Storage.saveCurrentGame(updatedGame);
+    // Check for victory condition
+    let gameIsOver = false;
+    if (roundData.moonShotAttempted) {
+      // For moon shots, check if the bidding team's total score is >= 1500
+      const bidTeamScore = calculateTeamScore(updatedGame, roundData.bidWinner);
+      gameIsOver = bidTeamScore >= 1500;
+    } else {
+      // For regular rounds, check if any team's total score is >= 1500
+      gameIsOver = updatedGame.teams.some(
+        team => calculateTeamScore(updatedGame, team.id) >= 1500,
+      );
+    }
+
+    if (gameIsOver) {
+      // Save to history first
+      await Storage.saveGameHistory([
+        ...(await Storage.getGameHistory()),
+        updatedGame,
+      ]);
+      // Clear current game
+      setCurrentGame(null);
+      await Storage.saveCurrentGame(null);
+      // Trigger navigation via effect
+      setShouldNavigateToVictory(true);
+    } else {
+      // Just save the updated game
+      setCurrentGame(updatedGame);
+      await Storage.saveCurrentGame(updatedGame);
+      // Navigate back to current game
+      router.back();
+    }
   };
 
   const endGame = async () => {
