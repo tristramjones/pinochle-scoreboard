@@ -26,10 +26,11 @@ export interface Round {
 
 export interface Game {
   id: string;
+  timestamp: number;
   teams: Team[];
   rounds: Round[];
+  cardImageIndex: number; // Index of the card image assigned to this game
   winningScore: number;
-  timestamp: number;
 }
 
 export interface GameSettings {

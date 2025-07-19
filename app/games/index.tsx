@@ -3,6 +3,8 @@ import {useRouter} from 'expo-router';
 import React, {useCallback, useState} from 'react';
 import {
   Alert,
+  Image,
+  ImageStyle,
   Platform,
   RefreshControl,
   ScrollView,
@@ -19,6 +21,13 @@ import {useGame} from '../../contexts/GameContext';
 import {Game} from '../../types/game';
 import {calculateTeamScores} from '../../utils/scoring';
 import * as Storage from '../../utils/storage';
+
+const cardImages = [
+  require('../../assets/images/borderless_ace_hearts.png'),
+  require('../../assets/images/borderless_jack_diamonds.png'),
+  require('../../assets/images/borderless_king_clubs.png'),
+  require('../../assets/images/borderless_queen_spades.png'),
+];
 
 export default function GamesScreen() {
   const router = useRouter();
@@ -45,7 +54,6 @@ export default function GamesScreen() {
     }
   }, [loadCompletedGames]);
 
-  // Load completed games on focus
   useFocusEffect(
     useCallback(() => {
       loadCompletedGames();
@@ -58,8 +66,8 @@ export default function GamesScreen() {
 
   const renderGameCard = (game: Game, isCompleted = false) => {
     const scores = calculateTeamScores(game);
-    const winner = game.teams.reduce((prev, curr) =>
-      scores[curr.id] > scores[prev.id] ? curr : prev,
+    const sortedTeams = [...game.teams].sort(
+      (a, b) => scores[b.id] - scores[a.id],
     );
 
     return (
@@ -70,31 +78,35 @@ export default function GamesScreen() {
           router.push(isCompleted ? `/games/${game.id}` : '/games/current')
         }
       >
-        <View style={styles.gameHeader}>
-          <ThemedText type="label" style={[styles.date, styles.dateText]}>
-            {formatDate(game.timestamp)}
-          </ThemedText>
-          <ThemedText
-            type="label"
-            style={[
-              isCompleted ? styles.winner : styles.status,
-              styles.winnerText,
-            ]}
-          >
-            {isCompleted ? `${winner.name} Won!` : 'In Progress'}
-          </ThemedText>
-        </View>
-        <View style={styles.teams}>
-          {game.teams.map(team => (
-            <View key={team.id} style={styles.teamScore}>
-              <ThemedText type="subtitle" style={styles.teamName}>
-                {team.name}
-              </ThemedText>
-              <ThemedText type="score" style={styles.score}>
-                {scores[team.id]} points
-              </ThemedText>
+        <View style={styles.cardContent}>
+          <Image
+            source={cardImages[game.cardImageIndex]}
+            style={styles.cardImage}
+            resizeMode="contain"
+          />
+          <View style={styles.cardDetails}>
+            <ThemedText type="label" style={styles.dateText}>
+              {formatDate(game.timestamp)}
+            </ThemedText>
+            <View style={styles.teamsContainer}>
+              {sortedTeams.map((team, index) => (
+                <View key={team.id} style={styles.teamScore}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.teamName, index === 0 && styles.winnerText]}
+                  >
+                    {team.name}
+                  </ThemedText>
+                  <ThemedText
+                    type="score"
+                    style={[styles.score, index === 0 && styles.winnerText]}
+                  >
+                    {scores[team.id]} points
+                  </ThemedText>
+                </View>
+              ))}
             </View>
-          ))}
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -170,42 +182,43 @@ const styles = StyleSheet.create({
       },
     }),
   } as ViewStyle,
-  gameHeader: {
+  cardContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Theme.spacing.sm,
   } as ViewStyle,
-  date: {
-    marginBottom: Theme.spacing.xs,
-  } as TextStyle,
+  cardImage: {
+    width: 80,
+    height: 120,
+    marginRight: Theme.spacing.md,
+    borderRadius: Theme.borderRadius.sm,
+  } as ImageStyle,
+  cardDetails: {
+    flex: 1,
+  } as ViewStyle,
   dateText: {
     color: Theme.colors.textSecondary,
+    marginBottom: Theme.spacing.lg, // Increased from sm to lg
+    textAlign: 'right',
   } as TextStyle,
-  teams: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: Theme.spacing.sm,
+  teamsContainer: {
+    gap: Theme.spacing.sm,
   } as ViewStyle,
   teamScore: {
-    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   } as ViewStyle,
   teamName: {
-    marginBottom: Theme.spacing.xs,
     color: Theme.colors.text,
+    flex: 1,
   } as TextStyle,
   score: {
     color: Theme.colors.text,
-  } as TextStyle,
-  winner: {
-    fontWeight: '600',
-  } as TextStyle,
-  status: {
-    fontWeight: '500',
+    marginLeft: Theme.spacing.sm,
   } as TextStyle,
   winnerText: {
     color: Theme.colors.primary,
+    fontFamily: Theme.typography.fonts.bold,
   } as TextStyle,
   emptyStateText: {
     textAlign: 'center',

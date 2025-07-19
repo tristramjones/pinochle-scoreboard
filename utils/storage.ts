@@ -6,6 +6,78 @@ const STORAGE_KEYS = {
   GAME_HISTORY: 'pinochle_game_history',
 };
 
+// Helper function to ensure games have cardImageIndex
+function ensureGameHasCardImage(game: Game): Game {
+  if (typeof game.cardImageIndex !== 'number') {
+    // Assign a random card (0-3) if one isn't assigned
+    return {
+      ...game,
+      cardImageIndex: Math.floor(Math.random() * 4),
+    };
+  }
+  return game;
+}
+
+export async function saveCurrentGame(game: Game | null): Promise<void> {
+  try {
+    if (game) {
+      game = ensureGameHasCardImage(game);
+    }
+    await AsyncStorage.setItem(STORAGE_KEYS.CURRENT_GAME, JSON.stringify(game));
+  } catch (error) {
+    console.error('Error saving current game:', error);
+    throw error;
+  }
+}
+
+export async function getCurrentGame(): Promise<Game | null> {
+  try {
+    const gameJson = await AsyncStorage.getItem(STORAGE_KEYS.CURRENT_GAME);
+    if (!gameJson) return null;
+    const game = JSON.parse(gameJson);
+    return ensureGameHasCardImage(game);
+  } catch (error) {
+    console.error('Error getting current game:', error);
+    throw error;
+  }
+}
+
+export async function saveGameHistory(games: Game[]): Promise<void> {
+  try {
+    // Ensure all games have card images before saving
+    const migratedGames = games.map(ensureGameHasCardImage);
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.GAME_HISTORY,
+      JSON.stringify(migratedGames),
+    );
+  } catch (error) {
+    console.error('Error saving game history:', error);
+    throw error;
+  }
+}
+
+export async function getGameHistory(): Promise<Game[]> {
+  try {
+    const historyJson = await AsyncStorage.getItem(STORAGE_KEYS.GAME_HISTORY);
+    if (!historyJson) return [];
+    const games = JSON.parse(historyJson);
+    // Ensure all games have card images when loading
+    return games.map(ensureGameHasCardImage);
+  } catch (error) {
+    console.error('Error getting game history:', error);
+    throw error;
+  }
+}
+
+export async function clearStorage(): Promise<void> {
+  try {
+    await AsyncStorage.clear();
+  } catch (error) {
+    console.error('Error clearing storage:', error);
+    throw error;
+  }
+}
+
 // Add backup functionality
 export const backupData = async () => {
   try {
@@ -53,88 +125,28 @@ export const restoreFromBackup = async () => {
   }
 };
 
-export const getCurrentGame = async (): Promise<Game | null> => {
+// Optional: Run migration on all existing games
+export async function migrateAllGames(): Promise<void> {
   try {
-    const gameData = await AsyncStorage.getItem(STORAGE_KEYS.CURRENT_GAME);
-    return gameData ? JSON.parse(gameData) : null;
-  } catch (error) {
-    console.error('Error getting current game:', error);
-    // Try to restore from backup
-    const restored = await restoreFromBackup();
-    if (restored) {
-      return getCurrentGame();
+    // Try to restore from backup first
+    await restoreFromBackup();
+
+    // Migrate current game
+    const currentGame = await getCurrentGame();
+    if (currentGame) {
+      await saveCurrentGame(currentGame);
     }
-    return null;
-  }
-};
 
-export const setCurrentGame = async (game: Game | null): Promise<void> => {
-  try {
-    if (game) {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.CURRENT_GAME,
-        JSON.stringify(game),
-      );
-    } else {
-      await AsyncStorage.removeItem(STORAGE_KEYS.CURRENT_GAME);
-    }
-    // Create backup after successful save
-    await backupData();
-  } catch (error) {
-    console.error('Error setting current game:', error);
-    throw error;
-  }
-};
-
-export const getGameHistory = async (): Promise<Game[]> => {
-  try {
-    const historyData = await AsyncStorage.getItem(STORAGE_KEYS.GAME_HISTORY);
-    return historyData ? JSON.parse(historyData) : [];
-  } catch (error) {
-    console.error('Error getting game history:', error);
-    // Try to restore from backup
-    const restored = await restoreFromBackup();
-    if (restored) {
-      return getGameHistory();
-    }
-    return [];
-  }
-};
-
-export const saveGameHistory = async (games: Game[]): Promise<void> => {
-  try {
-    await AsyncStorage.setItem(
-      STORAGE_KEYS.GAME_HISTORY,
-      JSON.stringify(games),
-    );
-    // Create backup after successful save
-    await backupData();
-  } catch (error) {
-    console.error('Error saving game history:', error);
-    throw error;
-  }
-};
-
-export const addGameToHistory = async (game: Game): Promise<void> => {
-  try {
+    // Migrate game history
     const history = await getGameHistory();
-    history.push(game);
     await saveGameHistory(history);
-  } catch (error) {
-    console.error('Error adding game to history:', error);
-    throw error;
-  }
-};
 
-export const deleteGamesFromHistory = async (
-  gameIds: string[],
-): Promise<void> => {
-  try {
-    const history = await getGameHistory();
-    const updatedHistory = history.filter(game => !gameIds.includes(game.id));
-    await saveGameHistory(updatedHistory);
+    // Create a new backup after migration
+    await backupData();
+
+    console.log('Game migration completed successfully');
   } catch (error) {
-    console.error('Error deleting games from history:', error);
+    console.error('Error during game migration:', error);
     throw error;
   }
-};
+}

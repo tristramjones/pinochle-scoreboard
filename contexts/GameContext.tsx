@@ -81,6 +81,7 @@ export function GameProvider({children}: {children: React.ReactNode}) {
         rounds: [],
         winningScore: 1500,
         timestamp: Date.now(),
+        cardImageIndex: Math.floor(Math.random() * 4), // Randomly assign one of our 4 card images
       };
 
       await Storage.setCurrentGame(newGame);
