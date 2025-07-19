@@ -1,40 +1,38 @@
+import {useTheme} from '@react-navigation/native';
 import {Stack} from 'expo-router';
-import {Theme} from '../../constants/Theme';
 
 export default function GamesLayout() {
+  const {colors} = useTheme();
+
   return (
     <Stack
       screenOptions={{
-        headerShown: true,
         headerStyle: {
-          backgroundColor: Theme.colors.background,
+          backgroundColor: colors.card,
         },
-        headerTintColor: Theme.colors.text,
+        headerTintColor: colors.text,
       }}
     >
       <Stack.Screen
         name="index"
         options={{
+          headerTitle: '',
           headerShown: true,
-          headerTitle: '',
-        }}
-      />
-      <Stack.Screen
-        name="[id]"
-        options={{
-          headerTitle: '',
-        }}
-      />
-      <Stack.Screen
-        name="new"
-        options={{
-          headerTitle: '',
+          headerBackVisible: false,
         }}
       />
       <Stack.Screen
         name="current"
         options={{
           headerTitle: '',
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen
+        name="round/new"
+        options={{
+          headerTitle: '',
+          headerShown: true,
         }}
       />
     </Stack>
