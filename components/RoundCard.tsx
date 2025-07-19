@@ -27,19 +27,31 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
         <View style={styles.tableRow}>
           <ThemedText
             type="label"
-            style={[styles.tableCell, styles.teamCell]}
+            style={[styles.tableCell, styles.teamCell, styles.headerCell]}
           />
-          <ThemedText type="label" style={styles.tableCell}>
-            Meld
+          <ThemedText
+            type="label"
+            style={[styles.tableCell, styles.headerCell]}
+          >
+            MELD
           </ThemedText>
-          <ThemedText type="label" style={styles.tableCell}>
-            Tricks
+          <ThemedText
+            type="label"
+            style={[styles.tableCell, styles.headerCell]}
+          >
+            TRICKS
           </ThemedText>
-          <ThemedText type="label" style={styles.tableCell}>
-            Total
+          <ThemedText
+            type="label"
+            style={[styles.tableCell, styles.headerCell]}
+          >
+            TOTAL
           </ThemedText>
-          <ThemedText type="label" style={styles.tableCell}>
-            Score
+          <ThemedText
+            type="label"
+            style={[styles.tableCell, styles.headerCell]}
+          >
+            SCORE
           </ThemedText>
         </View>
 
@@ -86,14 +98,11 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
               <ThemedText type="default" style={styles.tableCell}>
                 {trickPoints}
               </ThemedText>
-              <ThemedText
-                type="subtitle"
-                style={[styles.tableCell, styles.boldText]}
-              >
+              <ThemedText type="default" style={styles.tableCell}>
                 {roundTotal}
               </ThemedText>
               <ThemedText
-                type="subtitle"
+                type="default"
                 style={[styles.tableCell, styles.boldText]}
               >
                 {runningScore}
@@ -115,9 +124,9 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: Theme.colors.card.shadow,
-        shadowOffset: {width: 2, height: 3}, // More shadow on right and bottom
+        shadowOffset: {width: 2, height: 3},
         shadowOpacity: 0.6,
-        shadowRadius: 6, // Slightly smaller radius for more directional shadow
+        shadowRadius: 6,
       },
       android: {
         elevation: 8,
@@ -147,6 +156,10 @@ const styles = StyleSheet.create({
   teamCell: {
     flex: 1.5,
     textAlign: 'left',
+  } as TextStyle,
+  headerCell: {
+    fontSize: Theme.typography.fontSizes.xs,
+    color: Theme.colors.text,
   } as TextStyle,
   bidWinnerText: {
     color: Theme.colors.accent.burgundy,
