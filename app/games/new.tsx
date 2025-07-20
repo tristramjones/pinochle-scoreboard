@@ -38,42 +38,49 @@ export default function NewGameScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, styles.containerThemed]}>
-      <View style={styles.form}>
-        <ThemedText type="heading" style={styles.title}>
-          New Game
-        </ThemedText>
+    <ScrollView
+      style={[styles.container, styles.containerThemed]}
+      contentContainerStyle={styles.contentContainer}
+    >
+      <ThemedText type="title" style={styles.phaseTitle}>
+        New Game
+      </ThemedText>
 
-        <View style={styles.inputGroup}>
-          <ThemedText type="label">Team 1</ThemedText>
+      <View style={styles.inputSection}>
+        <View style={styles.teamInput}>
+          <ThemedText type="heading" style={styles.inputLabel}>
+            Team 1
+          </ThemedText>
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team1Name}
             onChangeText={setTeam1Name}
-            placeholder="Enter team 1 name"
+            placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />
         </View>
 
-        <View style={styles.inputGroup}>
-          <ThemedText type="label">Team 2</ThemedText>
+        <View style={styles.teamInput}>
+          <ThemedText type="heading" style={styles.inputLabel}>
+            Team 2
+          </ThemedText>
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team2Name}
             onChangeText={setTeam2Name}
-            placeholder="Enter team 2 name"
+            placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />
         </View>
-
-        <ThemedButton
-          title="Start Game"
-          onPress={handleStartGame}
-          variant="primary"
-          size="md"
-          style={styles.button}
-        />
       </View>
+
+      <ThemedButton
+        title="Start Game"
+        onPress={handleStartGame}
+        variant="primary"
+        size="lg"
+        style={styles.submitButton}
+      />
     </ScrollView>
   );
 }
@@ -81,23 +88,32 @@ export default function NewGameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Theme.spacing.md,
   } as ViewStyle,
   containerThemed: {
     backgroundColor: Theme.colors.background,
   } as ViewStyle,
-  form: {
-    gap: Theme.spacing.lg,
+  contentContainer: {
+    padding: Theme.spacing.lg,
   } as ViewStyle,
-  title: {
-    marginBottom: Theme.spacing.lg,
+  phaseTitle: {
+    fontSize: Theme.typography.fontSizes.xxl,
+    fontFamily: Theme.typography.fonts.bold,
     textAlign: 'center',
+    marginBottom: Theme.spacing.xl,
   } as TextStyle,
-  inputGroup: {
-    gap: Theme.spacing.xs,
+  inputSection: {
+    marginBottom: Theme.spacing.xl,
   } as ViewStyle,
+  teamInput: {
+    marginBottom: Theme.spacing.lg,
+  } as ViewStyle,
+  inputLabel: {
+    marginBottom: Theme.spacing.md,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.regular,
+  } as TextStyle,
   input: {
-    height: Theme.button.height,
+    height: Theme.button.sizes.lg.height,
     borderWidth: 1,
     borderRadius: Theme.borderRadius.md,
     paddingHorizontal: Theme.spacing.md,
@@ -109,7 +125,7 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.input.border,
     color: Theme.colors.input.text,
   } as TextStyle,
-  button: {
-    marginTop: Theme.spacing.md,
+  submitButton: {
+    marginTop: Theme.spacing.xl,
   } as ViewStyle,
 });

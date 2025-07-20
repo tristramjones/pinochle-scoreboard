@@ -51,7 +51,10 @@ export default function GameDetailsScreen() {
   );
 
   return (
-    <ScrollView style={[styles.container, styles.containerThemed]}>
+    <ScrollView
+      style={[styles.container, styles.containerThemed]}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View style={styles.header}>
         <ThemedText type="label" style={styles.dateText}>
           {formatDate(game.timestamp)}
@@ -101,11 +104,12 @@ export default function GameDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Theme.spacing.md,
-    marginBottom: Theme.spacing.xl,
   } as ViewStyle,
   containerThemed: {
     backgroundColor: Theme.colors.background,
+  } as ViewStyle,
+  contentContainer: {
+    padding: Theme.spacing.lg,
   } as ViewStyle,
   header: {
     marginBottom: Theme.spacing.xl,

@@ -114,6 +114,7 @@ export default function GamesScreen() {
   return (
     <ScrollView
       style={[styles.container, styles.containerThemed]}
+      contentContainerStyle={styles.contentContainer}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -155,10 +156,12 @@ export default function GamesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Theme.spacing.md,
   } as ViewStyle,
   containerThemed: {
     backgroundColor: Theme.colors.background,
+  } as ViewStyle,
+  contentContainer: {
+    padding: Theme.spacing.lg,
   } as ViewStyle,
   section: {
     marginBottom: Theme.spacing.xl,

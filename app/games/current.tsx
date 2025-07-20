@@ -23,7 +23,10 @@ export default function CurrentGameScreen() {
   }
 
   return (
-    <ScrollView style={[styles.container, styles.containerThemed]}>
+    <ScrollView
+      style={[styles.container, styles.containerThemed]}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View style={styles.scoreHeader}>
         <View style={styles.scoreboardTeams}>
           {currentGame.teams.map(team => (
@@ -75,10 +78,12 @@ export default function CurrentGameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Theme.spacing.md,
   } as ViewStyle,
   containerThemed: {
     backgroundColor: Theme.colors.background,
+  } as ViewStyle,
+  contentContainer: {
+    padding: Theme.spacing.lg,
   } as ViewStyle,
   scoreHeader: {
     marginBottom: Theme.spacing.xl,
