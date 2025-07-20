@@ -8,8 +8,9 @@ export const Theme = {
     // Base colors
     background: '#F8F0D9', // Warm cream background
     card: {
-      background: '#FFFDF7', // Slightly warmer white for cards
-      border: '#E8D5B0', // Warm border color for cards
+      background: '#F6F0E4', // Warmer cream for cards
+      border: '#E8D5B0',
+      shadow: 'rgba(0, 0, 0, 0.25)', // 15% darker shadow
     },
     // Text colors
     text: '#202017', // Rich dark color for main text
@@ -110,6 +111,22 @@ export const Theme = {
       fast: 200,
       normal: 300,
       slow: 500,
+    },
+  },
+
+  // Standardized card styling
+  card: {
+    background: '#F6F0E4', // Warmer cream color
+    borderRadius: 8,
+    shadow: {
+      shadowColor: 'rgba(0, 0, 0, 0.25)', // 15% darker
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.4, // Increased opacity by ~15%
+      shadowRadius: 6,
+      elevation: 7, // Slightly increased elevation to match
     },
   },
 };

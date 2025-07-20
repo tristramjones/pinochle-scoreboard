@@ -5,6 +5,7 @@ import {
   Alert,
   Image,
   ImageStyle,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -183,8 +184,19 @@ const styles = StyleSheet.create({
   gameCard: {
     borderRadius: Theme.borderRadius.md,
     padding: Theme.spacing.md,
-    backgroundColor: Theme.colors.card.background,
+    backgroundColor: Theme.card.background,
     marginBottom: Theme.spacing.md,
+    ...Platform.select({
+      ios: {
+        shadowColor: Theme.card.shadow.shadowColor,
+        shadowOffset: Theme.card.shadow.shadowOffset,
+        shadowOpacity: Theme.card.shadow.shadowOpacity,
+        shadowRadius: Theme.card.shadow.shadowRadius,
+      },
+      android: {
+        elevation: Theme.card.shadow.elevation,
+      },
+    }),
   } as ViewStyle,
   cardContent: {
     flexDirection: 'row',
