@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TextInput,
   TextStyle,
-  TouchableOpacity,
   View,
   ViewStyle,
 } from 'react-native';
@@ -55,6 +54,10 @@ export default function NewRoundScreen() {
     }
 
     setPhase('meld');
+  };
+
+  const handleSubmitMeld = () => {
+    setPhase('tricks');
   };
 
   const handleSubmitTricks = async () => {
@@ -121,28 +124,31 @@ export default function NewRoundScreen() {
       </View>
 
       <View style={styles.inputSection}>
-        <ThemedText type="heading" style={styles.inputLabel}>
-          Bid Winner
-        </ThemedText>
-        {currentGame.teams.map(team => (
-          <TouchableOpacity
-            key={team.id}
+        <ThemedText style={styles.inputLabel}>Who won the bid?</ThemedText>
+        <View style={styles.buttonGroup}>
+          <ThemedButton
+            title={currentGame?.teams[0].name}
+            onPress={() => setBidTeamId('0')}
+            variant="secondary"
+            size="lg"
             style={[
-              styles.teamButton,
-              bidTeamId === team.id && styles.teamButtonSelected,
+              styles.fullWidthButton,
+              bidTeamId === '0' && styles.selectedButton,
             ]}
-            onPress={() => setBidTeamId(team.id)}
-          >
-            <ThemedText
-              style={[
-                styles.teamButtonText,
-                bidTeamId === team.id && styles.teamButtonTextSelected,
-              ]}
-            >
-              {team.name}
-            </ThemedText>
-          </TouchableOpacity>
-        ))}
+            textStyle={bidTeamId === '0' && styles.selectedButtonText}
+          />
+          <ThemedButton
+            title={currentGame?.teams[1].name}
+            onPress={() => setBidTeamId('1')}
+            variant="secondary"
+            size="lg"
+            style={[
+              styles.fullWidthButton,
+              bidTeamId === '1' && styles.selectedButton,
+            ]}
+            textStyle={bidTeamId === '1' && styles.selectedButtonText}
+          />
+        </View>
       </View>
 
       <ThemedButton
@@ -183,7 +189,7 @@ export default function NewRoundScreen() {
 
       <ThemedButton
         title="Submit Meld"
-        onPress={() => setPhase('tricks')}
+        onPress={handleSubmitMeld}
         variant="primary"
         size="lg"
         style={styles.submitButton}
@@ -195,17 +201,15 @@ export default function NewRoundScreen() {
         </ThemedText>
       </View>
 
-      <TouchableOpacity
-        style={styles.moonShotButton}
+      <ThemedButton
+        title="Shoot the Moon"
         onPress={() => {
           setMoonShotAttempted(true);
           setPhase('tricks');
         }}
-      >
-        <ThemedText style={styles.moonShotButtonText}>
-          Shoot the Moon
-        </ThemedText>
-      </TouchableOpacity>
+        variant="secondary"
+        size="lg"
+      />
     </View>
   );
 
@@ -235,40 +239,26 @@ export default function NewRoundScreen() {
               the moon shot?
             </ThemedText>
             <View style={styles.buttonGroup}>
-              <TouchableOpacity
-                style={[
-                  styles.teamButton,
-                  trickPoints[bidTeamId!] === '1' && styles.teamButtonSelected,
-                ]}
+              <ThemedButton
+                title="Yes"
                 onPress={() => setTrickPoints({[bidTeamId!]: '1'})}
-              >
-                <ThemedText
-                  style={[
-                    styles.teamButtonText,
-                    trickPoints[bidTeamId!] === '1' &&
-                      styles.teamButtonTextSelected,
-                  ]}
-                >
-                  Yes
-                </ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.teamButton,
-                  trickPoints[bidTeamId!] === '0' && styles.teamButtonSelected,
-                ]}
+                variant="secondary"
+                size="lg"
+                style={trickPoints[bidTeamId!] === '1' && styles.selectedButton}
+                textStyle={
+                  trickPoints[bidTeamId!] === '1' && styles.selectedButtonText
+                }
+              />
+              <ThemedButton
+                title="No"
                 onPress={() => setTrickPoints({[bidTeamId!]: '0'})}
-              >
-                <ThemedText
-                  style={[
-                    styles.teamButtonText,
-                    trickPoints[bidTeamId!] === '0' &&
-                      styles.teamButtonTextSelected,
-                  ]}
-                >
-                  No
-                </ThemedText>
-              </TouchableOpacity>
+                variant="secondary"
+                size="lg"
+                style={trickPoints[bidTeamId!] === '0' && styles.selectedButton}
+                textStyle={
+                  trickPoints[bidTeamId!] === '0' && styles.selectedButtonText
+                }
+              />
             </View>
           </View>
 
@@ -356,13 +346,15 @@ const styles = StyleSheet.create({
     color: Theme.colors.primary,
   } as TextStyle,
   inputSection: {
-    marginBottom: Theme.spacing.xl,
+    marginBottom: Theme.spacing.lg,
   } as ViewStyle,
   inputLabel: {
     marginBottom: Theme.spacing.md,
     fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.regular,
     color: Theme.colors.primary,
+    lineHeight: Theme.typography.fontSizes.xl,
+    paddingTop: Theme.spacing.xs,
   } as TextStyle,
   input: {
     height: Theme.button.sizes.lg.height,
@@ -409,32 +401,24 @@ const styles = StyleSheet.create({
     marginVertical: Theme.spacing.md,
   } as ViewStyle,
   orText: {
-    color: Theme.colors.accent.burgundy,
+    color: Theme.colors.primary,
     fontSize: Theme.typography.fontSizes.lg,
-  } as TextStyle,
-  moonShotButton: {
-    backgroundColor: Theme.colors.card.background,
-    borderWidth: 1,
-    borderColor: Theme.colors.accent.burgundy,
-    borderRadius: Theme.borderRadius.md,
-    height: Theme.button.sizes.lg.height,
-    paddingHorizontal: Theme.button.sizes.lg.paddingHorizontal,
-    justifyContent: 'center',
-  } as ViewStyle,
-  moonShotButtonText: {
-    fontSize: Theme.button.sizes.lg.fontSize,
-    fontFamily: Theme.typography.fonts.regular,
-    textAlign: 'center',
-    color: Theme.colors.accent.burgundy,
-    lineHeight:
-      Theme.button.sizes.lg.fontSize * Theme.button.sizes.lg.lineHeight,
   } as TextStyle,
   teamInput: {
     marginBottom: Theme.spacing.lg,
   } as ViewStyle,
   buttonGroup: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     gap: Theme.spacing.md,
   } as ViewStyle,
+  fullWidthButton: {
+    flex: 1,
+  } as ViewStyle,
+  selectedButton: {
+    backgroundColor: Theme.colors.primary,
+  } as ViewStyle,
+  selectedButtonText: {
+    color: Theme.colors.button.text,
+  } as TextStyle,
 });

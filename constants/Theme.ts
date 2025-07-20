@@ -27,7 +27,7 @@ export const Theme = {
     // Button colors
     button: {
       primary: '#173D2D', // Deep vintage green
-      secondary: '#FFFDF7', // Card background color
+      secondary: '#FFFDF7', // White background for secondary buttons
       text: '#FFFDF7', // White text on primary
       textSecondary: '#173D2D', // Green text on secondary
     },
