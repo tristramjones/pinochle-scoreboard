@@ -100,7 +100,7 @@ export default function GamesScreen() {
                     type="score"
                     style={[styles.score, index === 0 && styles.winnerText]}
                   >
-                    {scores[team.id]} points
+                    {scores[team.id]}
                   </ThemedText>
                 </View>
               ))}
@@ -119,7 +119,7 @@ export default function GamesScreen() {
       }
     >
       <View style={styles.section}>
-        <ThemedText type="heading" style={styles.sectionTitle}>
+        <ThemedText type="title" style={styles.mainTitle}>
           Current Game
         </ThemedText>
         {currentGame ? (
@@ -163,53 +163,71 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Theme.spacing.xl,
   } as ViewStyle,
-  sectionTitle: {
+  mainTitle: {
     marginBottom: Theme.spacing.sm,
+    fontSize: Theme.typography.fontSizes.xxl,
+    fontFamily: Theme.typography.fonts.bold,
+    lineHeight: Theme.typography.fontSizes.xxl * 1.3,
+  } as TextStyle,
+  sectionTitle: {
+    marginBottom: Theme.spacing.xs,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.bold,
+    lineHeight: Theme.typography.fontSizes.xl * 1.3,
   } as TextStyle,
   gameCard: {
     borderRadius: Theme.borderRadius.md,
     padding: Theme.spacing.md,
     backgroundColor: Theme.colors.card.background,
     marginBottom: Theme.spacing.md,
-    borderWidth: 1,
-    borderColor: Theme.colors.card.border,
   } as ViewStyle,
   cardContent: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    gap: Theme.spacing.md,
   } as ViewStyle,
   cardImage: {
-    width: 80,
-    height: 120,
-    marginRight: Theme.spacing.md,
+    width: 60,
+    height: 90,
     borderRadius: Theme.borderRadius.sm,
   } as ImageStyle,
   cardDetails: {
     flex: 1,
+    justifyContent: 'center',
   } as ViewStyle,
   dateText: {
     color: Theme.colors.textSecondary,
-    marginBottom: Theme.spacing.lg,
+    marginBottom: Theme.spacing.sm,
     textAlign: 'right',
+    fontSize: Theme.typography.fontSizes.md,
+    fontFamily: Theme.typography.fonts.regular,
   } as TextStyle,
   teamsContainer: {
-    gap: Theme.spacing.sm,
+    gap: Theme.spacing.xs,
   } as ViewStyle,
   teamScore: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'baseline',
+    paddingRight: Theme.spacing.xs,
   } as ViewStyle,
   teamName: {
     color: Theme.colors.text,
     flex: 1,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.regular,
+    lineHeight: Theme.typography.fontSizes.xl * 1.1,
   } as TextStyle,
   score: {
     color: Theme.colors.text,
-    marginLeft: Theme.spacing.sm,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.regular,
+    textAlign: 'right',
+    minWidth: 60,
+    lineHeight: Theme.typography.fontSizes.xl * 1.1,
   } as TextStyle,
   winnerText: {
-    color: Theme.colors.primary,
+    color: Theme.colors.text,
     fontFamily: Theme.typography.fonts.bold,
   } as TextStyle,
   emptyStateText: {
@@ -217,5 +235,6 @@ const styles = StyleSheet.create({
     marginVertical: Theme.spacing.xl,
     fontSize: Theme.typography.fontSizes.lg,
     color: Theme.colors.textSecondary,
+    fontFamily: Theme.typography.fonts.regular,
   } as TextStyle,
 });

@@ -118,11 +118,9 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
 const styles = StyleSheet.create({
   roundCard: {
     borderRadius: Theme.borderRadius.md,
-    padding: Theme.spacing.md,
+    padding: Theme.spacing.lg,
     backgroundColor: Theme.colors.card.background,
     marginBottom: Theme.spacing.md,
-    borderWidth: 1,
-    borderColor: Theme.colors.card.border,
   } as ViewStyle,
   roundHeader: {
     flexDirection: 'row',
@@ -151,6 +149,7 @@ const styles = StyleSheet.create({
   headerCell: {
     fontSize: Theme.typography.fontSizes.xs,
     color: Theme.colors.text,
+    textTransform: 'uppercase',
   } as TextStyle,
   bidWinnerText: {
     color: Theme.colors.accent.burgundy,

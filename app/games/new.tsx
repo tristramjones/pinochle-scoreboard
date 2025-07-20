@@ -10,6 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import {ThemedButton} from '../../components/ThemedButton';
+import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
 import {useGame} from '../../contexts/GameContext';
 
@@ -39,7 +40,12 @@ export default function NewGameScreen() {
   return (
     <ScrollView style={[styles.container, styles.containerThemed]}>
       <View style={styles.form}>
+        <ThemedText type="heading" style={styles.title}>
+          New Game
+        </ThemedText>
+
         <View style={styles.inputGroup}>
+          <ThemedText type="label">Team 1</ThemedText>
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team1Name}
@@ -50,6 +56,7 @@ export default function NewGameScreen() {
         </View>
 
         <View style={styles.inputGroup}>
+          <ThemedText type="label">Team 2</ThemedText>
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team2Name}
@@ -64,6 +71,7 @@ export default function NewGameScreen() {
           onPress={handleStartGame}
           variant="primary"
           size="md"
+          style={styles.button}
         />
       </View>
     </ScrollView>
@@ -79,21 +87,29 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.background,
   } as ViewStyle,
   form: {
-    gap: Theme.spacing.md,
+    gap: Theme.spacing.lg,
   } as ViewStyle,
+  title: {
+    marginBottom: Theme.spacing.lg,
+    textAlign: 'center',
+  } as TextStyle,
   inputGroup: {
     gap: Theme.spacing.xs,
   } as ViewStyle,
   input: {
-    height: Theme.input.height,
+    height: Theme.button.height,
     borderWidth: 1,
-    borderRadius: Theme.borderRadius.sm,
-    paddingHorizontal: Theme.spacing.sm,
-    fontSize: Theme.typography.fontSizes.lg,
+    borderRadius: Theme.borderRadius.md,
+    paddingHorizontal: Theme.spacing.md,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.regular,
   } as TextStyle,
   inputThemed: {
     backgroundColor: Theme.colors.input.background,
     borderColor: Theme.colors.input.border,
     color: Theme.colors.input.text,
   } as TextStyle,
+  button: {
+    marginTop: Theme.spacing.md,
+  } as ViewStyle,
 });

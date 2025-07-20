@@ -51,7 +51,6 @@ export default function CurrentGameScreen() {
         <ThemedText type="heading" style={styles.sectionTitle}>
           Previous Rounds
         </ThemedText>
-
         {currentGame.rounds.length > 0 ? (
           <View style={styles.roundsContainer}>
             {currentGame.rounds.map((round, index) => (
@@ -77,7 +76,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: Theme.spacing.md,
-    marginBottom: Theme.spacing.xl,
   } as ViewStyle,
   containerThemed: {
     backgroundColor: Theme.colors.background,
@@ -95,7 +93,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   teamScoreContainer: {
     alignItems: 'center',
-    gap: Theme.spacing.xs,
+    gap: Theme.spacing.sm,
   } as ViewStyle,
   teamScoreName: {
     fontSize: Theme.typography.fontSizes.lg,
@@ -112,10 +110,13 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.xl,
   } as ViewStyle,
   previousRounds: {
-    gap: Theme.spacing.md,
+    // Remove gap property as it's adding extra space
   } as ViewStyle,
   sectionTitle: {
-    marginBottom: Theme.spacing.md,
+    marginBottom: Theme.spacing.xs,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.bold,
+    lineHeight: Theme.typography.fontSizes.xl * 1.3,
   } as TextStyle,
   roundsContainer: {
     gap: Theme.spacing.md,

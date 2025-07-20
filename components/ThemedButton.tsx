@@ -7,14 +7,15 @@ import {
   TouchableOpacityProps,
   ViewStyle,
 } from 'react-native';
-import {useTheme} from '../hooks/useTheme';
+import {Theme} from '../constants/Theme';
 import {ThemedText} from './ThemedText';
 
 export type ThemedButtonVariant = 'primary' | 'secondary';
+export type ThemedButtonSize = 'sm' | 'md' | 'lg';
 
 interface ThemedButtonProps extends TouchableOpacityProps {
   variant?: ThemedButtonVariant;
-  size?: 'sm' | 'md' | 'lg';
+  size?: ThemedButtonSize;
   title: string;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
@@ -29,19 +30,18 @@ export function ThemedButton({
   disabled,
   ...rest
 }: ThemedButtonProps) {
-  const theme = useTheme();
+  const buttonSize = Theme.button.sizes[size];
 
   const buttonStyles = [
     styles.base,
     {
       backgroundColor:
         variant === 'primary'
-          ? theme.colors.button.primary
-          : theme.colors.button.secondary,
-      height: theme.button.height,
-      paddingHorizontal:
-        theme.spacing[size === 'sm' ? 'sm' : size === 'lg' ? 'xl' : 'lg'],
-      borderRadius: theme.borderRadius[size === 'sm' ? 'sm' : 'md'],
+          ? Theme.colors.button.primary
+          : Theme.colors.button.secondary,
+      height: buttonSize.height,
+      paddingHorizontal: buttonSize.paddingHorizontal,
+      borderRadius: Theme.borderRadius.md,
       opacity: disabled ? 0.6 : 1,
     },
     style,
@@ -52,9 +52,11 @@ export function ThemedButton({
     {
       color:
         variant === 'primary'
-          ? theme.colors.button.text
-          : theme.colors.button.textSecondary,
-      fontSize: theme.typography.fontSizes['lg'],
+          ? Theme.colors.button.text
+          : Theme.colors.button.textSecondary,
+      fontSize: buttonSize.fontSize,
+      lineHeight: buttonSize.fontSize * buttonSize.lineHeight,
+      fontFamily: Theme.typography.fonts.regular,
     },
     textStyle,
   ];
@@ -70,7 +72,7 @@ const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
+  } as ViewStyle,
   text: {
     textAlign: 'center',
   } as TextStyle,

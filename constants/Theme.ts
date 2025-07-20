@@ -5,76 +5,64 @@
 
 export const Theme = {
   colors: {
-    // Core brand colors
-    primary: '#1C3823', // deep forest green
-    secondary: '#8B3A2B', // rich burgundy
-    accent: {
-      burgundy: '#8B3A2B',
-      green: '#1C3823',
-      gold: '#D4B355',
-    },
-
-    // Background colors
-    background: '#F2E4B6', // warm yellow parchment
-    backgroundGrain: '#E8D5A0', // slightly darker for texture
-    surface: '#F7EAC3', // lighter warm parchment
-
-    // Text colors
-    text: '#1C3823', // forest green
-    textSecondary: '#8B3A2B', // burgundy
-
-    // Status colors
-    success: '#1C3823', // forest green
-    error: '#8B3A2B', // burgundy
-    warning: '#D4B355', // gold
-
-    // Component specific
+    // Base colors
+    background: '#F8F0D9', // Warm cream background
     card: {
-      background: '#F7EAC3', // light warm parchment
-      border: '#8B3A2B', // burgundy
-      shadow: '#1C382348', // semi-transparent green
+      background: '#FFFDF7', // Slightly warmer white for cards
+      border: '#E8D5B0', // Warm border color for cards
     },
+    // Text colors
+    text: '#202017', // Rich dark color for main text
+    textSecondary: '#6B5F51', // Warm brown for secondary text (dates)
+
+    // Accent colors
+    primary: '#173D2D', // Deep vintage green for primary actions
+    accent: {
+      burgundy: '#8B2E2E', // Deep red for accents
+      green: '#173D2D', // Deep green
+      gold: '#C6A15B', // Vintage gold
+    },
+
+    // Button colors
     button: {
-      primary: '#1C3823', // forest green
-      secondary: '#F7EAC3', // parchment
-      text: '#F7EAC3', // parchment
-      textSecondary: '#1C3823', // forest green
+      primary: '#173D2D', // Deep vintage green
+      secondary: '#FFFDF7', // Card background color
+      text: '#FFFDF7', // White text on primary
+      textSecondary: '#173D2D', // Green text on secondary
     },
+
+    // Input colors
     input: {
-      background: '#F7EAC3', // parchment
-      border: '#8B3A2B', // burgundy
-      text: '#1C3823', // forest green
-      placeholder: '#8B3A2B80', // semi-transparent burgundy
-      height: 40,
+      background: '#FFFDF7',
+      border: '#E8D5B0',
+      text: '#202017',
+      placeholder: '#A39485',
     },
   },
 
+  // Typography
   typography: {
     fonts: {
-      regular: 'CrimsonText-Regular',
+      regular: 'CrimsonText',
       bold: 'CrimsonText-Bold',
     },
     fontSizes: {
       xs: 12,
       sm: 14,
       md: 16,
-      lg: 18,
+      lg: 20,
       xl: 24,
       xxl: 32,
+      xxxl: 40,
     },
     lineHeights: {
       tight: 1.2,
       normal: 1.5,
       loose: 1.8,
     },
-    fontWeights: {
-      regular: '400',
-      medium: '500',
-      semibold: '600',
-      bold: '700',
-    },
   },
 
+  // Spacing
   spacing: {
     xs: 4,
     sm: 8,
@@ -84,18 +72,39 @@ export const Theme = {
     xxl: 48,
   },
 
+  // Border radius
   borderRadius: {
     sm: 4,
     md: 8,
-    lg: 16,
-    full: 9999,
+    lg: 12,
+    xl: 16,
   },
-  input: {
-    height: 40,
-  },
+
+  // Button
   button: {
-    height: 48,
+    sizes: {
+      sm: {
+        height: 40,
+        paddingHorizontal: 16,
+        fontSize: 14,
+        lineHeight: 1.3,
+      },
+      md: {
+        height: 48,
+        paddingHorizontal: 24,
+        fontSize: 16,
+        lineHeight: 1.3,
+      },
+      lg: {
+        height: 64,
+        paddingHorizontal: 32,
+        fontSize: 20,
+        lineHeight: 1.3,
+      },
+    },
   },
+
+  // Animation
   animation: {
     duration: {
       fast: 200,
