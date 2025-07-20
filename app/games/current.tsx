@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   teamColumn: {
     alignItems: 'center',
+    paddingVertical: Theme.spacing.xs,
   } as ViewStyle,
   teamName: {
     fontSize: Theme.typography.fontSizes.xl,
@@ -109,12 +110,14 @@ const styles = StyleSheet.create({
     color: Theme.colors.primary,
     textAlign: 'center',
     marginBottom: Theme.spacing.xs,
+    lineHeight: Theme.typography.fontSizes.xl,
   } as TextStyle,
   scoreValue: {
     fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.bold,
     color: Theme.colors.primary,
     textAlign: 'center',
+    lineHeight: Theme.typography.fontSizes.xl,
   } as TextStyle,
   newRoundButton: {
     marginBottom: Theme.spacing.xl,

@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSizes.lg,
     color: Theme.colors.accent.burgundy,
     textAlign: 'center',
-    marginBottom: Theme.spacing.xl,
+    marginBottom: Theme.spacing.lg,
   } as TextStyle,
   scoreboardTeams: {
     flexDirection: 'row',
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Theme.spacing.sm,
     marginBottom: Theme.spacing.xs,
+    paddingVertical: Theme.spacing.xs,
   } as ViewStyle,
   teamName: {
     fontSize: Theme.typography.fontSizes.xl,
@@ -157,10 +158,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   } as TextStyle,
   winnerText: {
-    color: Theme.colors.primary, // No change needed since we want all text in primary color
+    color: Theme.colors.primary,
   } as TextStyle,
   trophyIcon: {
     fontSize: Theme.typography.fontSizes.lg,
+    lineHeight: Theme.typography.fontSizes.xl,
   } as TextStyle,
   rounds: {
     gap: Theme.spacing.md,
