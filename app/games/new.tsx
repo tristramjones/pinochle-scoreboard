@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fonts.bold,
     textAlign: 'center',
     marginBottom: Theme.spacing.xl,
+    color: Theme.colors.primary,
   } as TextStyle,
   inputSection: {
     marginBottom: Theme.spacing.xl,
@@ -111,6 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.md,
     fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.regular,
+    color: Theme.colors.primary,
   } as TextStyle,
   input: {
     height: Theme.button.sizes.lg.height,

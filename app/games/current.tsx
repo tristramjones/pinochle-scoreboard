@@ -27,50 +27,47 @@ export default function CurrentGameScreen() {
       style={[styles.container, styles.containerThemed]}
       contentContainerStyle={styles.contentContainer}
     >
-      <View style={styles.scoreHeader}>
-        <View style={styles.scoreboardTeams}>
-          {currentGame.teams.map(team => (
-            <View key={team.id} style={styles.teamScoreContainer}>
-              <ThemedText type="subtitle" style={styles.teamScoreName}>
-                {team.name}
-              </ThemedText>
-              <ThemedText type="title" style={styles.teamScoreValue}>
-                {calculateTeamScore(currentGame, team.id)}
-              </ThemedText>
-            </View>
-          ))}
-        </View>
+      <ThemedText type="title" style={styles.phaseTitle}>
+        Current Game
+      </ThemedText>
+
+      <ThemedText type="label" style={styles.dateText}>
+        {new Date(currentGame.timestamp).toLocaleDateString()}
+      </ThemedText>
+
+      <View style={styles.scoreboardTeams}>
+        {currentGame.teams.map(team => (
+          <View key={team.id} style={styles.teamColumn}>
+            <ThemedText type="heading" style={styles.teamName}>
+              {team.name}
+            </ThemedText>
+            <ThemedText type="heading" style={styles.scoreValue}>
+              {calculateTeamScore(currentGame, team.id)}
+            </ThemedText>
+          </View>
+        ))}
       </View>
 
       <ThemedButton
         title="New Round"
         onPress={() => router.push('/games/round/new')}
         variant="primary"
-        size="md"
+        size="lg"
         style={styles.newRoundButton}
       />
 
-      <View style={styles.previousRounds}>
-        <ThemedText type="heading" style={styles.sectionTitle}>
-          Previous Rounds
-        </ThemedText>
-        {currentGame.rounds.length > 0 ? (
-          <View style={styles.roundsContainer}>
-            {currentGame.rounds.map((round, index) => (
-              <RoundCard
-                key={round.id}
-                round={round}
-                game={currentGame}
-                roundNumber={index + 1}
-              />
-            ))}
-          </View>
-        ) : (
-          <ThemedText type="subtitle" style={styles.emptyStateText}>
-            No completed rounds
-          </ThemedText>
-        )}
-      </View>
+      {currentGame.rounds.length > 0 && (
+        <View style={styles.roundsContainer}>
+          {currentGame.rounds.map((round, index) => (
+            <RoundCard
+              key={round.id}
+              round={round}
+              game={currentGame}
+              roundNumber={index + 1}
+            />
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -85,49 +82,44 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: Theme.spacing.lg,
   } as ViewStyle,
-  scoreHeader: {
+  phaseTitle: {
+    fontSize: Theme.typography.fontSizes.xxl,
+    fontFamily: Theme.typography.fonts.bold,
+    textAlign: 'center',
+    marginBottom: Theme.spacing.xs,
+    color: Theme.colors.primary,
+  } as TextStyle,
+  dateText: {
+    fontSize: Theme.typography.fontSizes.lg,
+    color: Theme.colors.accent.burgundy,
+    textAlign: 'center',
     marginBottom: Theme.spacing.xl,
-    paddingBottom: Theme.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.card.border,
-  } as ViewStyle,
+  } as TextStyle,
   scoreboardTeams: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginBottom: Theme.spacing.xl,
+  } as ViewStyle,
+  teamColumn: {
     alignItems: 'center',
   } as ViewStyle,
-  teamScoreContainer: {
-    alignItems: 'center',
-    gap: Theme.spacing.sm,
-  } as ViewStyle,
-  teamScoreName: {
-    fontSize: Theme.typography.fontSizes.lg,
-    color: Theme.colors.textSecondary,
-    textAlign: 'center',
-  } as TextStyle,
-  teamScoreValue: {
-    fontSize: Theme.typography.fontSizes.xxl,
+  teamName: {
+    fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.bold,
-    color: Theme.colors.text,
+    color: Theme.colors.primary,
+    textAlign: 'center',
+    marginBottom: Theme.spacing.xs,
+  } as TextStyle,
+  scoreValue: {
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.bold,
+    color: Theme.colors.primary,
     textAlign: 'center',
   } as TextStyle,
   newRoundButton: {
     marginBottom: Theme.spacing.xl,
   } as ViewStyle,
-  previousRounds: {
-    // Remove gap property as it's adding extra space
-  } as ViewStyle,
-  sectionTitle: {
-    marginBottom: Theme.spacing.xs,
-    fontSize: Theme.typography.fontSizes.xl,
-    fontFamily: Theme.typography.fonts.bold,
-    lineHeight: Theme.typography.fontSizes.xl * 1.3,
-  } as TextStyle,
   roundsContainer: {
     gap: Theme.spacing.md,
   } as ViewStyle,
-  emptyStateText: {
-    textAlign: 'center',
-    color: Theme.colors.textSecondary,
-  } as TextStyle,
 });

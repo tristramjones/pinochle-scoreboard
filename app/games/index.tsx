@@ -171,12 +171,14 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSizes.xxl,
     fontFamily: Theme.typography.fonts.bold,
     lineHeight: Theme.typography.fontSizes.xxl * 1.3,
+    color: Theme.colors.primary,
   } as TextStyle,
   sectionTitle: {
     marginBottom: Theme.spacing.xs,
     fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.bold,
     lineHeight: Theme.typography.fontSizes.xl * 1.3,
+    color: Theme.colors.primary,
   } as TextStyle,
   gameCard: {
     borderRadius: Theme.borderRadius.md,

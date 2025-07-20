@@ -55,39 +55,45 @@ export default function GameDetailsScreen() {
       style={[styles.container, styles.containerThemed]}
       contentContainerStyle={styles.contentContainer}
     >
-      <View style={styles.header}>
-        <ThemedText type="label" style={styles.dateText}>
-          {formatDate(game.timestamp)}
-        </ThemedText>
-        <View style={styles.teams}>
-          {game.teams.map(team => (
-            <View key={team.id} style={styles.teamScore}>
+      <ThemedText type="title" style={styles.phaseTitle}>
+        Game Details
+      </ThemedText>
+
+      <ThemedText type="label" style={styles.dateText}>
+        {formatDate(game.timestamp)}
+      </ThemedText>
+
+      <View style={styles.scoreboardTeams}>
+        {game.teams.map(team => (
+          <View key={team.id} style={styles.teamColumn}>
+            <View style={styles.teamNameContainer}>
               <ThemedText
-                type="subtitle"
+                type="heading"
                 style={[
                   styles.teamName,
                   team.id === winner.id && styles.winnerText,
                 ]}
               >
                 {team.name}
-                {team.id === winner.id && ' 🏆'}
               </ThemedText>
-              <ThemedText
-                type="score"
-                style={[
-                  styles.score,
-                  team.id === winner.id && styles.winnerText,
-                ]}
-              >
-                {scores[team.id]} points
-              </ThemedText>
+              {team.id === winner.id && (
+                <ThemedText style={styles.trophyIcon}>🏆</ThemedText>
+              )}
             </View>
-          ))}
-        </View>
+            <ThemedText
+              type="heading"
+              style={[
+                styles.scoreValue,
+                team.id === winner.id && styles.winnerText,
+              ]}
+            >
+              {scores[team.id]}
+            </ThemedText>
+          </View>
+        ))}
       </View>
 
       <View style={styles.rounds}>
-        <ThemedText type="heading">Rounds</ThemedText>
         {game.rounds.map((round, index) => (
           <RoundCard
             key={round.id}
@@ -111,31 +117,50 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: Theme.spacing.lg,
   } as ViewStyle,
-  header: {
+  phaseTitle: {
+    fontSize: Theme.typography.fontSizes.xxl,
+    fontFamily: Theme.typography.fonts.bold,
+    textAlign: 'center',
+    marginBottom: Theme.spacing.xs,
+    color: Theme.colors.primary,
+  } as TextStyle,
+  dateText: {
+    fontSize: Theme.typography.fontSizes.lg,
+    color: Theme.colors.accent.burgundy,
+    textAlign: 'center',
+    marginBottom: Theme.spacing.xl,
+  } as TextStyle,
+  scoreboardTeams: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     marginBottom: Theme.spacing.xl,
   } as ViewStyle,
-  dateText: {
-    marginBottom: Theme.spacing.xs,
-    color: Theme.colors.textSecondary,
-  } as TextStyle,
-  teams: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: Theme.spacing.md,
-    marginBottom: Theme.spacing.md,
-  } as ViewStyle,
-  teamScore: {
-    flex: 1,
+  teamColumn: {
     alignItems: 'center',
   } as ViewStyle,
+  teamNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Theme.spacing.sm,
+    marginBottom: Theme.spacing.xs,
+  } as ViewStyle,
   teamName: {
-    marginBottom: Theme.spacing.xs,
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.bold,
+    color: Theme.colors.primary,
+    textAlign: 'center',
   } as TextStyle,
-  score: {
-    marginBottom: Theme.spacing.xs,
+  scoreValue: {
+    fontSize: Theme.typography.fontSizes.xl,
+    fontFamily: Theme.typography.fonts.bold,
+    color: Theme.colors.primary,
+    textAlign: 'center',
   } as TextStyle,
   winnerText: {
-    color: Theme.colors.primary,
+    color: Theme.colors.primary, // No change needed since we want all text in primary color
+  } as TextStyle,
+  trophyIcon: {
+    fontSize: Theme.typography.fontSizes.lg,
   } as TextStyle,
   rounds: {
     gap: Theme.spacing.md,
