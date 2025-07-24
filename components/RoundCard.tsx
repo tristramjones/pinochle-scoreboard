@@ -18,9 +18,16 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
     <View style={styles.roundCard}>
       <View style={styles.roundHeader}>
         <ThemedText type="subtitle">Round {roundNumber}</ThemedText>
-        <ThemedText type="label" style={styles.bidText}>
-          {bidWinningTeam?.name} bid {round.bid}
-        </ThemedText>
+        {round.moonShotAttempted ? (
+          <ThemedText type="label" style={styles.bidText}>
+            {bidWinningTeam?.name}{' '}
+            {round.moonShotSuccessful ? 'made' : 'failed'} moon shot
+          </ThemedText>
+        ) : (
+          <ThemedText type="label" style={styles.bidText}>
+            {bidWinningTeam?.name} bid {round.bid}
+          </ThemedText>
+        )}
       </View>
 
       <View style={styles.scoreTable}>
@@ -58,7 +65,21 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
         {game.teams.map(team => {
           const meldPoints = round.meld[team.id] || 0;
           const trickPoints = round.trickPoints[team.id] || 0;
-          const roundTotal = meldPoints + trickPoints;
+
+          // For moon shots, show the actual points (+1500/-1500) in the tricks column
+          const displayTrickPoints = round.moonShotAttempted
+            ? team.id === round.bidWinner
+              ? round.moonShotSuccessful
+                ? 1500
+                : -1500
+              : 0
+            : trickPoints;
+
+          // For moon shots, total is the same as trick points (no meld)
+          const roundTotal = round.moonShotAttempted
+            ? displayTrickPoints
+            : meldPoints + trickPoints;
+
           const isBidWinner = team.id === round.bidWinner;
 
           // Calculate running score up to this round
@@ -93,10 +114,10 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
                 {team.name}
               </ThemedText>
               <ThemedText type="default" style={styles.tableCell}>
-                {meldPoints}
+                {round.moonShotAttempted ? '-' : meldPoints}
               </ThemedText>
               <ThemedText type="default" style={styles.tableCell}>
-                {trickPoints}
+                {displayTrickPoints}
               </ThemedText>
               <ThemedText type="default" style={styles.tableCell}>
                 {roundTotal}

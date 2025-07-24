@@ -74,35 +74,29 @@ export function GameProvider({children}: PropsWithChildren) {
       rounds: [...currentGame.rounds, roundData],
     };
 
-    // Check for victory condition
     let gameIsOver = false;
     if (roundData.moonShotAttempted) {
-      // For moon shots, check if the bidding team's total score is >= 1500
       const bidTeamScore = calculateTeamScore(updatedGame, roundData.bidWinner);
       gameIsOver = bidTeamScore >= 1500;
     } else {
-      // For regular rounds, check if any team's total score is >= 1500
-      gameIsOver = updatedGame.teams.some(
-        team => calculateTeamScore(updatedGame, team.id) >= 1500,
-      );
+      const teamScores = updatedGame.teams.map(team => ({
+        teamId: team.id,
+        score: calculateTeamScore(updatedGame, team.id),
+      }));
+      gameIsOver = teamScores.some(({score}) => score >= 1500);
     }
 
     if (gameIsOver) {
-      // Save to history first
       await Storage.saveGameHistory([
         ...(await Storage.getGameHistory()),
         updatedGame,
       ]);
-      // Clear current game
       setCurrentGame(null);
       await Storage.saveCurrentGame(null);
-      // Trigger navigation via effect
       setShouldNavigateToVictory(true);
     } else {
-      // Just save the updated game
       setCurrentGame(updatedGame);
       await Storage.saveCurrentGame(updatedGame);
-      // Navigate back to current game
       router.back();
     }
   };

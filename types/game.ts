@@ -11,17 +11,13 @@ export interface Team {
 
 export interface Round {
   id: string;
-  bidWinner: string; // team id
-  bid: number;
-  meld: {
-    [teamId: string]: number;
-  };
-  trickPoints: {
-    [teamId: string]: number;
-  };
-  moonShotAttempted?: boolean;
-  moonShotSuccessful?: boolean;
   timestamp: number;
+  bidWinner: string;
+  bid: number;
+  meld: {[key: string]: number};
+  trickPoints: {[key: string]: number};
+  moonShotAttempted: boolean;
+  moonShotSuccessful?: boolean;
 }
 
 export interface Game {

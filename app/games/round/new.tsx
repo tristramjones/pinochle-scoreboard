@@ -67,22 +67,37 @@ export default function NewRoundScreen() {
     }
 
     try {
+      const otherTeamId = currentGame.teams.find(t => t.id !== bidTeamId)?.id;
+      if (!otherTeamId) {
+        throw new Error('Could not find other team ID');
+      }
+
+      const finalTrickPoints = moonShotAttempted
+        ? {
+            [bidTeamId]: trickPoints[bidTeamId] === '1' ? 1500 : -1500,
+            [otherTeamId]: 0,
+          }
+        : Object.fromEntries(
+            Object.entries(trickPoints).map(([key, value]) => [
+              key,
+              parseInt(value) || 0,
+            ]),
+          );
+
       const roundData = {
         id: `round-${Date.now()}`,
+        timestamp: Date.now(),
         bidWinner: bidTeamId,
         bid: parseInt(bidAmount),
-        meld: Object.fromEntries(
-          Object.entries(meldPoints).map(([key, value]) => [
-            key,
-            parseInt(value) || 0,
-          ]),
-        ),
-        trickPoints: Object.fromEntries(
-          Object.entries(trickPoints).map(([key, value]) => [
-            key,
-            parseInt(value) || 0,
-          ]),
-        ),
+        meld: moonShotAttempted
+          ? {[bidTeamId]: 0, [otherTeamId]: 0}
+          : Object.fromEntries(
+              Object.entries(meldPoints).map(([key, value]) => [
+                key,
+                parseInt(value) || 0,
+              ]),
+            ),
+        trickPoints: finalTrickPoints,
         moonShotAttempted,
         moonShotSuccessful: moonShotAttempted
           ? trickPoints[bidTeamId] === '1'
@@ -90,7 +105,7 @@ export default function NewRoundScreen() {
       };
 
       await addRound(roundData);
-      setIsSubmitting(true); // This will trigger the navigation effect
+      setIsSubmitting(true);
     } catch (error) {
       console.error('Error submitting round:', error);
       Alert.alert('Error', 'Failed to submit round. Please try again.');
@@ -126,28 +141,20 @@ export default function NewRoundScreen() {
       <View style={styles.inputSection}>
         <ThemedText style={styles.inputLabel}>Who won the bid?</ThemedText>
         <View style={styles.buttonGroup}>
-          <ThemedButton
-            title={currentGame?.teams[0].name}
-            onPress={() => setBidTeamId('0')}
-            variant="secondary"
-            size="lg"
-            style={[
-              styles.fullWidthButton,
-              bidTeamId === '0' && styles.selectedButton,
-            ]}
-            textStyle={bidTeamId === '0' && styles.selectedButtonText}
-          />
-          <ThemedButton
-            title={currentGame?.teams[1].name}
-            onPress={() => setBidTeamId('1')}
-            variant="secondary"
-            size="lg"
-            style={[
-              styles.fullWidthButton,
-              bidTeamId === '1' && styles.selectedButton,
-            ]}
-            textStyle={bidTeamId === '1' && styles.selectedButtonText}
-          />
+          {currentGame.teams.map((team, index) => (
+            <ThemedButton
+              key={team.id}
+              title={team.name}
+              onPress={() => setBidTeamId(team.id)}
+              variant="secondary"
+              size="lg"
+              style={[
+                styles.fullWidthButton,
+                bidTeamId === team.id && styles.selectedButton,
+              ]}
+              textStyle={bidTeamId === team.id && styles.selectedButtonText}
+            />
+          ))}
         </View>
       </View>
 
@@ -235,13 +242,21 @@ export default function NewRoundScreen() {
 
           <View style={styles.inputSection}>
             <ThemedText type="heading" style={styles.inputLabel}>
-              Did {currentGame.teams[parseInt(bidTeamId!, 10)].name} make the
-              moon shot?
+              Did {currentGame.teams.find(t => t.id === bidTeamId)?.name} make
+              the moon shot?
             </ThemedText>
             <View style={styles.buttonGroup}>
               <ThemedButton
                 title="Yes"
-                onPress={() => setTrickPoints({[bidTeamId!]: '1'})}
+                onPress={() => {
+                  const otherTeamId = currentGame.teams.find(
+                    t => t.id !== bidTeamId,
+                  )?.id;
+                  setTrickPoints({
+                    [bidTeamId!]: '1',
+                    [otherTeamId!]: '0',
+                  });
+                }}
                 variant="secondary"
                 size="lg"
                 style={[
@@ -254,7 +269,15 @@ export default function NewRoundScreen() {
               />
               <ThemedButton
                 title="No"
-                onPress={() => setTrickPoints({[bidTeamId!]: '0'})}
+                onPress={() => {
+                  const otherTeamId = currentGame.teams.find(
+                    t => t.id !== bidTeamId,
+                  )?.id;
+                  setTrickPoints({
+                    [bidTeamId!]: '0',
+                    [otherTeamId!]: '0',
+                  });
+                }}
                 variant="secondary"
                 size="lg"
                 style={[

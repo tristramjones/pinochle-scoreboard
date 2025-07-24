@@ -7,7 +7,9 @@ const STORAGE_KEYS = {
 };
 
 // Helper function to ensure games have cardImageIndex
-function ensureGameHasCardImage(game: Game): Game {
+function ensureGameHasCardImage(game: Game | null): Game | null {
+  if (!game) return null;
+
   if (typeof game.cardImageIndex !== 'number') {
     // Assign a random card (0-23) if one isn't assigned
     return {
@@ -30,17 +32,16 @@ export async function saveCurrentGame(game: Game | null): Promise<void> {
   }
 }
 
-export async function getCurrentGame(): Promise<Game | null> {
+export const getCurrentGame = async (): Promise<Game | null> => {
   try {
     const gameJson = await AsyncStorage.getItem(STORAGE_KEYS.CURRENT_GAME);
     if (!gameJson) return null;
-    const game = JSON.parse(gameJson);
-    return ensureGameHasCardImage(game);
+    return ensureGameHasCardImage(JSON.parse(gameJson));
   } catch (error) {
     console.error('Error getting current game:', error);
-    throw error;
+    return null;
   }
-}
+};
 
 export async function saveGameHistory(games: Game[]): Promise<void> {
   try {
@@ -56,18 +57,17 @@ export async function saveGameHistory(games: Game[]): Promise<void> {
   }
 }
 
-export async function getGameHistory(): Promise<Game[]> {
+export const getGameHistory = async (): Promise<Game[]> => {
   try {
     const historyJson = await AsyncStorage.getItem(STORAGE_KEYS.GAME_HISTORY);
     if (!historyJson) return [];
-    const games = JSON.parse(historyJson);
-    // Ensure all games have card images when loading
-    return games.map(ensureGameHasCardImage);
+    const history = JSON.parse(historyJson);
+    return history.map((game: Game) => ensureGameHasCardImage(game) || game);
   } catch (error) {
     console.error('Error getting game history:', error);
-    throw error;
+    return [];
   }
-}
+};
 
 export async function clearStorage(): Promise<void> {
   try {
