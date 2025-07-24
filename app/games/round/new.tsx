@@ -235,8 +235,8 @@ export default function NewRoundScreen() {
 
           <View style={styles.inputSection}>
             <ThemedText type="heading" style={styles.inputLabel}>
-              Did {currentGame.teams.find(t => t.id === bidTeamId)?.name} make
-              the moon shot?
+              Did {currentGame.teams[parseInt(bidTeamId!, 10)].name} make the
+              moon shot?
             </ThemedText>
             <View style={styles.buttonGroup}>
               <ThemedButton
@@ -244,7 +244,10 @@ export default function NewRoundScreen() {
                 onPress={() => setTrickPoints({[bidTeamId!]: '1'})}
                 variant="secondary"
                 size="lg"
-                style={trickPoints[bidTeamId!] === '1' && styles.selectedButton}
+                style={[
+                  styles.fullWidthButton,
+                  trickPoints[bidTeamId!] === '1' && styles.selectedButton,
+                ]}
                 textStyle={
                   trickPoints[bidTeamId!] === '1' && styles.selectedButtonText
                 }
@@ -254,7 +257,10 @@ export default function NewRoundScreen() {
                 onPress={() => setTrickPoints({[bidTeamId!]: '0'})}
                 variant="secondary"
                 size="lg"
-                style={trickPoints[bidTeamId!] === '0' && styles.selectedButton}
+                style={[
+                  styles.fullWidthButton,
+                  trickPoints[bidTeamId!] === '0' && styles.selectedButton,
+                ]}
                 textStyle={
                   trickPoints[bidTeamId!] === '0' && styles.selectedButtonText
                 }
