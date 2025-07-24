@@ -58,8 +58,8 @@ export function GameProvider({children}: PropsWithChildren) {
       timestamp: Date.now(),
       teams,
       rounds: [],
-      cardImageIndex: Math.floor(Math.random() * 4), // Randomly assign one of our 4 card images
-      winningScore: 1500, // Add required winningScore property
+      cardImageIndex: Math.floor(Math.random() * 24), // Random index for 24 cards
+      winningScore: 1500,
     };
 
     setCurrentGame(newGame);

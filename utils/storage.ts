@@ -9,10 +9,10 @@ const STORAGE_KEYS = {
 // Helper function to ensure games have cardImageIndex
 function ensureGameHasCardImage(game: Game): Game {
   if (typeof game.cardImageIndex !== 'number') {
-    // Assign a random card (0-3) if one isn't assigned
+    // Assign a random card (0-23) if one isn't assigned
     return {
       ...game,
-      cardImageIndex: Math.floor(Math.random() * 4),
+      cardImageIndex: Math.floor(Math.random() * 24),
     };
   }
   return game;

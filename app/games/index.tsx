@@ -23,10 +23,34 @@ import {calculateTeamScores} from '../../utils/scoring';
 import * as Storage from '../../utils/storage';
 
 const cardImages = [
-  require('../../assets/images/hearts_ace.png'),
-  require('../../assets/images/diamonds_jack.png'),
-  require('../../assets/images/clubs_king.png'),
-  require('../../assets/images/spades_queen.png'),
+  // Spades
+  require('../../assets/images/cards/spades_9.png'),
+  require('../../assets/images/cards/spades_10.png'),
+  require('../../assets/images/cards/spades_jack.png'),
+  require('../../assets/images/cards/spades_queen.png'),
+  require('../../assets/images/cards/spades_king.png'),
+  require('../../assets/images/cards/spades_ace.png'),
+  // Hearts
+  require('../../assets/images/cards/hearts_9.png'),
+  require('../../assets/images/cards/hearts_10.png'),
+  require('../../assets/images/cards/hearts_jack.png'),
+  require('../../assets/images/cards/hearts_queen.png'),
+  require('../../assets/images/cards/hearts_king.png'),
+  require('../../assets/images/cards/hearts_ace.png'),
+  // Diamonds
+  require('../../assets/images/cards/diamonds_9.png'),
+  require('../../assets/images/cards/diamonds_10.png'),
+  require('../../assets/images/cards/diamonds_jack.png'),
+  require('../../assets/images/cards/diamonds_queen.png'),
+  require('../../assets/images/cards/diamonds_king.png'),
+  require('../../assets/images/cards/diamonds_ace.png'),
+  // Clubs
+  require('../../assets/images/cards/clubs_9.png'),
+  require('../../assets/images/cards/clubs_10.png'),
+  require('../../assets/images/cards/clubs_jack.png'),
+  require('../../assets/images/cards/clubs_queen.png'),
+  require('../../assets/images/cards/clubs_king.png'),
+  require('../../assets/images/cards/clubs_ace.png'),
 ];
 
 export default function GamesScreen() {
