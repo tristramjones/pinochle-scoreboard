@@ -15,6 +15,10 @@ interface GameState {
   currentGame: Game | null;
   isLoading: boolean;
   error: Error | null;
+  gameOverData: {
+    teamName: string;
+    score: number;
+  } | null;
 }
 
 interface GameContextValue extends GameState {
@@ -22,6 +26,7 @@ interface GameContextValue extends GameState {
   addRound: (roundData: RoundData) => Promise<void>;
   endGame: () => Promise<void>;
   clearError: () => void;
+  clearGameOverData: () => void;
 }
 
 type GameAction =
@@ -30,12 +35,17 @@ type GameAction =
   | {type: 'CLEAR_ERROR'}
   | {type: 'SET_GAME'; payload: Game | null}
   | {type: 'ADD_ROUND'; payload: Round}
-  | {type: 'END_GAME'};
+  | {type: 'END_GAME'}
+  | {
+      type: 'SET_GAME_OVER_DATA';
+      payload: {teamName: string; score: number} | null;
+    };
 
 const initialState: GameState = {
   currentGame: null,
   isLoading: false,
   error: null,
+  gameOverData: null,
 };
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -66,7 +76,13 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         isLoading: false,
       };
     case 'END_GAME':
-      return {...state, currentGame: null, isLoading: false};
+      return {
+        ...state,
+        currentGame: null,
+        isLoading: false,
+      };
+    case 'SET_GAME_OVER_DATA':
+      return {...state, gameOverData: action.payload};
     default:
       return state;
   }
@@ -96,6 +112,19 @@ export function GameProvider({children}: PropsWithChildren) {
 
     loadCurrentGame();
   }, []);
+
+  // Watch for game over and handle navigation
+  useEffect(() => {
+    if (state.gameOverData) {
+      router.replace({
+        pathname: '/games/victory',
+        params: {
+          teamName: state.gameOverData.teamName,
+          score: state.gameOverData.score.toString(),
+        },
+      });
+    }
+  }, [state.gameOverData, router]);
 
   const startNewGame = useCallback(
     async ({teamNames}: {teamNames: string[]}) => {
@@ -153,28 +182,48 @@ export function GameProvider({children}: PropsWithChildren) {
         };
 
         let gameIsOver = false;
+        let winningTeam: {id: string; score: number} | null = null;
+
         if (roundData.moonShotAttempted) {
           const bidTeamScore = calculateTeamScore(
             updatedGame,
             roundData.bidWinner,
           );
           gameIsOver = bidTeamScore >= updatedGame.winningScore;
+          if (gameIsOver) {
+            winningTeam = {
+              id: roundData.bidWinner,
+              score: bidTeamScore,
+            };
+          }
         } else {
           const teamScores = updatedGame.teams.map(team => ({
-            teamId: team.id,
+            id: team.id,
             score: calculateTeamScore(updatedGame, team.id),
           }));
-          gameIsOver = teamScores.some(
-            ({score}) => score >= updatedGame.winningScore,
+          const highestScore = teamScores.reduce((prev, curr) =>
+            curr.score > prev.score ? curr : prev,
           );
+          gameIsOver = highestScore.score >= updatedGame.winningScore;
+          if (gameIsOver) {
+            winningTeam = highestScore;
+          }
         }
 
         // Save the updated game first
         await Storage.saveCurrentGame(updatedGame);
         dispatch({type: 'SET_GAME', payload: updatedGame});
 
-        if (gameIsOver) {
-          // Save to history before ending the game
+        if (gameIsOver && winningTeam) {
+          const winningTeamName = updatedGame.teams.find(
+            t => t.id === winningTeam.id,
+          )?.name;
+
+          if (!winningTeamName) {
+            throw new GameError('Could not find winning team name');
+          }
+
+          // Save to history first
           await Storage.saveGameHistory([
             ...(await Storage.getGameHistory()),
             updatedGame,
@@ -184,10 +233,14 @@ export function GameProvider({children}: PropsWithChildren) {
           await Storage.saveCurrentGame(null);
           dispatch({type: 'END_GAME'});
 
-          // Navigate after all state updates are complete
-          setTimeout(() => {
-            router.replace('/games/victory');
-          }, 0);
+          // Set game over data to trigger navigation
+          dispatch({
+            type: 'SET_GAME_OVER_DATA',
+            payload: {
+              teamName: winningTeamName,
+              score: winningTeam.score,
+            },
+          });
         } else {
           router.back();
         }
@@ -228,6 +281,10 @@ export function GameProvider({children}: PropsWithChildren) {
     dispatch({type: 'CLEAR_ERROR'});
   }, []);
 
+  const clearGameOverData = useCallback(() => {
+    dispatch({type: 'SET_GAME_OVER_DATA', payload: null});
+  }, []);
+
   return (
     <GameContext.Provider
       value={{
@@ -236,6 +293,7 @@ export function GameProvider({children}: PropsWithChildren) {
         addRound,
         endGame,
         clearError,
+        clearGameOverData,
       }}
     >
       {children}

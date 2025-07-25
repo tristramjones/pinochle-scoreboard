@@ -1,50 +1,21 @@
 import * as Haptics from 'expo-haptics';
-import {useRouter} from 'expo-router';
-import React, {useEffect, useState} from 'react';
+import {useLocalSearchParams, useRouter} from 'expo-router';
+import React, {useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
-import {calculateTeamScore} from '../../utils/scoring';
-import * as Storage from '../../utils/storage';
+import {useGame} from '../../contexts/GameContext';
 
 export default function VictoryScreen() {
   const router = useRouter();
-  const [winningTeam, setWinningTeam] = useState<{
-    name: string;
-    score: number;
-  } | null>(null);
+  const {clearGameOverData} = useGame();
+  const params = useLocalSearchParams<{
+    teamName: string;
+    score: string;
+  }>();
 
   useEffect(() => {
-    const loadWinningTeam = async () => {
-      try {
-        // Get the most recent game from history
-        const history = await Storage.getGameHistory();
-        if (history.length > 0) {
-          const lastGame = history[history.length - 1];
-          // Find the winning team
-          const scores = lastGame.teams.map(team => ({
-            team,
-            score: calculateTeamScore(lastGame, team.id),
-          }));
-          const winner = scores.reduce((prev, curr) =>
-            curr.score > prev.score ? curr : prev,
-          );
-          setWinningTeam({
-            name: winner.team.name,
-            score: winner.score,
-          });
-        } else {
-          router.replace('/games');
-        }
-      } catch (error) {
-        console.error('Error loading game:', error);
-        router.replace('/games');
-      }
-    };
-
-    loadWinningTeam();
-
     // Play haptic feedback
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
@@ -53,10 +24,16 @@ export default function VictoryScreen() {
       router.replace('/games');
     }, 3000);
 
-    return () => clearTimeout(timer);
-  }, [router]);
+    return () => {
+      clearTimeout(timer);
+      clearGameOverData();
+    };
+  }, [router, clearGameOverData]);
 
-  if (!winningTeam) return null;
+  if (!params.teamName || !params.score) {
+    router.replace('/games');
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -65,10 +42,10 @@ export default function VictoryScreen() {
           🎉 Victory! 🎉
         </ThemedText>
         <ThemedText type="heading" style={styles.winner}>
-          {winningTeam.name} Wins!
+          {params.teamName} Wins!
         </ThemedText>
         <ThemedText type="score" style={styles.score}>
-          {winningTeam.score} points
+          {params.score} points
         </ThemedText>
       </View>
       <ConfettiCannon
