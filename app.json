@@ -1,28 +1,33 @@
 {
   "expo": {
-    "name": "pinochle-scoreboard",
+    "name": "Pinochle Scoreboard",
     "slug": "pinochle-scoreboard",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "userInterfaceStyle": "light",
+    "scheme": "pinochle-scoreboard",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*", "assets/images/*"],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trisjones.pinochle-scoreboard"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.trisjones.pinochle_scoreboard"
     },
     "web": {
+      "bundler": "metro",
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "plugins": ["expo-router"]
   }
 }

@@ -1,7 +1,32 @@
 import {Game} from '../types/game';
 
+// Cache for memoized scores
+const scoreCache = new Map<string, number>();
+
+// Create a cache key for a game and team
+function createCacheKey(game: Game, teamId: string): string {
+  return `${game.id}_${teamId}_${game.rounds.length}`;
+}
+
+// Clear cache entries for a specific game
+export function clearGameScoreCache(gameId: string) {
+  for (const key of scoreCache.keys()) {
+    if (key.startsWith(gameId)) {
+      scoreCache.delete(key);
+    }
+  }
+}
+
 export const calculateTeamScore = (game: Game, teamId: string): number => {
-  return game.rounds.reduce((total, round) => {
+  const cacheKey = createCacheKey(game, teamId);
+
+  // Check cache first
+  const cachedScore = scoreCache.get(cacheKey);
+  if (cachedScore !== undefined) {
+    return cachedScore;
+  }
+
+  const score = game.rounds.reduce((total, round) => {
     if (round.moonShotAttempted) {
       if (round.bidWinner === teamId) {
         return total + (round.moonShotSuccessful ? 1500 : -1500);
@@ -29,6 +54,10 @@ export const calculateTeamScore = (game: Game, teamId: string): number => {
       return total + roundTotal;
     }
   }, 0);
+
+  // Cache the result
+  scoreCache.set(cacheKey, score);
+  return score;
 };
 
 export const calculateTeamScores = (game: Game): {[teamId: string]: number} => {

@@ -36,8 +36,14 @@ export default function NewRoundScreen() {
     }
   }, [isSubmitting, router]);
 
+  // Handle navigation when no current game
+  useEffect(() => {
+    if (!currentGame) {
+      router.replace('/games');
+    }
+  }, [currentGame, router]);
+
   if (!currentGame) {
-    router.replace('/games');
     return null;
   }
 
