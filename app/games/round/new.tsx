@@ -179,6 +179,11 @@ export default function NewRoundScreen() {
       <ThemedText type="title" style={styles.phaseTitle}>
         Meld
       </ThemedText>
+      <ThemedText type="subtitle" style={styles.phaseSubtitle}>
+        {`${
+          currentGame.teams.find(t => t.id === bidTeamId)?.name
+        } bid ${bidAmount}`}
+      </ThemedText>
 
       <View style={styles.inputSection}>
         {currentGame.teams.map(team => (
@@ -244,6 +249,11 @@ export default function NewRoundScreen() {
         <View style={styles.phaseContainer}>
           <ThemedText type="title" style={styles.phaseTitle}>
             Moon Shot
+          </ThemedText>
+          <ThemedText type="subtitle" style={styles.phaseSubtitle}>
+            {`${
+              currentGame.teams.find(t => t.id === bidTeamId)?.name
+            } bid ${bidAmount}`}
           </ThemedText>
 
           <View style={styles.inputSection}>
@@ -313,6 +323,11 @@ export default function NewRoundScreen() {
         <ThemedText type="title" style={styles.phaseTitle}>
           Tricks
         </ThemedText>
+        <ThemedText type="subtitle" style={styles.phaseSubtitle}>
+          {`${
+            currentGame.teams.find(t => t.id === bidTeamId)?.name
+          } bid ${bidAmount}`}
+        </ThemedText>
 
         <View style={styles.inputSection}>
           {currentGame.teams.map((team, index) => (
@@ -377,8 +392,15 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSizes.xxl,
     fontFamily: Theme.typography.fonts.bold,
     textAlign: 'center',
-    marginBottom: Theme.spacing.xl,
+    marginBottom: Theme.spacing.sm,
     color: Theme.colors.primary,
+  } as TextStyle,
+  phaseSubtitle: {
+    fontSize: Theme.typography.fontSizes.lg,
+    fontFamily: Theme.typography.fonts.regular,
+    textAlign: 'center',
+    marginBottom: Theme.spacing.xl,
+    color: Theme.colors.textSecondary,
   } as TextStyle,
   inputSection: {
     marginBottom: Theme.spacing.lg,
