@@ -32,6 +32,41 @@ function migrateGame(game: Game | null): Game | null {
     updatedGame.version = CURRENT_VERSION;
   }
 
+  // Add roundPoints to each round if missing
+  updatedGame.rounds = updatedGame.rounds.map(round => {
+    if (!('roundPoints' in round)) {
+      const roundWithPoints = {
+        ...round,
+        roundPoints: {} as {[teamId: string]: number},
+      };
+      // Calculate points for each team
+      updatedGame.teams.forEach(team => {
+        const isBidWinner = round.bidWinner === team.id;
+        const meldPoints = round.meld[team.id] || 0;
+        const trickPoints = round.trickPoints[team.id] || 0;
+        const totalPoints = meldPoints + trickPoints;
+
+        if (round.moonShotAttempted) {
+          if (isBidWinner) {
+            roundWithPoints.roundPoints[team.id] = round.moonShotSuccessful
+              ? 1500
+              : -1500;
+          } else {
+            roundWithPoints.roundPoints[team.id] = 0;
+          }
+        } else if (isBidWinner) {
+          roundWithPoints.roundPoints[team.id] =
+            totalPoints >= round.bid ? totalPoints : -round.bid;
+        } else {
+          roundWithPoints.roundPoints[team.id] =
+            trickPoints > 0 ? totalPoints : 0;
+        }
+      });
+      return roundWithPoints;
+    }
+    return round;
+  });
+
   return updatedGame;
 }
 

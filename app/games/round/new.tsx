@@ -14,6 +14,8 @@ import {ThemedButton} from '../../../components/ThemedButton';
 import {ThemedText} from '../../../components/ThemedText';
 import {Theme} from '../../../constants/Theme';
 import {useGame} from '../../../contexts/GameContext';
+import {Round} from '../../../types/round';
+import {calculateRoundPoints} from '../../../utils/scoring';
 
 type RoundPhase = 'bid' | 'meld' | 'tricks';
 
@@ -96,6 +98,10 @@ export default function NewRoundScreen() {
             [bidTeamId]: 0,
             [otherTeamId]: 0,
           },
+          roundPoints: {
+            [bidTeamId]: -currentBidAmount, // Failed bid - lose bid amount
+            [otherTeamId]: otherTeamMeld, // Keep meld points
+          },
           moonShotAttempted: false,
         };
 
@@ -155,7 +161,22 @@ export default function NewRoundScreen() {
           : undefined,
       };
 
-      await addRound(roundData);
+      // Calculate and add round points
+      const roundDataWithPoints = {
+        ...roundData,
+        roundPoints: {
+          [bidTeamId]: calculateRoundPoints(
+            {...roundData, roundPoints: {}} as Round,
+            bidTeamId,
+          ),
+          [otherTeamId]: calculateRoundPoints(
+            {...roundData, roundPoints: {}} as Round,
+            otherTeamId,
+          ),
+        },
+      } as Round;
+
+      await addRound(roundDataWithPoints);
       setIsSubmitting(true);
     } catch (error) {
       console.error('Error submitting round:', error);

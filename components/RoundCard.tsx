@@ -75,12 +75,8 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
               : 0
             : trickPoints;
 
-          // For moon shots, total is the same as trick points (no meld)
-          const roundTotal = round.moonShotAttempted
-            ? displayTrickPoints
-            : meldPoints + trickPoints;
-
           const isBidWinner = team.id === round.bidWinner;
+          const roundTotal = round.roundPoints[team.id];
 
           // Calculate running score up to this round
           const runningScore = game.rounds

@@ -8,4 +8,9 @@ export interface Round {
   trickPoints: {
     [teamId: string]: number;
   };
+  roundPoints: {
+    [teamId: string]: number;
+  };
+  moonShotAttempted: boolean;
+  moonShotSuccessful?: boolean;
 }

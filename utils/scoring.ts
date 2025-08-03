@@ -1,4 +1,5 @@
 import {Game} from '../types/game';
+import {Round} from '../types/round';
 
 // Cache for memoized scores
 const scoreCache = new Map<string, number>();
@@ -22,6 +23,33 @@ export function clearAllScoreCache() {
   scoreCache.clear();
 }
 
+export const calculateRoundPoints = (round: Round, teamId: string): number => {
+  const isBidWinner = round.bidWinner === teamId;
+
+  // Handle moon shot rounds first
+  if (round.moonShotAttempted) {
+    if (!isBidWinner) return 0;
+    return round.moonShotSuccessful ? 1500 : -1500;
+  }
+
+  // Regular round scoring
+  const meldPoints = round.meld[teamId] || 0;
+  const trickPoints = round.trickPoints[teamId] || 0;
+  const totalPoints = meldPoints + trickPoints;
+
+  if (isBidWinner) {
+    // If this team won the bid, they need to make at least the bid amount
+    if (totalPoints >= round.bid) {
+      return totalPoints; // Made the bid - get meld + tricks
+    } else {
+      return -round.bid; // Failed to make bid - lose the bid amount
+    }
+  } else {
+    // Not the bid winner, gets their points if they won at least one trick
+    return trickPoints > 0 ? totalPoints : 0;
+  }
+};
+
 export const calculateTeamScore = (game: Game, teamId: string): number => {
   const cacheKey = createCacheKey(game, teamId);
 
@@ -31,58 +59,12 @@ export const calculateTeamScore = (game: Game, teamId: string): number => {
     return cachedScore;
   }
 
-  console.log('\nCalculating score for team:', teamId);
   const score = game.rounds.reduce((total, round) => {
-    console.log(`\nRound:`, round);
-    const isBidWinner = round.bidWinner === teamId;
-
-    // Handle moon shot rounds first
-    if (round.moonShotAttempted) {
-      if (!isBidWinner) {
-        console.log('Not bid winner in moon shot round, getting 0 points');
-        return total;
-      }
-      // For moon shots, we ignore meld and trick points
-      const moonShotPoints = round.moonShotSuccessful ? 1500 : -1500;
-      console.log('Moon shot points:', moonShotPoints);
-      const newTotal = total + moonShotPoints;
-      console.log('Running total (moon shot):', newTotal);
-      return newTotal;
-    }
-
-    // Regular round scoring
-    const meldPoints = round.meld[teamId] || 0;
-    const trickPoints = round.trickPoints[teamId] || 0;
-    const totalPoints = meldPoints + trickPoints;
-
-    let roundPoints;
-    if (isBidWinner) {
-      // If this team won the bid, they need to make at least the bid amount
-      if (totalPoints >= round.bid) {
-        // Made the bid - get meld + tricks
-        roundPoints = totalPoints;
-        console.log('Made bid, getting points:', roundPoints);
-      } else {
-        // Failed to make bid - lose the bid amount
-        roundPoints = -round.bid;
-        console.log('Failed bid, losing points:', roundPoints);
-        // For failed bids, we want to return just the negative bid amount
-        return total - round.bid;
-      }
-    } else {
-      // Not the bid winner, gets their points if they won at least one trick
-      if (trickPoints > 0) {
-        roundPoints = totalPoints;
-        console.log('Not bid winner, getting points:', roundPoints);
-      } else {
-        roundPoints = 0;
-        console.log('Not bid winner, no tricks won, getting 0 points');
-      }
-    }
-
-    const newTotal = total + roundPoints;
-    console.log('Running total:', newTotal);
-    return newTotal;
+    // Use the stored round points if available, otherwise calculate them
+    const roundPoints =
+      (round as unknown as Round).roundPoints?.[teamId] ??
+      calculateRoundPoints({...round, roundPoints: {}} as Round, teamId);
+    return total + roundPoints;
   }, 0);
 
   // Cache the result
