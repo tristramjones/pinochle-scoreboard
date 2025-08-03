@@ -27,8 +27,8 @@ export const calculateTeamScore = (game: Game, teamId: string): number => {
   }
 
   console.log('\nCalculating score for team:', teamId);
-  const score = game.rounds.reduce((total, round, index) => {
-    console.log(`\nRound ${index + 1}:`, round);
+  const score = game.rounds.reduce((total, round) => {
+    console.log(`\nRound:`, round);
     const isBidWinner = round.bidWinner === teamId;
 
     // Handle moon shot rounds first
@@ -65,9 +65,14 @@ export const calculateTeamScore = (game: Game, teamId: string): number => {
         return total - round.bid;
       }
     } else {
-      // Not the bid winner - just get their points
-      roundPoints = totalPoints;
-      console.log('Not bid winner, getting points:', roundPoints);
+      // Not the bid winner, gets their points if they won at least one trick
+      if (trickPoints > 0) {
+        roundPoints = totalPoints;
+        console.log('Not bid winner, getting points:', roundPoints);
+      } else {
+        roundPoints = 0;
+        console.log('Not bid winner, no tricks won, getting 0 points');
+      }
     }
 
     const newTotal = total + roundPoints;
