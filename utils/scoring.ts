@@ -17,6 +17,11 @@ export function clearGameScoreCache(gameId: string) {
   }
 }
 
+// Clear all cache entries (used for testing)
+export function clearAllScoreCache() {
+  scoreCache.clear();
+}
+
 export const calculateTeamScore = (game: Game, teamId: string): number => {
   const cacheKey = createCacheKey(game, teamId);
 

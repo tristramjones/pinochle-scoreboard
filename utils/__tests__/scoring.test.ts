@@ -1,5 +1,9 @@
 import {Game, Round} from '../../types/game';
-import {calculateTeamScore, calculateTeamScores} from '../scoring';
+import {
+  calculateTeamScore,
+  calculateTeamScores,
+  clearAllScoreCache,
+} from '../scoring';
 
 describe('Scoring Utils', () => {
   let mockGame: Game;
@@ -9,6 +13,7 @@ describe('Scoring Utils', () => {
   beforeEach(() => {
     team1Id = 'team-1';
     team2Id = 'team-2';
+    // Create a fresh game object for each test
     mockGame = {
       id: 'game-1',
       timestamp: Date.now(),
@@ -21,6 +26,8 @@ describe('Scoring Utils', () => {
       winningScore: 1500,
       version: 1,
     };
+    // Clear any cached scores
+    clearAllScoreCache();
   });
 
   describe('calculateTeamScore', () => {
@@ -119,7 +126,7 @@ describe('Scoring Utils', () => {
       mockGame.rounds = rounds;
 
       expect(calculateTeamScore(mockGame, team1Id)).toBe(425); // Round 1: 250 + Round 2: 175
-      expect(calculateTeamScore(mockGame, team2Id)).toBe(425); // Round 1: 150 + Round 2: 275
+      expect(calculateTeamScore(mockGame, team2Id)).toBe(-150); // Round 1: 150 + Round 2: -300 (failed bid)
     });
 
     it('should handle a mix of regular and moon shot rounds', () => {
