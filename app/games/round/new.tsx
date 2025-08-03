@@ -62,8 +62,53 @@ export default function NewRoundScreen() {
     setPhase('meld');
   };
 
-  const handleSubmitMeld = () => {
-    setPhase('tricks');
+  const handleSubmitMeld = async () => {
+    if (!bidTeamId) {
+      Alert.alert('Error', 'No bid winner selected');
+      return;
+    }
+
+    // Convert meld points to numbers
+    const bidTeamMeld = parseInt(meldPoints[bidTeamId] || '0');
+    const otherTeamId = currentGame.teams.find(t => t.id !== bidTeamId)?.id;
+    if (!otherTeamId) {
+      Alert.alert('Error', 'Could not find other team');
+      return;
+    }
+    const otherTeamMeld = parseInt(meldPoints[otherTeamId] || '0');
+    const currentBidAmount = parseInt(bidAmount);
+
+    // Check if bidding team can mathematically make their bid
+    const maxPossibleScore = bidTeamMeld + 250; // Max possible trick points is 250
+    if (maxPossibleScore < currentBidAmount) {
+      // Team is automatically set - they cannot make their bid even with all tricks
+      try {
+        const roundData = {
+          id: `round-${Date.now()}`,
+          timestamp: Date.now(),
+          bidWinner: bidTeamId,
+          bid: currentBidAmount,
+          meld: {
+            [bidTeamId]: bidTeamMeld,
+            [otherTeamId]: otherTeamMeld,
+          },
+          trickPoints: {
+            [bidTeamId]: 0,
+            [otherTeamId]: 0,
+          },
+          moonShotAttempted: false,
+        };
+
+        await addRound(roundData);
+        setIsSubmitting(true);
+      } catch (error) {
+        console.error('Error submitting round:', error);
+        Alert.alert('Error', 'Failed to submit round. Please try again.');
+      }
+    } else {
+      // Team still has a chance to make their bid - proceed to tricks
+      setPhase('tricks');
+    }
   };
 
   const handleSubmitTricks = async () => {
