@@ -21,14 +21,17 @@ export default function NewGameScreen() {
   const [team2Name, setTeam2Name] = useState('');
 
   const handleStartGame = async () => {
-    if (!team1Name || !team2Name) {
+    const trimmedTeam1Name = team1Name.trim();
+    const trimmedTeam2Name = team2Name.trim();
+
+    if (!trimmedTeam1Name || !trimmedTeam2Name) {
       Alert.alert('Error', 'Please enter names for both teams');
       return;
     }
 
     try {
       await startNewGame({
-        teamNames: [team1Name, team2Name],
+        teamNames: [trimmedTeam1Name, trimmedTeam2Name],
       });
       router.replace('/games/current');
     } catch (error) {
@@ -54,7 +57,7 @@ export default function NewGameScreen() {
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team1Name}
-            onChangeText={setTeam1Name}
+            onChangeText={text => setTeam1Name(text.trim())}
             placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />
@@ -67,7 +70,7 @@ export default function NewGameScreen() {
           <TextInput
             style={[styles.input, styles.inputThemed]}
             value={team2Name}
-            onChangeText={setTeam2Name}
+            onChangeText={text => setTeam2Name(text.trim())}
             placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />

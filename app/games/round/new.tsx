@@ -390,9 +390,12 @@ export default function NewRoundScreen() {
           Tricks
         </ThemedText>
         <ThemedText type="subtitle" style={styles.phaseSubtitle}>
-          {`${
-            currentGame.teams.find(t => t.id === bidTeamId)?.name
-          } bid ${bidAmount}`}
+          {(() => {
+            const bidTeam = currentGame.teams.find(t => t.id === bidTeamId);
+            const bidTeamMeld = parseInt(meldPoints[bidTeamId!] || '0');
+            const tricksNeeded = parseInt(bidAmount) - bidTeamMeld;
+            return `${bidTeam?.name} needs ${tricksNeeded} trick points to make bid of ${bidAmount}`;
+          })()}
         </ThemedText>
 
         <View style={styles.inputSection}>
