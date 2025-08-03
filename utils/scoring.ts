@@ -26,37 +26,58 @@ export const calculateTeamScore = (game: Game, teamId: string): number => {
     return cachedScore;
   }
 
-  const score = game.rounds.reduce((total, round) => {
+  console.log('\nCalculating score for team:', teamId);
+  const score = game.rounds.reduce((total, round, index) => {
+    console.log(`\nRound ${index + 1}:`, round);
+    const isBidWinner = round.bidWinner === teamId;
+
+    // Handle moon shot rounds first
     if (round.moonShotAttempted) {
-      if (round.bidWinner === teamId) {
-        return total + (round.moonShotSuccessful ? 1500 : -1500);
+      if (!isBidWinner) {
+        console.log('Not bid winner in moon shot round, getting 0 points');
+        return total;
       }
-      return total;
+      // For moon shots, we ignore meld and trick points
+      const moonShotPoints = round.moonShotSuccessful ? 1500 : -1500;
+      console.log('Moon shot points:', moonShotPoints);
+      const newTotal = total + moonShotPoints;
+      console.log('Running total (moon shot):', newTotal);
+      return newTotal;
     }
 
-    // Get base points (meld + tricks)
+    // Regular round scoring
     const meldPoints = round.meld[teamId] || 0;
     const trickPoints = round.trickPoints[teamId] || 0;
-    const roundTotal = meldPoints + trickPoints;
+    const totalPoints = meldPoints + trickPoints;
 
-    // If this team won the bid
-    if (round.bidWinner === teamId) {
-      // Need to make at least the bid amount in combined meld + tricks
-      if (roundTotal >= round.bid) {
+    let roundPoints;
+    if (isBidWinner) {
+      // If this team won the bid, they need to make at least the bid amount
+      if (totalPoints >= round.bid) {
         // Made the bid - get meld + tricks
-        return total + roundTotal;
+        roundPoints = totalPoints;
+        console.log('Made bid, getting points:', roundPoints);
       } else {
-        // Didn't make the bid - subtract bid amount
+        // Failed to make bid - lose the bid amount
+        roundPoints = -round.bid;
+        console.log('Failed bid, losing points:', roundPoints);
+        // For failed bids, we want to return just the negative bid amount
         return total - round.bid;
       }
     } else {
-      // Not the bid winner - get meld + tricks
-      return total + roundTotal;
+      // Not the bid winner - just get their points
+      roundPoints = totalPoints;
+      console.log('Not bid winner, getting points:', roundPoints);
     }
+
+    const newTotal = total + roundPoints;
+    console.log('Running total:', newTotal);
+    return newTotal;
   }, 0);
 
   // Cache the result
   scoreCache.set(cacheKey, score);
+  console.log('Final score:', score);
   return score;
 };
 
