@@ -15,7 +15,12 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.trisjones.pinochle-scoreboard"
+      "bundleIdentifier": "com.trisjones.pinochle-scoreboard",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIBackgroundModes": [],
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
