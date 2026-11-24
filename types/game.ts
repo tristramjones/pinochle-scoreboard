@@ -31,6 +31,7 @@ export interface Round {
   bid: number;
   meld: {[key: string]: number};
   trickPoints: {[key: string]: number};
+  roundPoints?: {[teamId: string]: number};
   moonShotAttempted: boolean;
   moonShotSuccessful?: boolean;
 }

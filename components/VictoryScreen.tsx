@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import {useRouter} from 'expo-router';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import {Theme} from '../constants/Theme';
@@ -15,7 +15,7 @@ interface VictoryScreenProps {
 
 export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
   const router = useRouter();
-  const opacity = useRef(new Animated.Value(0)).current;
+  const [opacity] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     // Play haptic feedback
@@ -82,7 +82,7 @@ export default function VictoryScreen({winningTeam}: VictoryScreenProps) {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,

@@ -1,8 +1,9 @@
+import {KeyboardScrollView} from '../../../components/KeyboardScrollView';
 import {useRouter} from 'expo-router';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
-  ScrollView,
+  Keyboard,
   StyleSheet,
   TextInput,
   TextStyle,
@@ -31,16 +32,11 @@ export default function NewRoundScreen() {
   const [moonShotAttempted, setMoonShotAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle navigation after round submission
-  useEffect(() => {
-    if (isSubmitting) {
-      router.back();
-    }
-  }, [isSubmitting, router]);
+  const submissionPending = useRef(false);
 
   // Handle navigation when no current game
   useEffect(() => {
-    if (!currentGame) {
+    if (!currentGame && !submissionPending.current) {
       router.replace('/games');
     }
   }, [currentGame, router]);
@@ -56,65 +52,38 @@ export default function NewRoundScreen() {
     }
 
     const bid = parseInt(bidAmount);
-    if (isNaN(bid) || bid <= 0) {
-      Alert.alert('Error', 'Please enter a valid bid amount');
+    if (!Number.isInteger(bid) || bid <= 0 || bid > 1500) {
+      Alert.alert('Error', 'Please enter a bid from 1 to 1500');
       return;
     }
 
+    Keyboard.dismiss();
     setPhase('meld');
   };
 
-  const handleSubmitMeld = async () => {
+  const handleSubmitMeld = () => {
     if (!bidTeamId) {
       Alert.alert('Error', 'No bid winner selected');
       return;
     }
 
     // Convert meld points to numbers
-    const bidTeamMeld = parseInt(meldPoints[bidTeamId] || '0');
+    const bidTeamMeld = Number(meldPoints[bidTeamId] || '0');
     const otherTeamId = currentGame.teams.find(t => t.id !== bidTeamId)?.id;
     if (!otherTeamId) {
       Alert.alert('Error', 'Could not find other team');
       return;
     }
-    const otherTeamMeld = parseInt(meldPoints[otherTeamId] || '0');
-    const currentBidAmount = parseInt(bidAmount);
+    const otherTeamMeld = Number(meldPoints[otherTeamId] || '0');
 
-    // Check if bidding team can mathematically make their bid
-    const maxPossibleScore = bidTeamMeld + 250; // Max possible trick points is 250
-    if (maxPossibleScore < currentBidAmount) {
-      // Team is automatically set - they cannot make their bid even with all tricks
-      try {
-        const roundData = {
-          id: `round-${Date.now()}`,
-          timestamp: Date.now(),
-          bidWinner: bidTeamId,
-          bid: currentBidAmount,
-          meld: {
-            [bidTeamId]: bidTeamMeld,
-            [otherTeamId]: otherTeamMeld,
-          },
-          trickPoints: {
-            [bidTeamId]: 0,
-            [otherTeamId]: 0,
-          },
-          roundPoints: {
-            [bidTeamId]: -currentBidAmount, // Failed bid - lose bid amount
-            [otherTeamId]: otherTeamMeld, // Keep meld points
-          },
-          moonShotAttempted: false,
-        };
-
-        await addRound(roundData);
-        setIsSubmitting(true);
-      } catch (error) {
-        console.error('Error submitting round:', error);
-        Alert.alert('Error', 'Failed to submit round. Please try again.');
-      }
-    } else {
-      // Team still has a chance to make their bid - proceed to tricks
-      setPhase('tricks');
+    if (currentGame.teams.some(team => !/^\d*$/.test(meldPoints[team.id] || '')) ||
+        ![bidTeamMeld, otherTeamMeld].every(value => Number.isSafeInteger(value) && value >= 0)) {
+      Alert.alert('Error', 'Please enter non-negative whole numbers for meld');
+      return;
     }
+    // Record actual tricks even when the bid cannot be made. Meld requires a trick.
+    Keyboard.dismiss();
+    setPhase('tricks');
   };
 
   const handleSubmitTricks = async () => {
@@ -123,6 +92,23 @@ export default function NewRoundScreen() {
       return;
     }
 
+    if (submissionPending.current) return;
+    if (moonShotAttempted && !['0', '1'].includes(trickPoints[bidTeamId])) {
+      Alert.alert('Error', 'Please select Yes or No for the moon shot');
+      return;
+    }
+    if (!moonShotAttempted) {
+      const values = currentGame.teams.map(team => Number(trickPoints[team.id]));
+      if (currentGame.teams.some(team => !/^\d+$/.test(trickPoints[team.id] || '')) ||
+          !values.every(value => Number.isSafeInteger(value) && value >= 0 && value <= 250) ||
+          values.reduce((sum, value) => sum + value, 0) !== 250) {
+        Alert.alert('Error', 'Trick points must be whole numbers from 0 to 250 and total 250');
+        return;
+      }
+    }
+    Keyboard.dismiss();
+    submissionPending.current = true;
+    setIsSubmitting(true);
     try {
       const otherTeamId = currentGame.teams.find(t => t.id !== bidTeamId)?.id;
       if (!otherTeamId) {
@@ -177,10 +163,12 @@ export default function NewRoundScreen() {
       } as Round;
 
       await addRound(roundDataWithPoints);
-      setIsSubmitting(true);
     } catch (error) {
       console.error('Error submitting round:', error);
       Alert.alert('Error', 'Failed to submit round. Please try again.');
+    } finally {
+      submissionPending.current = false;
+      setIsSubmitting(false);
     }
   };
 
@@ -195,11 +183,13 @@ export default function NewRoundScreen() {
           Bid Amount
         </ThemedText>
         <TextInput
+          returnKeyType="done"
+          onSubmitEditing={Keyboard.dismiss}
           style={[styles.input, styles.inputThemed]}
           value={bidAmount}
           onChangeText={text => {
             const numericText = text.replace(/[^0-9]/g, '');
-            if (numericText.length <= 4) {
+            if (numericText.length <= 4 && Number(numericText) <= 1500) {
               setBidAmount(numericText);
             }
           }}
@@ -258,6 +248,8 @@ export default function NewRoundScreen() {
               {team.name}
             </ThemedText>
             <TextInput
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
               style={[styles.input, styles.inputThemed]}
               value={meldPoints[team.id] || ''}
               onChangeText={value =>
@@ -289,6 +281,7 @@ export default function NewRoundScreen() {
         title="Shoot the Moon"
         onPress={() => {
           setMoonShotAttempted(true);
+          Keyboard.dismiss();
           setPhase('tricks');
         }}
         variant="secondary"
@@ -299,13 +292,14 @@ export default function NewRoundScreen() {
 
   const renderTricksPhase = () => {
     const handleTrickPointsChange = (teamId: string, value: string) => {
-      const points = parseInt(value) || 0;
+      if (!/^\d*$/.test(value) || Number(value) > 250) return;
+      const points = Number(value);
       const otherTeam = currentGame.teams.find(t => t.id !== teamId);
 
       if (otherTeam) {
         setTrickPoints({
           [teamId]: value,
-          [otherTeam.id]: points <= 250 ? String(250 - points) : '0',
+          [otherTeam.id]: value === '' ? '' : String(250 - points),
         });
       }
     };
@@ -375,6 +369,7 @@ export default function NewRoundScreen() {
 
           <ThemedButton
             title="Submit Round"
+          disabled={isSubmitting}
             onPress={handleSubmitTricks}
             variant="primary"
             size="lg"
@@ -393,8 +388,10 @@ export default function NewRoundScreen() {
           {(() => {
             const bidTeam = currentGame.teams.find(t => t.id === bidTeamId);
             const bidTeamMeld = parseInt(meldPoints[bidTeamId!] || '0');
-            const tricksNeeded = parseInt(bidAmount) - bidTeamMeld;
-            return `${bidTeam?.name} needs ${tricksNeeded} trick points to make bid of ${bidAmount}`;
+            const tricksNeeded = Math.max(0, parseInt(bidAmount) - bidTeamMeld);
+            return tricksNeeded > 250
+              ? `${bidTeam?.name} cannot make the bid. Record tricks to score the round.`
+              : `${bidTeam?.name} needs ${tricksNeeded} trick points to make bid of ${bidAmount}. Meld requires winning a trick.`;
           })()}
         </ThemedText>
 
@@ -405,6 +402,8 @@ export default function NewRoundScreen() {
                 {team.name}
               </ThemedText>
               <TextInput
+                returnKeyType="done"
+                onSubmitEditing={Keyboard.dismiss}
                 style={[styles.input, styles.inputThemed]}
                 value={trickPoints[team.id] || ''}
                 onChangeText={value => handleTrickPointsChange(team.id, value)}
@@ -419,6 +418,7 @@ export default function NewRoundScreen() {
 
         <ThemedButton
           title="Submit Round"
+          disabled={isSubmitting}
           onPress={handleSubmitTricks}
           variant="primary"
           size="lg"
@@ -429,7 +429,7 @@ export default function NewRoundScreen() {
   };
 
   return (
-    <ScrollView
+    <KeyboardScrollView
       style={[styles.container, styles.containerThemed]}
       contentContainerStyle={styles.contentContainer}
     >
@@ -440,7 +440,7 @@ export default function NewRoundScreen() {
       {phase === 'bid' && renderBidPhase()}
       {phase === 'meld' && renderMeldPhase()}
       {phase === 'tricks' && renderTricksPhase()}
-    </ScrollView>
+    </KeyboardScrollView>
   );
 }
 

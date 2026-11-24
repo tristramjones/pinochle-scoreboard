@@ -1,8 +1,9 @@
+import {KeyboardScrollView} from '../../components/KeyboardScrollView';
 import {useRouter} from 'expo-router';
 import React, {useState} from 'react';
 import {
   Alert,
-  ScrollView,
+  Keyboard,
   StyleSheet,
   TextInput,
   TextStyle,
@@ -21,6 +22,7 @@ export default function NewGameScreen() {
   const [team2Name, setTeam2Name] = useState('');
 
   const handleStartGame = async () => {
+    Keyboard.dismiss();
     const trimmedTeam1Name = team1Name.trim();
     const trimmedTeam2Name = team2Name.trim();
 
@@ -41,7 +43,7 @@ export default function NewGameScreen() {
   };
 
   return (
-    <ScrollView
+    <KeyboardScrollView
       style={[styles.container, styles.containerThemed]}
       contentContainerStyle={styles.contentContainer}
     >
@@ -55,6 +57,8 @@ export default function NewGameScreen() {
             Team 1
           </ThemedText>
           <TextInput
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
             style={[styles.input, styles.inputThemed]}
             value={team1Name}
             onChangeText={text => setTeam1Name(text.trim())}
@@ -68,6 +72,8 @@ export default function NewGameScreen() {
             Team 2
           </ThemedText>
           <TextInput
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
             style={[styles.input, styles.inputThemed]}
             value={team2Name}
             onChangeText={text => setTeam2Name(text.trim())}
@@ -84,7 +90,7 @@ export default function NewGameScreen() {
         size="lg"
         style={styles.submitButton}
       />
-    </ScrollView>
+    </KeyboardScrollView>
   );
 }
 

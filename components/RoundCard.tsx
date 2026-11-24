@@ -1,4 +1,5 @@
 import React from 'react';
+import {calculateRoundPoints} from '../utils/scoring';
 import {Platform, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {Theme} from '../constants/Theme';
 import {Game} from '../types/game';
@@ -76,26 +77,12 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
             : trickPoints;
 
           const isBidWinner = team.id === round.bidWinner;
-          const roundTotal = round.roundPoints[team.id];
+          const roundTotal = calculateRoundPoints(round, team.id);
 
           // Calculate running score up to this round
           const runningScore = game.rounds
             .slice(0, roundNumber)
-            .reduce((sum, r) => {
-              if (r.moonShotAttempted) {
-                if (r.bidWinner === team.id) {
-                  return sum + (r.moonShotSuccessful ? 1500 : -1500);
-                }
-                return sum;
-              }
-
-              const roundPoints =
-                (r.meld[team.id] || 0) + (r.trickPoints[team.id] || 0);
-              if (r.bidWinner === team.id && roundPoints < r.bid) {
-                return sum - r.bid;
-              }
-              return sum + roundPoints;
-            }, 0);
+            .reduce((sum, r) => sum + calculateRoundPoints(r, team.id), 0);
 
           return (
             <View key={team.id} style={styles.tableRow}>

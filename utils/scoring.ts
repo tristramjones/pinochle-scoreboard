@@ -1,27 +1,4 @@
-import {Game} from '../types/game';
-import {Round} from '../types/round';
-
-// Cache for memoized scores
-const scoreCache = new Map<string, number>();
-
-// Create a cache key for a game and team
-function createCacheKey(game: Game, teamId: string): string {
-  return `${game.id}_${teamId}_${game.rounds.length}`;
-}
-
-// Clear cache entries for a specific game
-export function clearGameScoreCache(gameId: string) {
-  for (const key of scoreCache.keys()) {
-    if (key.startsWith(gameId)) {
-      scoreCache.delete(key);
-    }
-  }
-}
-
-// Clear all cache entries (used for testing)
-export function clearAllScoreCache() {
-  scoreCache.clear();
-}
+import {Game, Round} from '../types/game';
 
 export const calculateRoundPoints = (round: Round, teamId: string): number => {
   const isBidWinner = round.bidWinner === teamId;
@@ -35,7 +12,7 @@ export const calculateRoundPoints = (round: Round, teamId: string): number => {
   // Regular round scoring
   const meldPoints = round.meld[teamId] || 0;
   const trickPoints = round.trickPoints[teamId] || 0;
-  const totalPoints = meldPoints + trickPoints;
+  const totalPoints = trickPoints > 0 ? meldPoints + trickPoints : 0;
 
   if (isBidWinner) {
     // If this team won the bid, they need to make at least the bid amount
@@ -51,26 +28,10 @@ export const calculateRoundPoints = (round: Round, teamId: string): number => {
 };
 
 export const calculateTeamScore = (game: Game, teamId: string): number => {
-  const cacheKey = createCacheKey(game, teamId);
-
-  // Check cache first
-  const cachedScore = scoreCache.get(cacheKey);
-  if (cachedScore !== undefined) {
-    return cachedScore;
-  }
-
-  const score = game.rounds.reduce((total, round) => {
-    // Use the stored round points if available, otherwise calculate them
-    const roundPoints =
-      (round as unknown as Round).roundPoints?.[teamId] ??
-      calculateRoundPoints({...round, roundPoints: {}} as Round, teamId);
-    return total + roundPoints;
-  }, 0);
-
-  // Cache the result
-  scoreCache.set(cacheKey, score);
-  console.log('Final score:', score);
-  return score;
+  return game.rounds.reduce(
+    (total, round) => total + calculateRoundPoints(round, teamId),
+    0,
+  );
 };
 
 export const calculateTeamScores = (game: Game): {[teamId: string]: number} => {

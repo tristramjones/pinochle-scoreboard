@@ -1,6 +1,5 @@
-import {DefaultTheme, ThemeProvider} from '@react-navigation/native';
+import {DefaultTheme, ThemeProvider, Slot} from 'expo-router';
 import {useFonts} from 'expo-font';
-import {Slot} from 'expo-router';
 import {StatusBar} from 'expo-status-bar';
 import 'react-native-reanimated';
 import {Theme} from '../constants/Theme';
@@ -18,7 +17,7 @@ const appTheme = {
   },
 };
 
-export default function RootLayout() {
+function RootLayout() {
   const [loaded] = useFonts({
     CrimsonText: require('../assets/fonts/CrimsonText-Regular.ttf'),
     'CrimsonText-Bold': require('../assets/fonts/CrimsonText-Bold.ttf'),
@@ -37,3 +36,5 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+export default RootLayout;

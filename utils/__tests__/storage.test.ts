@@ -6,7 +6,7 @@ import * as Storage from '../storage';
 jest.mock('@react-native-async-storage/async-storage', () => ({
   setItem: jest.fn(),
   getItem: jest.fn(),
-  clear: jest.fn(),
+  multiRemove: jest.fn(),
 }));
 
 // Silence console logs/warnings/errors during tests
@@ -259,11 +259,11 @@ describe('Storage Utils', () => {
   describe('clearStorage', () => {
     it('should clear all storage', async () => {
       await Storage.clearStorage();
-      expect(AsyncStorage.clear).toHaveBeenCalled();
+      expect(AsyncStorage.multiRemove).toHaveBeenCalled();
     });
 
     it('should throw StorageError if clear fails', async () => {
-      (AsyncStorage.clear as jest.Mock).mockRejectedValue(new Error('Failed'));
+      (AsyncStorage.multiRemove as jest.Mock).mockRejectedValue(new Error('Failed'));
       await expect(Storage.clearStorage()).rejects.toThrow(StorageError);
     });
   });

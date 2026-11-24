@@ -12,7 +12,7 @@ A React Native mobile app built with Expo for tracking scores in Pinochle card g
 
 ## Getting Started
 
-1. Install dependencies:
+1. Use Node.js 24 (`nvm use`), then install dependencies:
    ```bash
    npm install
    ```
@@ -34,7 +34,7 @@ A React Native mobile app built with Expo for tracking scores in Pinochle card g
 - Bid-winning team must achieve their bid amount in combined meld + trick points
 - If bid team makes their bid, they score: meld points + trick points
 - If bid team fails to make their bid, they score: -bid amount
-- Non-bidding team always scores: meld points + trick points
+- A team must win at least one trick to count its meld. The bidding team loses its bid if it wins no tricks or fails to reach the bid; the non-bidding team scores zero without a trick.
 - First team to reach 1500 points wins
 
 ## Development
@@ -48,3 +48,16 @@ This app is built with:
 ## Contributing
 
 Feel free to submit issues and enhancement requests!
+
+## Toolchain
+
+This project uses Expo SDK 58, React Native 0.88, React 19.3, and TypeScript 6.
+Use Node.js 24 (`nvm use`) before running npm commands.
+
+Validation: `npm test -- --runInBand`, `npm run typecheck`, `npm run lint`,
+`npx expo-doctor`, and `npx expo export --platform web`.
+
+Scores are calculated from meld and tricks for saved games as well as new rounds.
+Previously stored totals that awarded meld without tricks are corrected on display.
+Older automatically-set rounds recorded zero tricks for both teams; these now award
+zero points to the non-bidding team because no actual trick result was saved.

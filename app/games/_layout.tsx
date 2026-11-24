@@ -1,5 +1,4 @@
-import {useTheme} from '@react-navigation/native';
-import {Stack} from 'expo-router';
+import {useTheme, Stack} from 'expo-router';
 
 export default function GamesLayout() {
   const {colors} = useTheme();

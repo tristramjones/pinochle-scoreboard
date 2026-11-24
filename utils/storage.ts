@@ -5,6 +5,15 @@ const STORAGE_KEYS = {
   CURRENT_GAME: 'pinochle_current_game',
   GAME_HISTORY: 'pinochle_game_history',
 };
+function migrateGame(value: unknown): Game {
+  if (!value || typeof value !== 'object') throw new StorageError('Invalid game data');
+  const migrated = {...value} as Game;
+  migrated.version ??= 1;
+  migrated.cardImageIndex ??= 0;
+  if (!isValidGame(migrated)) throw new StorageError('Invalid game data');
+  return migrated;
+}
+
 export async function saveCurrentGame(game: Game | null): Promise<void> {
   try {
     if (game) {
@@ -37,11 +46,7 @@ export const getCurrentGame = async (): Promise<Game | null> => {
     const parsedGame = JSON.parse(gameJson);
     if (!parsedGame) return null;
 
-    if (!isValidGame(parsedGame)) {
-      throw new StorageError('Invalid game data in storage');
-    }
-
-    return parsedGame;
+    return migrateGame(parsedGame);
   } catch (error) {
     console.error('Error getting current game:', error);
     throw error instanceof StorageError
@@ -81,14 +86,7 @@ export const getGameHistory = async (): Promise<Game[]> => {
       throw new StorageError('Invalid game history format');
     }
 
-    // Validate each game
-    parsedHistory.forEach((game: unknown) => {
-      if (!isValidGame(game)) {
-        throw new StorageError('Invalid game data in history');
-      }
-    });
-
-    return parsedHistory;
+    return parsedHistory.map(migrateGame);
   } catch (error) {
     console.error('Error getting game history:', error);
     throw error instanceof StorageError
@@ -107,4 +105,24 @@ export async function clearStorage(): Promise<void> {
     console.error('Error clearing storage:', error);
     throw new StorageError('Failed to clear storage');
   }
+}
+
+export async function backupData(): Promise<void> {
+  const currentGame = await getCurrentGame();
+  const gameHistory = await getGameHistory();
+  await AsyncStorage.setItem('pinochle_data_backup', JSON.stringify({
+    timestamp: Date.now(), version: 1, currentGame, gameHistory,
+  }));
+}
+
+export async function restoreFromBackup(): Promise<boolean> {
+  const json = await AsyncStorage.getItem('pinochle_data_backup');
+  if (!json) return false;
+  const backup = JSON.parse(json);
+  const currentGame = backup.currentGame ? migrateGame(backup.currentGame) : null;
+  if (!Array.isArray(backup.gameHistory)) throw new StorageError('Invalid backup history');
+  const history = backup.gameHistory.map(migrateGame);
+  await saveCurrentGame(currentGame);
+  await saveGameHistory(history);
+  return true;
 }

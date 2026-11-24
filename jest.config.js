@@ -1,12 +1,11 @@
+// Utility tests run in Node; native storage is mocked in the storage suite.
 module.exports = {
-  preset: 'react-native',
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  setupFiles: ['<rootDir>/jest.setup.js'],
-  transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)/)',
-  ],
-  moduleNameMapper: {
-    '\\.png$': '<rootDir>/__mocks__/fileMock.js',
-    '\\.jpg$': '<rootDir>/__mocks__/fileMock.js',
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.[jt]sx?$': ['babel-jest', {
+      babelrc: false,
+      configFile: false,
+      presets: [['@babel/preset-env', {targets: {node: 'current'}}], '@babel/preset-typescript'],
+    }],
   },
 };

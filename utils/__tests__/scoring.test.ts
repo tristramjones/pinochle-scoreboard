@@ -2,7 +2,6 @@ import {Game, Round} from '../../types/game';
 import {
   calculateTeamScore,
   calculateTeamScores,
-  clearAllScoreCache,
 } from '../scoring';
 
 describe('Scoring Utils', () => {
@@ -27,7 +26,7 @@ describe('Scoring Utils', () => {
       version: 1,
     };
     // Clear any cached scores
-    clearAllScoreCache();
+
   });
 
   describe('calculateTeamScore', () => {
@@ -158,7 +157,16 @@ describe('Scoring Utils', () => {
     });
   });
 
-  describe('calculateTeamScores', () => {
+  it('requires tricks to count meld, including for the bidder and old stored totals', () => {
+    mockGame.rounds = [{id: 'r', timestamp: 0, bidWinner: team1Id, bid: 250,
+      meld: {[team1Id]: 500, [team2Id]: 100}, trickPoints: {},
+      roundPoints: {[team1Id]: 500, [team2Id]: 100}, moonShotAttempted: false}];
+    expect(calculateTeamScores(mockGame)).toEqual({[team1Id]: -250, [team2Id]: 0});
+    mockGame.rounds[0].trickPoints[team2Id] = 250;
+    expect(calculateTeamScore(mockGame, team2Id)).toBe(350);
+  });
+
+  describe('calculateTeamScores' , () => {
     it('should return scores for all teams', () => {
       const round: Round = {
         id: 'round-1',

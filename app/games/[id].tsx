@@ -1,5 +1,5 @@
 import {useLocalSearchParams, useRouter} from 'expo-router';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {RoundCard} from '../../components/RoundCard';
 import {ThemedButton} from '../../components/ThemedButton';
@@ -14,19 +14,13 @@ export default function GameDetailsScreen() {
   const router = useRouter();
   const [game, setGame] = useState<Game | null>(null);
 
-  const loadGame = useCallback(async () => {
-    try {
-      const history = await Storage.getGameHistory();
-      const foundGame = history.find(g => g.id === id);
-      setGame(foundGame || null);
-    } catch (error) {
-      console.error('Error loading game:', error);
-    }
-  }, [id]);
-
   useEffect(() => {
-    loadGame();
-  }, [loadGame]);
+    let active = true;
+    Storage.getGameHistory().then(history => {
+      if (active) setGame(history.find(g => g.id === id) || null);
+    }).catch(error => console.error('Error loading game:', error));
+    return () => { active = false; };
+  }, [id]);
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString();
