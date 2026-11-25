@@ -68,17 +68,22 @@ export function ThemedButton({
         styles.base,
         {
           minHeight: dimensions.height,
-          paddingHorizontal: dimensions.paddingHorizontal,
+          paddingHorizontal:
+            variant === 'text' ? Theme.spacing.sm : dimensions.paddingHorizontal,
           backgroundColor:
             filled || variant === 'text'
               ? 'transparent'
               : Theme.colors.button.secondary,
-          borderWidth: filled || variant === 'text' ? 0 : 1,
+          // Reserve the same border space in every state to prevent reflow.
+          borderWidth: 1,
           borderColor:
-            variant === 'destructive'
-              ? Theme.colors.accent.burgundy
-              : Theme.colors.accent.gold,
+            filled || variant === 'text'
+              ? 'transparent'
+              : variant === 'destructive'
+                ? Theme.colors.accent.burgundy
+                : Theme.colors.accent.gold,
         },
+        variant === 'text' && styles.compact,
         style,
         blocked && styles.disabled,
       ]}
@@ -105,7 +110,7 @@ export function ThemedButton({
           />
         )
       )}
-      <View style={styles.label}>
+      <View style={[styles.label, variant === 'text' && styles.compactLabel]}>
         {loading && (
           <ActivityIndicator size="small" color={color} accessible={false} />
         )}
@@ -136,7 +141,10 @@ const styles = StyleSheet.create({
     borderRadius: Theme.borderRadius.lg,
   },
   disabled: {opacity: Theme.button.disabledOpacity},
+  compact: {alignSelf: 'center', minWidth: 44},
+  compactLabel: {width: 'auto'},
   label: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

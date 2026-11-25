@@ -33,33 +33,6 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
       </View>
 
       <View style={styles.scoreTable}>
-        <View style={styles.tableRow}>
-          <ThemedText
-            type="label"
-            style={[styles.tableCell, styles.headerCell]}
-          >
-            MELD
-          </ThemedText>
-          <ThemedText
-            type="label"
-            style={[styles.tableCell, styles.headerCell]}
-          >
-            TRICKS
-          </ThemedText>
-          <ThemedText
-            type="label"
-            style={[styles.tableCell, styles.headerCell]}
-          >
-            TOTAL
-          </ThemedText>
-          <ThemedText
-            type="label"
-            style={[styles.tableCell, styles.headerCell]}
-          >
-            SCORE
-          </ThemedText>
-        </View>
-
         {game.teams.map(team => {
           const meldPoints = round.meld[team.id] || 0;
           const trickPoints = round.trickPoints[team.id] || 0;
@@ -85,30 +58,34 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
             <View key={team.id} style={styles.teamResult}>
               <ThemedText
                 type="subtitle"
-                style={[
-                  styles.tableCell,
-                  styles.teamName,
-                  isBidWinner && styles.bidWinnerText,
-                ]}
+                style={[styles.teamName, isBidWinner && styles.bidWinnerText]}
               >
                 {team.name}
               </ThemedText>
               <View style={styles.tableRow}>
-                <ThemedText type="default" style={styles.tableCell}>
-                  {round.moonShotAttempted ? '-' : meldPoints}
-                </ThemedText>
-                <ThemedText type="default" style={styles.tableCell}>
-                  {displayTrickPoints}
-                </ThemedText>
-                <ThemedText type="default" style={styles.tableCell}>
-                  {roundTotal}
-                </ThemedText>
-                <ThemedText
-                  type="default"
-                  style={[styles.tableCell, styles.boldText]}
-                >
-                  {runningScore}
-                </ThemedText>
+                {[
+                  {
+                    label: 'Meld',
+                    value: round.moonShotAttempted ? '—' : meldPoints,
+                  },
+                  {label: 'Tricks', value: displayTrickPoints},
+                  {label: 'Total', value: roundTotal},
+                  {label: 'Score', value: runningScore},
+                ].map(({label, value}) => (
+                  <View key={label} style={styles.stat}>
+                    <ThemedText type="label" style={styles.headerCell}>
+                      {label}
+                    </ThemedText>
+                    <ThemedText
+                      style={[
+                        styles.value,
+                        label === 'Score' && styles.boldText,
+                      ]}
+                    >
+                      {value}
+                    </ThemedText>
+                  </View>
+                ))}
               </View>
             </View>
           );
@@ -155,10 +132,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   } as ViewStyle,
-  tableCell: {
-    flex: 1,
-    textAlign: 'center',
-  } as TextStyle,
+  stat: {flex: 1, minWidth: 0, alignItems: 'center', gap: 4},
+  value: {textAlign: 'center'},
   teamResult: {
     gap: Theme.spacing.sm,
     paddingVertical: Theme.spacing.sm,
@@ -167,6 +142,7 @@ const styles = StyleSheet.create({
   },
   teamName: {fontSize: 20, lineHeight: 28, textAlign: 'left'},
   headerCell: {
+    textAlign: 'center',
     fontSize: Theme.typography.fontSizes.xs,
     color: Theme.colors.text,
     textTransform: 'uppercase',

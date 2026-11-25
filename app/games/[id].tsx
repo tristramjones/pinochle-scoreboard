@@ -27,7 +27,7 @@ export default function GameDetailsScreen() {
           {isLoading ? 'Opening the ledger…' : 'Game not found'}
         </ThemedText>
         <ThemedButton
-          title="Back to Games"
+          title="Back to games"
           onPress={() => router.back()}
           variant="primary"
         />
@@ -54,7 +54,7 @@ export default function GameDetailsScreen() {
       <TeamScoreboard game={game} winnerId={winner?.id} />
 
       <ThemedButton
-        title="Delete Game"
+        title="Delete game"
         variant="destructive"
         disabled={isLoading}
         style={{marginBottom: Theme.spacing.xl}}
@@ -65,7 +65,7 @@ export default function GameDetailsScreen() {
             [
               {text: 'Cancel', style: 'cancel'},
               {
-                text: 'Delete Game',
+                text: 'Delete game',
                 style: 'destructive',
                 onPress: () => {
                   deleteCompletedGame(game.id).catch(() =>

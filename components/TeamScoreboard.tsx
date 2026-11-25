@@ -1,4 +1,4 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Game} from '../types/game';
 import {calculateTeamScore} from '../utils/scoring';
 import {Theme} from '../constants/Theme';
@@ -12,103 +12,65 @@ export function TeamScoreboard({
   game: Game;
   winnerId?: string;
 }) {
-  const {width, fontScale} = useWindowDimensions();
-  // Give long words and larger accessibility text a full-width panel rather
-  // than breaking a name into narrow fragments or shrinking it to fit.
-  const stacked =
-    width < 370 ||
-    fontScale > 1.2 ||
-    game.teams.some(
-      team =>
-        team.name.length > 18 ||
-        team.name.split(/\s+/).some(word => word.length > 10),
-    );
   return (
-    <View style={[styles.container, stacked && styles.stacked]}>
-      {game.teams.map(team => (
-        <CardFrame
-          key={team.id}
-          style={[
-            styles.panel,
-            stacked ? styles.fullWidthPanel : styles.halfWidthPanel,
-          ]}
-        >
-          <View style={styles.badge}>
+    <CardFrame style={styles.container}>
+      {game.teams.map((team, index) => (
+        <View key={team.id} style={[styles.row, index > 0 && styles.divider]}>
+          <View style={styles.team}>
+            {team.id === winnerId && (
+              <ThemedText style={styles.winner} accessibilityLabel="Winner">
+                🏆 Winner
+              </ThemedText>
+            )}
             <ThemedText
-              style={styles.symbol}
-              accessibilityLabel={team.id === winnerId ? 'Winner' : undefined}
+              type="heading"
+              style={styles.name}
+              textBreakStrategy="highQuality"
+              lineBreakStrategyIOS="standard"
             >
-              {team.id === winnerId ? '🏆' : '◇'}
+              {team.name}
             </ThemedText>
           </View>
           <ThemedText
-            type="heading"
-            style={[styles.name, stacked && styles.compactName]}
-            textBreakStrategy="highQuality"
-            lineBreakStrategyIOS="standard"
-          >
-            {team.name}
-          </ThemedText>
-          <View style={[styles.rule, stacked && styles.compactRule]} />
-          <ThemedText
             type="score"
-            style={[styles.score, stacked && styles.compactScore]}
+            style={styles.score}
             numberOfLines={1}
             adjustsFontSizeToFit
             minimumFontScale={0.6}
           >
             {calculateTeamScore(game, team.id)}
           </ThemedText>
-        </CardFrame>
+        </View>
       ))}
-    </View>
+    </CardFrame>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    gap: Theme.spacing.md,
+    padding: Theme.spacing.md,
     marginBottom: Theme.spacing.xl,
   },
-  stacked: {flexDirection: 'column'},
-  panel: {
-    minWidth: 0,
-    padding: Theme.spacing.lg,
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-  },
-  fullWidthPanel: {
-    flexShrink: 0,
-    width: '100%',
+    gap: Theme.spacing.sm,
     paddingVertical: Theme.spacing.md,
   },
-  compactName: {fontSize: 22, lineHeight: 30},
-  compactScore: {fontSize: 40, lineHeight: 54},
-  compactRule: {marginVertical: Theme.spacing.sm},
-  halfWidthPanel: {flex: 1},
-  badge: {
-    minHeight: 30,
-    marginBottom: Theme.spacing.sm,
-    justifyContent: 'center',
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: Theme.colors.card.border,
   },
-  symbol: {fontSize: 22, lineHeight: 30, color: Theme.colors.accent.gold},
-  name: {
-    alignSelf: 'stretch',
-    textAlign: 'center',
-    fontSize: 24,
-    lineHeight: 34,
-    flexShrink: 1,
-  },
-  rule: {
-    height: 1,
-    backgroundColor: Theme.colors.card.border,
-    alignSelf: 'stretch',
-    marginVertical: Theme.spacing.md,
-  },
+  team: {flexGrow: 1, flexShrink: 0, flexBasis: 160, minWidth: 0},
+  name: {fontSize: 20, lineHeight: 28},
+  winner: {fontSize: 14, lineHeight: 22, color: Theme.colors.accent.gold},
   score: {
-    alignSelf: 'stretch',
-    textAlign: 'center',
+    width: 80,
+    marginLeft: 'auto',
+    textAlign: 'right',
     color: Theme.colors.accent.gold,
-    fontSize: 48,
-    lineHeight: 64,
+    fontSize: 32,
+    lineHeight: 44,
+    fontVariant: ['lining-nums', 'tabular-nums'],
   },
 });

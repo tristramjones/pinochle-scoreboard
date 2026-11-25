@@ -10,14 +10,12 @@ export const suitStyles = StyleSheet.create({
     }),
     fontStyle: 'normal',
     fontWeight: 'normal',
-  },
-  red: {color: '#D32F2F', textShadowColor: 'transparent', textShadowRadius: 0},
-  black: {
-    color: '#111111',
     textShadowColor: '#D8BF8E',
     textShadowOffset: {width: 0, height: 0},
     textShadowRadius: 1.5,
   },
+  red: {color: '#D32F2F'},
+  black: {color: '#111111'},
 });
 
 // Suits use the system font so decorative body fonts cannot drop their glyphs.

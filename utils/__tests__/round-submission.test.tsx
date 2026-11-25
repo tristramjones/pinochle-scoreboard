@@ -61,7 +61,7 @@ async function fillRound() {
     screen.root.findByType('TextInput' as never).props.onChangeText('250');
   });
   await act(async () =>
-    screen.root.findByProps({title: 'Submit Bid'}).props.onPress(),
+    screen.root.findByProps({title: 'Submit bid'}).props.onPress(),
   );
   await act(async () => {
     screen.root
@@ -69,7 +69,7 @@ async function fillRound() {
       .props.onChangeText('100');
   });
   await act(async () =>
-    screen.root.findByProps({title: 'Submit Meld'}).props.onPress(),
+    screen.root.findByProps({title: 'Submit meld'}).props.onPress(),
   );
   await act(async () =>
     screen.root
@@ -82,7 +82,7 @@ it('does not overwrite victory navigation when archiving removes the current gam
   await fillRound();
   addRound.mockImplementationOnce(async () => router.replace('/games/victory'));
   await act(async () =>
-    screen.root.findByProps({title: 'Submit Round'}).props.onPress(),
+    screen.root.findByProps({title: 'Submit round'}).props.onPress(),
   );
   // A delayed provider update arrives while the native stack is transitioning.
   (useGame as jest.Mock).mockReturnValue({
@@ -98,7 +98,7 @@ it('lets the player retry when saving the round fails', async () => {
   await fillRound();
   addRound.mockRejectedValueOnce(new Error('Storage unavailable'));
   await act(async () =>
-    screen.root.findByProps({title: 'Submit Round'}).props.onPress(),
+    screen.root.findByProps({title: 'Submit round'}).props.onPress(),
   );
   expect(Alert.alert).toHaveBeenCalledWith(
     'Error',
@@ -106,7 +106,7 @@ it('lets the player retry when saving the round fails', async () => {
   );
   addRound.mockResolvedValueOnce(undefined);
   await act(async () =>
-    screen.root.findByProps({title: 'Submit Round'}).props.onPress(),
+    screen.root.findByProps({title: 'Submit round'}).props.onPress(),
   );
   expect(addRound).toHaveBeenCalledTimes(2);
 });

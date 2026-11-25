@@ -1,3 +1,4 @@
+import {normalizeTeamNames} from '../utils/teamNames';
 import {NEW_GAME_CARD_INDICES} from '../constants/Cards';
 import {useRouter} from 'expo-router';
 import {
@@ -116,10 +117,11 @@ export function GameProvider({children}: PropsWithChildren) {
     });
   };
   const startNewGame = async ({teamNames}: {teamNames: string[]}) => {
+    const names = normalizeTeamNames(teamNames);
     const game: Game = {
       id: `game-${Date.now()}-${Math.random()}`,
       timestamp: Date.now(),
-      teams: teamNames.map((name, index) => ({
+      teams: names.map((name, index) => ({
         id: `team-${index}`,
         name,
         players: [],

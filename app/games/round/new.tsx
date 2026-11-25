@@ -181,7 +181,7 @@ export default function NewRoundScreen() {
 
       <View style={styles.inputSection}>
         <ThemedText type="heading" style={styles.inputLabel}>
-          Bid Amount
+          Bid amount
         </ThemedText>
         <TextInput
           returnKeyType="done"
@@ -204,7 +204,7 @@ export default function NewRoundScreen() {
 
       <View style={styles.inputSection}>
         <ThemedText style={styles.inputLabel}>Who won the bid?</ThemedText>
-        <View style={styles.buttonGroup}>
+        <View style={styles.teamChoices}>
           {currentGame.teams.map((team, index) => (
             <ThemedButton
               key={team.id}
@@ -212,7 +212,6 @@ export default function NewRoundScreen() {
               onPress={() => setBidTeamId(team.id)}
               variant="secondary"
               size="lg"
-              style={styles.fullWidthButton}
               selected={bidTeamId === team.id}
             />
           ))}
@@ -220,7 +219,7 @@ export default function NewRoundScreen() {
       </View>
 
       <ThemedButton
-        title="Submit Bid"
+        title="Submit bid"
         disabled={!bidTeamId || !bidAmount || Number(bidAmount) <= 0}
         onPress={handleSubmitBid}
         variant="primary"
@@ -265,7 +264,7 @@ export default function NewRoundScreen() {
       </View>
 
       <ThemedButton
-        title="Submit Meld"
+        title="Submit meld"
         onPress={handleSubmitMeld}
         variant="primary"
         size="lg"
@@ -279,7 +278,7 @@ export default function NewRoundScreen() {
       </View>
 
       <ThemedButton
-        title="Shoot the Moon"
+        title="Shoot the moon"
         onPress={() => {
           setMoonShotAttempted(true);
           Keyboard.dismiss();
@@ -309,7 +308,7 @@ export default function NewRoundScreen() {
       return (
         <View style={styles.phaseContainer}>
           <ThemedText type="title" style={styles.phaseTitle}>
-            Moon Shot
+            Moon shot
           </ThemedText>
           <ThemedText type="subtitle" style={styles.phaseSubtitle}>
             {`${
@@ -361,7 +360,7 @@ export default function NewRoundScreen() {
           </View>
 
           <ThemedButton
-            title="Submit Round"
+            title="Submit round"
             loading={isSubmitting}
             disabled={!['0', '1'].includes(trickPoints[bidTeamId!] || '')}
             onPress={handleSubmitTricks}
@@ -412,7 +411,7 @@ export default function NewRoundScreen() {
         </View>
 
         <ThemedButton
-          title="Submit Round"
+          title="Submit round"
           loading={isSubmitting}
           disabled={currentGame.teams.some(team => !trickPoints[team.id])}
           onPress={handleSubmitTricks}
@@ -506,6 +505,9 @@ const styles = StyleSheet.create({
   } as TextStyle,
   teamInput: {
     marginBottom: Theme.spacing.lg,
+  } as ViewStyle,
+  teamChoices: {
+    gap: Theme.spacing.sm,
   } as ViewStyle,
   buttonGroup: {
     flexDirection: 'row',

@@ -2,11 +2,11 @@ import {cardImages} from '../../constants/CardImages';
 import {CardFrame} from '../../components/CardFrame';
 import {OrnamentalRule} from '../../components/RoomMasthead';
 import {TableScrollView} from '../../components/TableScrollView';
-import {useRouter} from 'expo-router';
+import {useIsFocused, useRouter} from 'expo-router';
+import {Image} from 'expo-image';
 import React from 'react';
 import {
   Alert,
-  Image,
   ImageStyle,
   Platform,
   StyleSheet,
@@ -24,6 +24,7 @@ import {calculateTeamScores} from '../../utils/scoring';
 
 export default function GamesScreen() {
   const router = useRouter();
+  const isFocused = useIsFocused();
   const {
     activeGames,
     completedGames,
@@ -70,11 +71,20 @@ export default function GamesScreen() {
       >
         <CardFrame style={styles.gameCard}>
           <View style={styles.cardContent}>
-            <Image
-              source={cardImages[game.cardImageIndex]}
-              style={styles.cardImage}
-              resizeMode="contain"
-            />
+            {/* The ledger updates behind the native stack. Mount artwork only
+                on return, rather than retaining a hidden native image view. */}
+            {isFocused ? (
+              <Image
+                source={cardImages[game.cardImageIndex]}
+                style={styles.cardImage}
+                contentFit="contain"
+                cachePolicy="memory-disk"
+                allowDownscaling
+                accessible={false}
+              />
+            ) : (
+              <View style={styles.cardImage} />
+            )}
             <ThemedText type="label" style={styles.dateText}>
               {formatDate(game.timestamp)} · {game.rounds.length}{' '}
               {game.rounds.length === 1 ? 'round' : 'rounds'}
@@ -117,7 +127,7 @@ export default function GamesScreen() {
           </ThemedText>
           {!isReady && (
             <ThemedButton
-              title="Retry Loading Games"
+              title="Retry loading games"
               loading={isLoading}
               variant="secondary"
               onPress={retryLoad}
@@ -143,7 +153,7 @@ export default function GamesScreen() {
           </ThemedText>
         )}
         <ThemedButton
-          title="Start New Game"
+          title="Start new game"
           disabled={isLoading || !isReady}
           onPress={() => router.push('/games/new')}
           size="lg"
@@ -236,14 +246,18 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   teamScore: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    // Align the lettering, rather than the tops of different-sized line boxes.
+    alignItems: 'baseline',
     gap: Theme.spacing.md,
     paddingRight: Theme.spacing.xs,
   } as ViewStyle,
   teamName: {
     color: Theme.colors.text,
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 0,
+    flexBasis: 160,
     fontSize: Theme.typography.fontSizes.lg,
     fontFamily: Theme.typography.fonts.regular,
     lineHeight: 30,
@@ -254,6 +268,7 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fonts.regular,
     textAlign: 'right',
     minWidth: 66,
+    marginLeft: 'auto',
     flexShrink: 0,
     lineHeight: 34,
   } as TextStyle,

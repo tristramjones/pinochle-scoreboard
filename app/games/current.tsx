@@ -23,7 +23,7 @@ export default function CurrentGameScreen() {
       [
         {text: 'Cancel', style: 'cancel'},
         {
-          text: archive ? 'End Game' : 'Delete Game',
+          text: archive ? 'End game' : 'Delete game',
           style: archive ? 'default' : 'destructive',
           onPress: () => {
             (archive ? endGame() : deleteGame()).catch(() =>
@@ -43,7 +43,7 @@ export default function CurrentGameScreen() {
         <ThemedText type="title">
           {isLoading ? 'Opening the table…' : 'No Current Game'}
         </ThemedText>
-        <ThemedButton title="Back to Games" onPress={() => router.back()} />
+        <ThemedButton title="Back to games" onPress={() => router.back()} />
       </ThemedView>
     );
   }
@@ -91,13 +91,13 @@ export default function CurrentGameScreen() {
       <OrnamentalRule />
       <View style={{gap: Theme.spacing.sm, marginBottom: Theme.spacing.xl}}>
         <ThemedButton
-          title="End Game & Save Scores"
+          title="End game and save scores"
           variant="secondary"
           disabled={isLoading}
           onPress={() => confirmFinish(true)}
         />
         <ThemedButton
-          title="Delete Game"
+          title="Delete game"
           variant="destructive"
           disabled={isLoading}
           onPress={() => confirmFinish(false)}

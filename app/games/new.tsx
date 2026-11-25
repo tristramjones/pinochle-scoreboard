@@ -1,3 +1,4 @@
+import {TEAM_NAME_MAX_LENGTH} from '../../utils/teamNames';
 import {KeyboardScrollView} from '../../components/KeyboardScrollView';
 import {useRouter} from 'expo-router';
 import React, {useState} from 'react';
@@ -48,7 +49,7 @@ export default function NewGameScreen() {
       contentContainerStyle={styles.contentContainer}
     >
       <ThemedText type="title" style={styles.phaseTitle}>
-        New Game
+        New game
       </ThemedText>
 
       <View style={styles.inputSection}>
@@ -61,11 +62,16 @@ export default function NewGameScreen() {
             keyboardAppearance="dark"
             onSubmitEditing={Keyboard.dismiss}
             style={[styles.input, styles.inputThemed]}
+            accessibilityLabel="Team 1 name"
+            maxLength={TEAM_NAME_MAX_LENGTH}
             value={team1Name}
             onChangeText={setTeam1Name}
             placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />
+          <ThemedText style={styles.characterCount}>
+            {team1Name.length}/{TEAM_NAME_MAX_LENGTH} characters
+          </ThemedText>
         </View>
 
         <View style={styles.teamInput}>
@@ -77,16 +83,21 @@ export default function NewGameScreen() {
             keyboardAppearance="dark"
             onSubmitEditing={Keyboard.dismiss}
             style={[styles.input, styles.inputThemed]}
+            accessibilityLabel="Team 2 name"
+            maxLength={TEAM_NAME_MAX_LENGTH}
             value={team2Name}
             onChangeText={setTeam2Name}
             placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />
+          <ThemedText style={styles.characterCount}>
+            {team2Name.length}/{TEAM_NAME_MAX_LENGTH} characters
+          </ThemedText>
         </View>
       </View>
 
       <ThemedButton
-        title="Start Game"
+        title="Start game"
         loading={isLoading}
         disabled={!team1Name.trim() || !team2Name.trim()}
         onPress={handleStartGame}
@@ -122,6 +133,13 @@ const styles = StyleSheet.create({
   teamInput: {
     marginBottom: Theme.spacing.lg,
   } as ViewStyle,
+  characterCount: {
+    textAlign: 'right',
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: Theme.spacing.xs,
+    color: Theme.colors.textSecondary,
+  },
   inputLabel: {
     marginBottom: Theme.spacing.md,
     fontSize: Theme.typography.fontSizes.xl,
