@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     flex: 1,
   } as ViewStyle,
   selectedButton: {
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: Theme.colors.button.primary,
   } as ViewStyle,
   selectedButtonText: {
     color: Theme.colors.button.text,

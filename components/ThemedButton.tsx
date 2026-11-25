@@ -1,4 +1,5 @@
 import React from 'react';
+import {CardFrame} from './CardFrame';
 import {
   StyleProp,
   StyleSheet,
@@ -38,11 +39,11 @@ export function ThemedButton({
     {
       backgroundColor:
         variant === 'primary'
-          ? Theme.colors.button.primary
+          ? 'transparent'
           : Theme.colors.button.secondary,
       minHeight: buttonSize.height,
       paddingVertical: Theme.spacing.sm,
-      borderWidth: 1,
+      borderWidth: variant === 'primary' ? 0 : 1,
       borderColor: Theme.colors.accent.gold,
       paddingHorizontal: buttonSize.paddingHorizontal,
       borderRadius: Theme.borderRadius.lg,
@@ -72,19 +73,26 @@ export function ThemedButton({
       disabled={disabled}
       {...rest}
     >
-      <View
-        pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            margin: 4,
-            borderRadius: 6,
-            borderWidth: 1,
-            borderColor:
-              variant === 'primary' ? '#A87934' : Theme.colors.card.border,
-          },
-        ]}
-      />
+      {variant === 'primary' ? (
+        <CardFrame
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, {padding: 0}]}
+          fillColor={Theme.colors.button.primary}
+        />
+      ) : (
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              margin: 4,
+              borderRadius: 6,
+              borderWidth: 1,
+              borderColor: Theme.colors.card.border,
+            },
+          ]}
+        />
+      )}
       <ThemedText style={textStyles}>{title}</ThemedText>
     </TouchableOpacity>
   );

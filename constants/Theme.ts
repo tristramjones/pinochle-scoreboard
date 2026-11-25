@@ -26,9 +26,9 @@ export const Theme = {
 
     // Button colors
     button: {
-      primary: '#E4BC73',
+      primary: '#20533E',
       secondary: '#2A170E',
-      text: '#21120C',
+      text: '#F8EACC',
       textSecondary: '#E4BC73',
     },
 
