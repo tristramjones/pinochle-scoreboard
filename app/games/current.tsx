@@ -120,9 +120,8 @@ export default function CurrentGameScreen() {
         />
         <ThemedButton
           title="Delete Game"
-          variant="secondary"
+          variant="destructive"
           disabled={isLoading}
-          textStyle={{color: Theme.colors.accent.burgundy}}
           onPress={() => confirmFinish(false)}
         />
       </View>

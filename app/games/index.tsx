@@ -77,9 +77,14 @@ export default function GamesScreen() {
     return (
       <TouchableOpacity
         key={game.id}
-        style={{marginBottom: Theme.spacing.md}}
+        style={{
+          marginBottom: Theme.spacing.md,
+          opacity: isLoading ? Theme.button.disabledOpacity : 1,
+        }}
         accessibilityRole="button"
         disabled={isLoading}
+        activeOpacity={Theme.button.activeOpacity}
+        accessibilityState={{disabled: isLoading}}
         onPress={async () => {
           if (isCompleted) {
             router.push(`/games/${game.id}`);
@@ -148,7 +153,7 @@ export default function GamesScreen() {
           {!isReady && (
             <ThemedButton
               title="Retry Loading Games"
-              disabled={isLoading}
+              loading={isLoading}
               variant="secondary"
               onPress={retryLoad}
             />

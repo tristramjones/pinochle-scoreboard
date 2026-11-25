@@ -86,10 +86,9 @@ export default function GameDetailsScreen() {
 
       <ThemedButton
         title="Delete Game"
-        variant="secondary"
+        variant="destructive"
         disabled={isLoading}
         style={{marginBottom: Theme.spacing.xl}}
-        textStyle={{color: Theme.colors.accent.burgundy}}
         onPress={() =>
           Alert.alert(
             'Delete this completed game?',

@@ -1,24 +1,28 @@
 import React from 'react';
-import {CardFrame} from './CardFrame';
 import {
+  ActivityIndicator,
+  Platform,
   StyleProp,
   StyleSheet,
   TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
-  ViewStyle,
   View,
+  ViewStyle,
 } from 'react-native';
+import {CardFrame} from './CardFrame';
 import {Theme} from '../constants/Theme';
 import {ThemedText} from './ThemedText';
 
-export type ThemedButtonVariant = 'primary' | 'secondary';
+export type ThemedButtonVariant =
+  'primary' | 'secondary' | 'destructive' | 'text';
 export type ThemedButtonSize = 'sm' | 'md' | 'lg';
-
 interface ThemedButtonProps extends TouchableOpacityProps {
   variant?: ThemedButtonVariant;
   size?: ThemedButtonSize;
   title: string;
+  selected?: boolean;
+  loading?: boolean;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 }
@@ -27,83 +31,127 @@ export function ThemedButton({
   variant = 'primary',
   size = 'md',
   title,
+  selected,
+  loading = false,
   style,
   textStyle,
-  disabled,
+  disabled = false,
+  accessibilityState,
   ...rest
 }: ThemedButtonProps) {
-  const buttonSize = Theme.button.sizes[size];
-
-  const buttonStyles = [
-    styles.base,
-    {
-      backgroundColor:
-        variant === 'primary'
-          ? 'transparent'
-          : Theme.colors.button.secondary,
-      minHeight: buttonSize.height,
-      paddingVertical: Theme.spacing.sm,
-      borderWidth: variant === 'primary' ? 0 : 1,
-      borderColor: Theme.colors.accent.gold,
-      paddingHorizontal: buttonSize.paddingHorizontal,
-      borderRadius: Theme.borderRadius.lg,
-      opacity: disabled ? 0.6 : 1,
-    },
-    style,
-  ];
-
-  const textStyles = [
-    styles.text,
-    {
-      color:
-        variant === 'primary'
-          ? Theme.colors.button.text
-          : Theme.colors.button.textSecondary,
-      fontSize: buttonSize.fontSize,
-      lineHeight: buttonSize.fontSize * buttonSize.lineHeight,
-      fontFamily: Theme.typography.fonts.editorial,
-    },
-    textStyle,
-  ];
-
+  const dimensions = Theme.button.sizes[size];
+  const filled = selected || variant === 'primary';
+  const blocked = disabled || loading;
+  const color = filled
+    ? Theme.colors.button.text
+    : variant === 'destructive'
+      ? Theme.colors.accent.burgundy
+      : Theme.colors.button.textSecondary;
   return (
     <TouchableOpacity
-      accessibilityRole="button"
-      style={buttonStyles}
-      disabled={disabled}
       {...rest}
+      accessibilityRole="button"
+      accessibilityState={{
+        ...accessibilityState,
+        disabled: blocked,
+        ...(selected !== undefined ? {selected} : {}),
+        busy: loading,
+      }}
+      aria-disabled={blocked}
+      aria-busy={loading}
+      {...(Platform.OS === 'web' && selected !== undefined
+        ? {'aria-pressed': selected}
+        : {})}
+      disabled={blocked}
+      activeOpacity={Theme.button.activeOpacity}
+      style={[
+        styles.base,
+        {
+          minHeight: dimensions.height,
+          paddingHorizontal: dimensions.paddingHorizontal,
+          backgroundColor:
+            filled || variant === 'text'
+              ? 'transparent'
+              : Theme.colors.button.secondary,
+          borderWidth: filled || variant === 'text' ? 0 : 1,
+          borderColor:
+            variant === 'destructive'
+              ? Theme.colors.accent.burgundy
+              : Theme.colors.accent.gold,
+        },
+        style,
+        blocked && styles.disabled,
+      ]}
     >
-      {variant === 'primary' ? (
+      {filled ? (
         <CardFrame
           pointerEvents="none"
           style={[StyleSheet.absoluteFill, {padding: 0}]}
           fillColor={Theme.colors.button.primary}
         />
       ) : (
-        <View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              margin: 4,
-              borderRadius: 6,
-              borderWidth: 1,
-              borderColor: Theme.colors.card.border,
-            },
-          ]}
-        />
+        variant !== 'text' && (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.innerBorder,
+              {
+                borderColor:
+                  variant === 'destructive'
+                    ? Theme.colors.accent.burgundy
+                    : Theme.colors.card.border,
+              },
+            ]}
+          />
+        )
       )}
-      <ThemedText style={textStyles}>{title}</ThemedText>
+      <View style={styles.label}>
+        {loading && (
+          <ActivityIndicator size="small" color={color} accessible={false} />
+        )}
+        <ThemedText
+          style={[
+            styles.text,
+            {
+              color,
+              fontSize: variant === 'text' ? 17 : dimensions.fontSize,
+              lineHeight:
+                (variant === 'text' ? 17 : dimensions.fontSize) *
+                dimensions.lineHeight,
+            },
+            textStyle,
+          ]}
+        >
+          {title}
+        </ThemedText>
+      </View>
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-  } as ViewStyle,
+    paddingVertical: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.lg,
+  },
+  disabled: {opacity: Theme.button.disabledOpacity},
+  label: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Theme.spacing.sm,
+    flexShrink: 1,
+  },
+  innerBorder: {
+    ...StyleSheet.absoluteFill,
+    margin: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
   text: {
     textAlign: 'center',
-  } as TextStyle,
+    fontFamily: Theme.typography.fonts.editorial,
+    flexShrink: 1,
+  },
 });

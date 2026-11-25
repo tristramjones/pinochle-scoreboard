@@ -86,9 +86,11 @@ export const Theme = {
 
   // Button
   button: {
+    activeOpacity: 0.72,
+    disabledOpacity: 0.45,
     sizes: {
       sm: {
-        height: 40,
+        height: 44,
         paddingHorizontal: 16,
         fontSize: 14,
         lineHeight: 1.3,

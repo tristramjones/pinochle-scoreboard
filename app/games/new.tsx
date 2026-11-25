@@ -87,7 +87,8 @@ export default function NewGameScreen() {
 
       <ThemedButton
         title="Start Game"
-        disabled={isLoading}
+        loading={isLoading}
+        disabled={!team1Name.trim() || !team2Name.trim()}
         onPress={handleStartGame}
         variant="primary"
         size="lg"

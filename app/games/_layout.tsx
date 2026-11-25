@@ -1,6 +1,6 @@
 import {useTheme, useRouter, Stack} from 'expo-router';
-import {Keyboard, Pressable} from 'react-native';
-import {ThemedText} from '../../components/ThemedText';
+import {Keyboard} from 'react-native';
+import {ThemedButton} from '../../components/ThemedButton';
 import {Theme} from '../../constants/Theme';
 
 export default function GamesLayout() {
@@ -18,24 +18,16 @@ export default function GamesLayout() {
         headerShadowVisible: false,
         headerTitleStyle: {fontFamily: Theme.typography.fonts.display},
         headerRight: () => (
-          <Pressable
-            accessibilityRole="button"
+          <ThemedButton
+            title="Scoring guide ♧"
+            variant="text"
+            size="sm"
             accessibilityLabel="Scoring help"
-            hitSlop={8}
-            style={{
-              minHeight: 44,
-              justifyContent: 'center',
-              paddingHorizontal: 8,
-            }}
             onPress={() => {
               Keyboard.dismiss();
               router.push('/games/help');
             }}
-          >
-            <ThemedText style={{color: Theme.colors.accent.gold, fontSize: 17}}>
-              Scoring guide ♧
-            </ThemedText>
-          </Pressable>
+          />
         ),
       }}
     >
@@ -46,24 +38,14 @@ export default function GamesLayout() {
           headerTitle: '',
           headerBackVisible: false,
           headerRight: () => (
-            <Pressable
-              accessibilityRole="button"
-              hitSlop={8}
-              style={{
-                minHeight: 44,
-                justifyContent: 'center',
-                paddingHorizontal: 8,
-              }}
+            <ThemedButton
+              title="Done"
+              variant="text"
+              size="sm"
               onPress={() =>
                 router.canGoBack() ? router.back() : router.replace('/games')
               }
-            >
-              <ThemedText
-                style={{color: Theme.colors.accent.gold, fontSize: 17}}
-              >
-                Done
-              </ThemedText>
-            </Pressable>
+            />
           ),
         }}
       />

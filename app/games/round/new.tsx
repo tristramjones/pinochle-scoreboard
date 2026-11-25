@@ -211,11 +211,8 @@ export default function NewRoundScreen() {
               onPress={() => setBidTeamId(team.id)}
               variant="secondary"
               size="lg"
-              style={[
-                styles.fullWidthButton,
-                bidTeamId === team.id && styles.selectedButton,
-              ]}
-              textStyle={bidTeamId === team.id && styles.selectedButtonText}
+              style={styles.fullWidthButton}
+              selected={bidTeamId === team.id}
             />
           ))}
         </View>
@@ -223,6 +220,7 @@ export default function NewRoundScreen() {
 
       <ThemedButton
         title="Submit Bid"
+        disabled={!bidTeamId || !bidAmount || Number(bidAmount) <= 0}
         onPress={handleSubmitBid}
         variant="primary"
         size="lg"
@@ -337,13 +335,9 @@ export default function NewRoundScreen() {
                 }}
                 variant="secondary"
                 size="lg"
-                style={[
-                  styles.fullWidthButton,
-                  trickPoints[bidTeamId!] === '1' && styles.selectedButton,
-                ]}
-                textStyle={
-                  trickPoints[bidTeamId!] === '1' && styles.selectedButtonText
-                }
+                style={styles.fullWidthButton}
+                selected={trickPoints[bidTeamId!] === '1'}
+                disabled={isSubmitting}
               />
               <ThemedButton
                 title="No"
@@ -358,20 +352,17 @@ export default function NewRoundScreen() {
                 }}
                 variant="secondary"
                 size="lg"
-                style={[
-                  styles.fullWidthButton,
-                  trickPoints[bidTeamId!] === '0' && styles.selectedButton,
-                ]}
-                textStyle={
-                  trickPoints[bidTeamId!] === '0' && styles.selectedButtonText
-                }
+                style={styles.fullWidthButton}
+                selected={trickPoints[bidTeamId!] === '0'}
+                disabled={isSubmitting}
               />
             </View>
           </View>
 
           <ThemedButton
             title="Submit Round"
-            disabled={isSubmitting}
+            loading={isSubmitting}
+            disabled={!['0', '1'].includes(trickPoints[bidTeamId!] || '')}
             onPress={handleSubmitTricks}
             variant="primary"
             size="lg"
@@ -421,7 +412,8 @@ export default function NewRoundScreen() {
 
         <ThemedButton
           title="Submit Round"
-          disabled={isSubmitting}
+          loading={isSubmitting}
+          disabled={currentGame.teams.some(team => !trickPoints[team.id])}
           onPress={handleSubmitTricks}
           variant="primary"
           size="lg"
@@ -500,30 +492,6 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.input.border,
     color: Theme.colors.input.text,
   } as TextStyle,
-  teamButton: {
-    backgroundColor: Theme.colors.card.background,
-    borderWidth: 1,
-    borderColor: Theme.colors.primary,
-    borderRadius: Theme.borderRadius.md,
-    height: Theme.button.sizes.lg.height,
-    paddingHorizontal: Theme.button.sizes.lg.paddingHorizontal,
-    marginBottom: Theme.spacing.md,
-    justifyContent: 'center',
-  } as ViewStyle,
-  teamButtonSelected: {
-    backgroundColor: Theme.colors.primary,
-  } as ViewStyle,
-  teamButtonText: {
-    fontSize: Theme.button.sizes.lg.fontSize,
-    fontFamily: Theme.typography.fonts.regular,
-    textAlign: 'center',
-    color: Theme.colors.primary,
-    lineHeight:
-      Theme.button.sizes.lg.fontSize * Theme.button.sizes.lg.lineHeight,
-  } as TextStyle,
-  teamButtonTextSelected: {
-    color: Theme.colors.card.background,
-  } as TextStyle,
   submitButton: {
     marginTop: Theme.spacing.xl,
   } as ViewStyle,
@@ -546,10 +514,4 @@ const styles = StyleSheet.create({
   fullWidthButton: {
     flex: 1,
   } as ViewStyle,
-  selectedButton: {
-    backgroundColor: Theme.colors.button.primary,
-  } as ViewStyle,
-  selectedButtonText: {
-    color: Theme.colors.button.text,
-  } as TextStyle,
 });
