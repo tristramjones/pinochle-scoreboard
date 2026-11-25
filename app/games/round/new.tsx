@@ -165,11 +165,12 @@ export default function NewRoundScreen() {
       await addRound(roundData);
     } catch (error) {
       console.error('Error submitting round:', error);
-      Alert.alert('Error', 'Failed to submit round. Please try again.');
-    } finally {
       submissionPending.current = false;
       setIsSubmitting(false);
+      Alert.alert('Error', 'Failed to submit round. Please try again.');
     }
+    // On success, addRound owns navigation. Keep the guard until unmount so
+    // archiving the current game cannot trigger the no-game redirect first.
   };
 
   const renderBidPhase = () => (
