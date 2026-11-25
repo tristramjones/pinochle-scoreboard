@@ -4,10 +4,12 @@ A React Native mobile app built with Expo for tracking scores in Pinochle card g
 
 ## Features
 
-- Track scores for 2-team Pinochle games
+- Keep multiple 2-team Pinochle games in progress
+- End a game early to save its scores, or delete an ongoing game
 - Record bids, melds, and trick points for each round
 - Automatic score calculation following Pinochle rules
 - Game history with final scores
+- Offline scoring help with meld values, trick points, and the app’s scoring rules
 - Clean, modern UI optimized for iOS
 
 ## Getting Started
@@ -27,6 +29,18 @@ A React Native mobile app built with Expo for tracking scores in Pinochle card g
    - Android Emulator
    - Expo Go on your physical device
 
+## Saved games
+
+Ongoing games appear under “At the table.” Tap a game to resume it. Start New
+Game stays available even when other games are in progress. End Game saves
+scores to “The ledger” without requiring another round; Delete Game removes
+only that game after confirmation. Games ended early are not marked as wins.
+
+The app imports the previous single current game and history into a new library
+on the first successful save. Original storage is retained during migration.
+Backups include the full multi-game library; older backups are imported into the
+same format. A tied score above 1500 does not pick an arbitrary winner; play continues.
+
 ## Scoring Rules
 
 - Each round, one team makes a bid
@@ -35,7 +49,8 @@ A React Native mobile app built with Expo for tracking scores in Pinochle card g
 - If bid team makes their bid, they score: meld points + trick points
 - If bid team fails to make their bid, they score: -bid amount
 - A team must win at least one trick to count its meld. The bidding team loses its bid if it wins no tricks or fails to reach the bid; the non-bidding team scores zero without a trick.
-- First team to reach 1500 points wins
+- A team wins by reaching 1500 points or leading by at least 1500 points, including after moon shots
+- A successful moon shot requires one player to take all 12 tricks
 
 ## Development
 

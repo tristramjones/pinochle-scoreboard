@@ -41,3 +41,25 @@ export const calculateTeamScores = (game: Game): {[teamId: string]: number} => {
   });
   return scores;
 };
+
+/** Total-score and lead-based victories use the same rule for every round. */
+export function findWinningTeam(
+  game: Game,
+): {id: string; name: string; score: number} | null {
+  const teams = game.teams.map(team => ({
+    ...team,
+    score: calculateTeamScore(game, team.id),
+  }));
+  const ranked = teams.sort((a, b) => b.score - a.score);
+  const leader = ranked[0];
+  if (!leader) return null;
+  const opponent = ranked[1];
+  if (opponent?.score === leader.score) return null;
+  if (
+    leader.score >= game.winningScore ||
+    (opponent && leader.score - opponent.score >= game.winningScore)
+  ) {
+    return {id: leader.id, name: leader.name, score: leader.score};
+  }
+  return null;
+}

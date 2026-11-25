@@ -4,13 +4,7 @@ import {useTheme} from '../hooks/useTheme';
 
 export type ThemedTextProps = TextProps & {
   type?:
-    | 'default'
-    | 'title'
-    | 'heading'
-    | 'score'
-    | 'label'
-    | 'subtitle'
-    | 'link';
+    'default' | 'title' | 'heading' | 'score' | 'label' | 'subtitle' | 'link';
 };
 
 export function ThemedText({
@@ -43,9 +37,9 @@ export function ThemedText({
 const styles = StyleSheet.create({
   default: {
     fontFamily: Theme.typography.fonts.regular,
-    fontSize: Theme.typography.fontSizes.sm,
+    fontSize: Theme.typography.fontSizes.md,
     lineHeight:
-      Theme.typography.fontSizes.sm * Theme.typography.lineHeights.normal,
+      Theme.typography.fontSizes.md * Theme.typography.lineHeights.normal,
   } as TextStyle,
   title: {
     fontFamily: Theme.typography.fonts.bold,
@@ -79,9 +73,9 @@ const styles = StyleSheet.create({
   } as TextStyle,
   link: {
     fontFamily: Theme.typography.fonts.regular,
-    fontSize: Theme.typography.fontSizes.sm,
+    fontSize: Theme.typography.fontSizes.md,
     lineHeight:
-      Theme.typography.fontSizes.sm * Theme.typography.lineHeights.normal,
+      Theme.typography.fontSizes.md * Theme.typography.lineHeights.normal,
     textDecorationLine: 'underline',
   } as TextStyle,
 });

@@ -15,13 +15,11 @@ import {ThemedButton} from '../../../components/ThemedButton';
 import {ThemedText} from '../../../components/ThemedText';
 import {Theme} from '../../../constants/Theme';
 import {useGame} from '../../../contexts/GameContext';
-import {Round} from '../../../types/round';
-import {calculateRoundPoints} from '../../../utils/scoring';
 
 type RoundPhase = 'bid' | 'meld' | 'tricks';
 
 export default function NewRoundScreen() {
-  const {currentGame, addRound} = useGame();
+  const {currentGame, addRound, isLoading} = useGame();
   const router = useRouter();
 
   const [phase, setPhase] = useState<RoundPhase>('bid');
@@ -36,10 +34,10 @@ export default function NewRoundScreen() {
 
   // Handle navigation when no current game
   useEffect(() => {
-    if (!currentGame && !submissionPending.current) {
+    if (!currentGame && !isLoading && !submissionPending.current) {
       router.replace('/games');
     }
-  }, [currentGame, router]);
+  }, [currentGame, isLoading, router]);
 
   if (!currentGame) {
     return null;
@@ -76,8 +74,14 @@ export default function NewRoundScreen() {
     }
     const otherTeamMeld = Number(meldPoints[otherTeamId] || '0');
 
-    if (currentGame.teams.some(team => !/^\d*$/.test(meldPoints[team.id] || '')) ||
-        ![bidTeamMeld, otherTeamMeld].every(value => Number.isSafeInteger(value) && value >= 0)) {
+    if (
+      currentGame.teams.some(
+        team => !/^\d*$/.test(meldPoints[team.id] || ''),
+      ) ||
+      ![bidTeamMeld, otherTeamMeld].every(
+        value => Number.isSafeInteger(value) && value >= 0,
+      )
+    ) {
       Alert.alert('Error', 'Please enter non-negative whole numbers for meld');
       return;
     }
@@ -98,11 +102,22 @@ export default function NewRoundScreen() {
       return;
     }
     if (!moonShotAttempted) {
-      const values = currentGame.teams.map(team => Number(trickPoints[team.id]));
-      if (currentGame.teams.some(team => !/^\d+$/.test(trickPoints[team.id] || '')) ||
-          !values.every(value => Number.isSafeInteger(value) && value >= 0 && value <= 250) ||
-          values.reduce((sum, value) => sum + value, 0) !== 250) {
-        Alert.alert('Error', 'Trick points must be whole numbers from 0 to 250 and total 250');
+      const values = currentGame.teams.map(team =>
+        Number(trickPoints[team.id]),
+      );
+      if (
+        currentGame.teams.some(
+          team => !/^\d+$/.test(trickPoints[team.id] || ''),
+        ) ||
+        !values.every(
+          value => Number.isSafeInteger(value) && value >= 0 && value <= 250,
+        ) ||
+        values.reduce((sum, value) => sum + value, 0) !== 250
+      ) {
+        Alert.alert(
+          'Error',
+          'Trick points must be whole numbers from 0 to 250 and total 250',
+        );
         return;
       }
     }
@@ -147,22 +162,7 @@ export default function NewRoundScreen() {
           : undefined,
       };
 
-      // Calculate and add round points
-      const roundDataWithPoints = {
-        ...roundData,
-        roundPoints: {
-          [bidTeamId]: calculateRoundPoints(
-            {...roundData, roundPoints: {}} as Round,
-            bidTeamId,
-          ),
-          [otherTeamId]: calculateRoundPoints(
-            {...roundData, roundPoints: {}} as Round,
-            otherTeamId,
-          ),
-        },
-      } as Round;
-
-      await addRound(roundDataWithPoints);
+      await addRound(roundData);
     } catch (error) {
       console.error('Error submitting round:', error);
       Alert.alert('Error', 'Failed to submit round. Please try again.');
@@ -184,6 +184,7 @@ export default function NewRoundScreen() {
         </ThemedText>
         <TextInput
           returnKeyType="done"
+          keyboardAppearance="dark"
           onSubmitEditing={Keyboard.dismiss}
           style={[styles.input, styles.inputThemed]}
           value={bidAmount}
@@ -249,6 +250,7 @@ export default function NewRoundScreen() {
             </ThemedText>
             <TextInput
               returnKeyType="done"
+              keyboardAppearance="dark"
               onSubmitEditing={Keyboard.dismiss}
               style={[styles.input, styles.inputThemed]}
               value={meldPoints[team.id] || ''}
@@ -369,7 +371,7 @@ export default function NewRoundScreen() {
 
           <ThemedButton
             title="Submit Round"
-          disabled={isSubmitting}
+            disabled={isSubmitting}
             onPress={handleSubmitTricks}
             variant="primary"
             size="lg"
@@ -403,6 +405,7 @@ export default function NewRoundScreen() {
               </ThemedText>
               <TextInput
                 returnKeyType="done"
+                keyboardAppearance="dark"
                 onSubmitEditing={Keyboard.dismiss}
                 style={[styles.input, styles.inputThemed]}
                 value={trickPoints[team.id] || ''}
@@ -458,6 +461,7 @@ const styles = StyleSheet.create({
     flex: 1,
   } as ViewStyle,
   phaseTitle: {
+    letterSpacing: 0.5,
     fontSize: Theme.typography.fontSizes.xxl,
     fontFamily: Theme.typography.fonts.bold,
     textAlign: 'center',
@@ -483,6 +487,7 @@ const styles = StyleSheet.create({
     paddingTop: Theme.spacing.xs,
   } as TextStyle,
   input: {
+    borderBottomWidth: 3,
     height: Theme.button.sizes.lg.height,
     borderWidth: 1,
     borderRadius: Theme.borderRadius.md,

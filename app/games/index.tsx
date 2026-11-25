@@ -1,12 +1,14 @@
-import {useFocusEffect, useRouter} from 'expo-router';
-import React, {useCallback, useState} from 'react';
+import {ScreenTitle} from '../../components/ScreenTitle';
+import {CardFrame} from '../../components/CardFrame';
+import {OrnamentalRule} from '../../components/RoomMasthead';
+import {TableScrollView} from '../../components/TableScrollView';
+import {useRouter} from 'expo-router';
+import React from 'react';
 import {
   Alert,
   Image,
   ImageStyle,
   Platform,
-  RefreshControl,
-  ScrollView,
   StyleSheet,
   TextStyle,
   TouchableOpacity,
@@ -19,7 +21,6 @@ import {Theme} from '../../constants/Theme';
 import {useGame} from '../../contexts/GameContext';
 import {Game} from '../../types/game';
 import {calculateTeamScores} from '../../utils/scoring';
-import * as Storage from '../../utils/storage';
 
 const cardImages = [
   // Spades
@@ -54,34 +55,15 @@ const cardImages = [
 
 export default function GamesScreen() {
   const router = useRouter();
-  const {currentGame} = useGame();
-  const [completedGames, setCompletedGames] = useState<Game[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const loadCompletedGames = useCallback(async () => {
-    try {
-      const history = await Storage.getGameHistory();
-      setCompletedGames(history);
-    } catch (error) {
-      console.error('Error loading game history:', error);
-      Alert.alert('Error', 'Failed to load game history');
-    }
-  }, []);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await loadCompletedGames();
-    } finally {
-      setRefreshing(false);
-    }
-  }, [loadCompletedGames]);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadCompletedGames();
-    }, [loadCompletedGames]),
-  );
+  const {
+    activeGames,
+    completedGames,
+    selectGame,
+    isLoading,
+    isReady,
+    error,
+    retryLoad,
+  } = useGame();
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString();
@@ -96,88 +78,135 @@ export default function GamesScreen() {
     return (
       <TouchableOpacity
         key={game.id}
-        style={styles.gameCard}
-        onPress={() =>
-          router.push(isCompleted ? `/games/${game.id}` : '/games/current')
-        }
+        style={{marginBottom: Theme.spacing.md}}
+        accessibilityRole="button"
+        disabled={isLoading}
+        onPress={async () => {
+          if (isCompleted) {
+            router.push(`/games/${game.id}`);
+            return;
+          }
+          try {
+            await selectGame(game.id);
+            router.push('/games/current');
+          } catch {
+            Alert.alert('Unable to open game', 'Please try again.');
+          }
+        }}
       >
-        <View style={styles.cardContent}>
-          <Image
-            source={cardImages[game.cardImageIndex]}
-            style={styles.cardImage}
-            resizeMode="contain"
-          />
-          <View style={styles.cardDetails}>
-            <ThemedText type="label" style={styles.dateText}>
-              {formatDate(game.timestamp)}
-            </ThemedText>
-            <View style={styles.teamsContainer}>
-              {sortedTeams.map((team, index) => (
-                <View key={team.id} style={styles.teamScore}>
-                  <ThemedText
-                    type="subtitle"
-                    style={[styles.teamName, index === 0 && styles.winnerText]}
-                  >
-                    {team.name}
-                  </ThemedText>
-                  <ThemedText
-                    type="score"
-                    style={[styles.score, index === 0 && styles.winnerText]}
-                  >
-                    {scores[team.id]}
-                  </ThemedText>
-                </View>
-              ))}
+        <CardFrame style={styles.gameCard}>
+          <View style={styles.cardContent}>
+            <Image
+              source={cardImages[game.cardImageIndex]}
+              style={styles.cardImage}
+              resizeMode="contain"
+            />
+            <View style={styles.cardDetails}>
+              <ThemedText type="label" style={styles.dateText}>
+                {formatDate(game.timestamp)} · {game.rounds.length}{' '}
+                {game.rounds.length === 1 ? 'round' : 'rounds'}
+              </ThemedText>
+              <View style={styles.teamsContainer}>
+                {sortedTeams.map((team, index) => (
+                  <View key={team.id} style={styles.teamScore}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[
+                        styles.teamName,
+                        index === 0 && styles.winnerText,
+                      ]}
+                    >
+                      {team.name}
+                    </ThemedText>
+                    <ThemedText
+                      type="score"
+                      style={[styles.score, index === 0 && styles.winnerText]}
+                    >
+                      {scores[team.id]}
+                    </ThemedText>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
-        </View>
+        </CardFrame>
       </TouchableOpacity>
     );
   };
 
   return (
-    <ScrollView
+    <TableScrollView
       style={[styles.container, styles.containerThemed]}
       contentContainerStyle={styles.contentContainer}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
     >
-      <View style={styles.section}>
-        <ThemedText type="title" style={styles.mainTitle}>
-          Current Game
+      <View style={styles.welcome}>
+        <ScreenTitle>Tonight’s games</ScreenTitle>
+        <ThemedText type="subtitle" style={styles.tagline}>
+          A good hand. Good company.
         </ThemedText>
-        {currentGame ? (
-          renderGameCard(currentGame)
-        ) : (
-          <>
-            <ThemedText type="subtitle" style={styles.emptyStateText}>
-              No game in progress
-            </ThemedText>
+        <ThemedButton
+          title="Start New Game"
+          disabled={isLoading || !isReady}
+          onPress={() => router.push('/games/new')}
+          size="lg"
+          style={{marginTop: Theme.spacing.lg}}
+        />
+      </View>
+      {error && (
+        <View style={{gap: Theme.spacing.sm, marginBottom: Theme.spacing.md}}>
+          <ThemedText accessibilityRole="alert">
+            {isReady
+              ? 'Your last change could not be saved. Please try again.'
+              : 'Could not load your games.'}
+          </ThemedText>
+          {!isReady && (
             <ThemedButton
-              title="New Game"
-              onPress={() => router.push('/games/new')}
-              variant="primary"
-              size="md"
-              style={{marginTop: Theme.spacing.sm}}
+              title="Retry Loading Games"
+              disabled={isLoading}
+              variant="secondary"
+              onPress={retryLoad}
             />
-          </>
+          )}
+        </View>
+      )}
+      <View style={styles.section}>
+        <ThemedText type="heading" style={styles.sectionTitle}>
+          At the table
+        </ThemedText>
+        <OrnamentalRule />
+        {activeGames.map(game => renderGameCard(game))}
+        {activeGames.length === 0 && (
+          <ThemedText style={styles.emptyStateText}>
+            {isLoading
+              ? 'Opening the ledger…'
+              : 'No games underway. Deal a new hand.'}
+          </ThemedText>
         )}
       </View>
 
       {completedGames.length > 0 && (
         <View style={styles.section}>
           <ThemedText type="heading" style={styles.sectionTitle}>
-            Completed Games
+            The ledger
           </ThemedText>
+          <OrnamentalRule />
           {completedGames.map(game => renderGameCard(game, true))}
         </View>
       )}
-    </ScrollView>
+    </TableScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  welcome: {marginBottom: Theme.spacing.xl, paddingBottom: Theme.spacing.md},
+  tagline: {
+    color: Theme.colors.textSecondary,
+    textAlign: 'center',
+    fontFamily: Theme.typography.fonts.regular,
+    fontStyle: 'italic',
+    fontSize: 21,
+    lineHeight: 30,
+  },
   container: {
     flex: 1,
   } as ViewStyle,
@@ -190,25 +219,17 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Theme.spacing.xl,
   } as ViewStyle,
-  mainTitle: {
-    marginBottom: Theme.spacing.sm,
-    fontSize: Theme.typography.fontSizes.xxl,
-    fontFamily: Theme.typography.fonts.bold,
-    lineHeight: Theme.typography.fontSizes.xxl * 1.3,
-    color: Theme.colors.primary,
-  } as TextStyle,
   sectionTitle: {
+    textAlign: 'center',
     marginBottom: Theme.spacing.xs,
     fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.bold,
     lineHeight: Theme.typography.fontSizes.xl * 1.3,
-    color: Theme.colors.primary,
+    color: Theme.colors.text,
   } as TextStyle,
   gameCard: {
-    borderRadius: Theme.borderRadius.md,
-    padding: Theme.spacing.md,
+    padding: 20,
     backgroundColor: Theme.card.background,
-    marginBottom: Theme.spacing.md,
     ...Platform.select({
       ios: {
         shadowColor: Theme.card.shadow.shadowColor,

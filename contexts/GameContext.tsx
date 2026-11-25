@@ -5,306 +5,197 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useReducer,
+  useRef,
+  useState,
 } from 'react';
-import {Game, GameError, Round, RoundData, Team} from '../types/game';
-import {calculateTeamScore} from '../utils/scoring';
-import * as Storage from '../utils/storage';
+import {Game, RoundData} from '../types/game';
+import {findWinningTeam} from '../utils/scoring';
+import {
+  closeGame,
+  GameLibrary,
+  loadLibrary,
+  saveLibrary,
+} from '../utils/library';
 
-interface GameState {
+interface GameContextValue {
   currentGame: Game | null;
+  activeGames: Game[];
+  completedGames: Game[];
   isLoading: boolean;
   error: Error | null;
-  gameOverData: {
-    teamName: string;
-    score: number;
-  } | null;
-}
-
-interface GameContextValue extends GameState {
   startNewGame: (params: {teamNames: string[]}) => Promise<void>;
-  addRound: (roundData: RoundData) => Promise<void>;
+  selectGame: (id: string) => Promise<void>;
+  addRound: (round: RoundData) => Promise<void>;
   endGame: () => Promise<void>;
-  clearError: () => void;
-  clearGameOverData: () => void;
+  deleteGame: () => Promise<void>;
+  isReady: boolean;
+  retryLoad: () => void;
 }
-
-type GameAction =
-  | {type: 'SET_LOADING'}
-  | {type: 'SET_ERROR'; payload: Error}
-  | {type: 'CLEAR_ERROR'}
-  | {type: 'SET_GAME'; payload: Game | null}
-  | {type: 'ADD_ROUND'; payload: Round}
-  | {type: 'END_GAME'}
-  | {
-      type: 'SET_GAME_OVER_DATA';
-      payload: {teamName: string; score: number} | null;
-    };
-
-const initialState: GameState = {
-  currentGame: null,
-  isLoading: false,
-  error: null,
-  gameOverData: null,
-};
-
-function gameReducer(state: GameState, action: GameAction): GameState {
-  switch (action.type) {
-    case 'SET_LOADING':
-      return {...state, isLoading: true, error: null};
-    case 'SET_ERROR':
-      return {...state, isLoading: false, error: action.payload};
-    case 'CLEAR_ERROR':
-      return {...state, error: null};
-    case 'SET_GAME':
-      return {
-        ...state,
-        currentGame: action.payload,
-        isLoading: false,
-        error: null,
-      };
-    case 'ADD_ROUND':
-      if (!state.currentGame) {
-        return state;
-      }
-      return {
-        ...state,
-        currentGame: {
-          ...state.currentGame,
-          rounds: [...state.currentGame.rounds, action.payload],
-        },
-        isLoading: false,
-      };
-    case 'END_GAME':
-      return {
-        ...state,
-        currentGame: null,
-        isLoading: false,
-      };
-    case 'SET_GAME_OVER_DATA':
-      return {...state, gameOverData: action.payload};
-    default:
-      return state;
-  }
-}
-
 const GameContext = createContext<GameContextValue | null>(null);
+const empty: GameLibrary = {activeGames: [], history: [], selectedId: null};
 
 export function GameProvider({children}: PropsWithChildren) {
-  const [state, dispatch] = useReducer(gameReducer, initialState);
   const router = useRouter();
+  const [library, setLibrary] = useState(empty);
+  const saved = useRef(empty);
+  const busy = useRef(false);
+  const ready = useRef(false);
+  const [isReady, setReady] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [isLoading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Load current game on mount
   useEffect(() => {
-    const loadCurrentGame = async () => {
-      try {
-        dispatch({type: 'SET_LOADING'});
-        const game = await Storage.getCurrentGame();
-        dispatch({type: 'SET_GAME', payload: game});
-      } catch (error) {
-        dispatch({
-          type: 'SET_ERROR',
-          payload:
-            error instanceof Error ? error : new Error('Failed to load game'),
-        });
-      }
-    };
-
-    loadCurrentGame();
-  }, []);
-
-  // Watch for game over and handle navigation
-  useEffect(() => {
-    if (state.gameOverData) {
-      router.replace({
-        pathname: '/games/victory',
-        params: {
-          teamName: state.gameOverData.teamName,
-          score: state.gameOverData.score.toString(),
-        },
+    let active = true;
+    loadLibrary()
+      .then(data => {
+        if (!active) return;
+        saved.current = data;
+        ready.current = true;
+        setLibrary(data);
+        setReady(true);
+        setError(null);
+      })
+      .catch(err => {
+        if (active)
+          setError(
+            err instanceof Error
+              ? err
+              : new Error('Failed to load saved games'),
+          );
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
-    }
-  }, [state.gameOverData, router]);
+    return () => {
+      active = false;
+    };
+  }, [loadAttempt]);
 
-  const startNewGame = useCallback(
-    async ({teamNames}: {teamNames: string[]}) => {
+  const retryLoad = () => {
+    setLoading(true);
+    setError(null);
+    setLoadAttempt(attempt => attempt + 1);
+  };
+
+  const mutate = useCallback(
+    async (change: (data: GameLibrary) => GameLibrary) => {
+      if (!ready.current) throw new Error('Saved games are still loading');
+      if (busy.current) throw new Error('Please wait for the current save');
+      busy.current = true;
+      setLoading(true);
       try {
-        dispatch({type: 'SET_LOADING'});
-
-        const teams: Team[] = teamNames.map(name => ({
-          id: `team-${Date.now()}-${Math.random()}`,
-          name,
-          players: [],
-        }));
-
-        const newGame: Game = {
-          id: `game-${Date.now()}`,
-          timestamp: Date.now(),
-          teams,
-          rounds: [],
-          cardImageIndex: Math.floor(Math.random() * 24),
-          winningScore: 1500,
-          version: 1,
-        };
-
-        await Storage.saveCurrentGame(newGame);
-        dispatch({type: 'SET_GAME', payload: newGame});
-      } catch (error) {
-        dispatch({
-          type: 'SET_ERROR',
-          payload:
-            error instanceof Error ? error : new Error('Failed to start game'),
-        });
-        throw error;
+        const next = change(saved.current);
+        await saveLibrary(next);
+        saved.current = next;
+        setLibrary(next);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to save game'));
+        throw err;
+      } finally {
+        busy.current = false;
+        setLoading(false);
       }
     },
     [],
   );
 
-  const addRound = useCallback(
-    async (roundData: RoundData) => {
-      if (!state.currentGame) {
-        throw new GameError('No current game');
+  const selectGame = async (id: string) => {
+    await mutate(data => {
+      if (!data.activeGames.some(g => g.id === id))
+        throw new Error('Game not found');
+      return {...data, selectedId: id};
+    });
+  };
+  const startNewGame = async ({teamNames}: {teamNames: string[]}) => {
+    const game: Game = {
+      id: `game-${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+      teams: teamNames.map((name, index) => ({
+        id: `team-${index}`,
+        name,
+        players: [],
+      })),
+      rounds: [],
+      cardImageIndex: Math.floor(Math.random() * 24),
+      winningScore: 1500,
+      version: 1,
+    };
+    await mutate(data => ({
+      ...data,
+      activeGames: [...data.activeGames, game],
+      selectedId: game.id,
+    }));
+  };
+  const addRound = async (round: RoundData) => {
+    let winner: {name: string; score: number} | undefined;
+    await mutate(data => {
+      const game = data.activeGames.find(g => g.id === data.selectedId);
+      if (!game) throw new Error('No game selected');
+      const updated = {
+        ...game,
+        rounds: [
+          ...game.rounds,
+          {...round, id: `round-${Date.now()}`, timestamp: Date.now()},
+        ],
+      };
+      const best = findWinningTeam(updated);
+      if (best) {
+        winner = best;
+        return closeGame(data, updated, true);
       }
-
-      try {
-        dispatch({type: 'SET_LOADING'});
-
-        const newRound: Round = {
-          ...roundData,
-          id: `round-${Date.now()}`,
-          timestamp: Date.now(),
-        };
-
-        const updatedGame = {
-          ...state.currentGame,
-          rounds: [...state.currentGame.rounds, newRound],
-        };
-
-        let gameIsOver = false;
-        let winningTeam: {id: string; score: number} | null = null;
-
-        if (roundData.moonShotAttempted) {
-          const bidTeamScore = calculateTeamScore(
-            updatedGame,
-            roundData.bidWinner,
-          );
-          gameIsOver = bidTeamScore >= updatedGame.winningScore;
-          if (gameIsOver) {
-            winningTeam = {
-              id: roundData.bidWinner,
-              score: bidTeamScore,
-            };
-          }
-        } else {
-          const teamScores = updatedGame.teams.map(team => ({
-            id: team.id,
-            score: calculateTeamScore(updatedGame, team.id),
-          }));
-          const highestScore = teamScores.reduce((prev, curr) =>
-            curr.score > prev.score ? curr : prev,
-          );
-          gameIsOver = highestScore.score >= updatedGame.winningScore;
-          if (gameIsOver) {
-            winningTeam = highestScore;
-          }
-        }
-
-        // Save the updated game first
-        await Storage.saveCurrentGame(updatedGame);
-        dispatch({type: 'SET_GAME', payload: updatedGame});
-
-        if (gameIsOver && winningTeam) {
-          const winningTeamName = updatedGame.teams.find(
-            t => t.id === winningTeam.id,
-          )?.name;
-
-          if (!winningTeamName) {
-            throw new GameError('Could not find winning team name');
-          }
-
-          // Save to history first
-          await Storage.saveGameHistory([
-            ...(await Storage.getGameHistory()),
-            updatedGame,
-          ]);
-
-          // Clear current game
-          await Storage.saveCurrentGame(null);
-          dispatch({type: 'END_GAME'});
-
-          // Set game over data to trigger navigation
-          dispatch({
-            type: 'SET_GAME_OVER_DATA',
-            payload: {
-              teamName: winningTeamName,
-              score: winningTeam.score,
-            },
-          });
-        } else {
-          router.back();
-        }
-      } catch (error) {
-        dispatch({
-          type: 'SET_ERROR',
-          payload:
-            error instanceof Error ? error : new Error('Failed to add round'),
-        });
-        throw error;
-      }
-    },
-    [state.currentGame, router],
-  );
-
-  const endGame = useCallback(async () => {
-    if (!state.currentGame) return;
-
-    try {
-      dispatch({type: 'SET_LOADING'});
-      await Storage.saveGameHistory([
-        ...(await Storage.getGameHistory()),
-        state.currentGame,
-      ]);
-      dispatch({type: 'END_GAME'});
-      await Storage.saveCurrentGame(null);
-    } catch (error) {
-      dispatch({
-        type: 'SET_ERROR',
-        payload:
-          error instanceof Error ? error : new Error('Failed to end game'),
+      return {
+        ...data,
+        activeGames: data.activeGames.map(g =>
+          g.id === updated.id ? updated : g,
+        ),
+      };
+    });
+    if (winner)
+      router.replace({
+        pathname: '/games/victory',
+        params: {teamName: winner.name, score: String(winner.score)},
       });
-      throw error;
-    }
-  }, [state.currentGame]);
-
-  const clearError = useCallback(() => {
-    dispatch({type: 'CLEAR_ERROR'});
-  }, []);
-
-  const clearGameOverData = useCallback(() => {
-    dispatch({type: 'SET_GAME_OVER_DATA', payload: null});
-  }, []);
+    else router.back();
+  };
+  const finish = async (archive: boolean) => {
+    await mutate(data => {
+      const game = data.activeGames.find(g => g.id === data.selectedId);
+      if (!game) throw new Error('No game selected');
+      return closeGame(
+        data,
+        archive ? {...game, endedEarly: true} : game,
+        archive,
+      );
+    });
+    router.replace('/games');
+  };
 
   return (
     <GameContext.Provider
       value={{
-        ...state,
+        currentGame:
+          library.activeGames.find(g => g.id === library.selectedId) ?? null,
+        activeGames: library.activeGames,
+        completedGames: library.history,
+        isLoading,
+        error,
         startNewGame,
+        selectGame,
         addRound,
-        endGame,
-        clearError,
-        clearGameOverData,
+        endGame: () => finish(true),
+        deleteGame: () => finish(false),
+        isReady,
+        retryLoad,
       }}
     >
       {children}
     </GameContext.Provider>
   );
 }
-
-export const useGame = () => {
+export function useGame() {
   const context = useContext(GameContext);
-  if (!context) {
-    throw new Error('useGame must be used within a GameProvider');
-  }
+  if (!context) throw new Error('useGame must be used within a GameProvider');
   return context;
-};
+}

@@ -8,6 +8,7 @@ import {GameProvider} from '../contexts/GameContext';
 // Customize the default theme to match our app's theme
 const appTheme = {
   ...DefaultTheme,
+  dark: true,
   colors: {
     ...DefaultTheme.colors,
     primary: Theme.colors.primary,
@@ -19,8 +20,11 @@ const appTheme = {
 
 function RootLayout() {
   const [loaded] = useFonts({
+    CormorantSC: require('../assets/fonts/CormorantSC-SemiBold.ttf'),
+    Cinzel: require('../assets/fonts/Cinzel.ttf'),
+    PlayfairDisplay: require('../assets/fonts/PlayfairDisplay-Regular.ttf'),
+    'PlayfairDisplay-Bold': require('../assets/fonts/PlayfairDisplay-Bold.ttf'),
     CrimsonText: require('../assets/fonts/CrimsonText-Regular.ttf'),
-    'CrimsonText-Bold': require('../assets/fonts/CrimsonText-Bold.ttf'),
   });
 
   if (!loaded) {
@@ -31,7 +35,7 @@ function RootLayout() {
     <ThemeProvider value={appTheme}>
       <GameProvider>
         <Slot />
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </GameProvider>
     </ThemeProvider>
   );

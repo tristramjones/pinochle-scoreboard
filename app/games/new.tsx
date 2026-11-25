@@ -17,7 +17,7 @@ import {useGame} from '../../contexts/GameContext';
 
 export default function NewGameScreen() {
   const router = useRouter();
-  const {startNewGame} = useGame();
+  const {startNewGame, isLoading} = useGame();
   const [team1Name, setTeam1Name] = useState('');
   const [team2Name, setTeam2Name] = useState('');
 
@@ -58,10 +58,11 @@ export default function NewGameScreen() {
           </ThemedText>
           <TextInput
             returnKeyType="done"
+            keyboardAppearance="dark"
             onSubmitEditing={Keyboard.dismiss}
             style={[styles.input, styles.inputThemed]}
             value={team1Name}
-            onChangeText={text => setTeam1Name(text.trim())}
+            onChangeText={setTeam1Name}
             placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />
@@ -73,10 +74,11 @@ export default function NewGameScreen() {
           </ThemedText>
           <TextInput
             returnKeyType="done"
+            keyboardAppearance="dark"
             onSubmitEditing={Keyboard.dismiss}
             style={[styles.input, styles.inputThemed]}
             value={team2Name}
-            onChangeText={text => setTeam2Name(text.trim())}
+            onChangeText={setTeam2Name}
             placeholder="Enter team name"
             placeholderTextColor={Theme.colors.input.placeholder}
           />
@@ -85,6 +87,7 @@ export default function NewGameScreen() {
 
       <ThemedButton
         title="Start Game"
+        disabled={isLoading}
         onPress={handleStartGame}
         variant="primary"
         size="lg"
@@ -105,6 +108,7 @@ const styles = StyleSheet.create({
     padding: Theme.spacing.lg,
   } as ViewStyle,
   phaseTitle: {
+    letterSpacing: 0.5,
     fontSize: Theme.typography.fontSizes.xxl,
     fontFamily: Theme.typography.fonts.bold,
     textAlign: 'center',
@@ -124,6 +128,7 @@ const styles = StyleSheet.create({
     color: Theme.colors.primary,
   } as TextStyle,
   input: {
+    borderBottomWidth: 3,
     height: Theme.button.sizes.lg.height,
     borderWidth: 1,
     borderRadius: Theme.borderRadius.md,

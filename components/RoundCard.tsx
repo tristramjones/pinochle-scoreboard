@@ -1,4 +1,5 @@
 import React from 'react';
+import {CardFrame} from './CardFrame';
 import {calculateRoundPoints} from '../utils/scoring';
 import {Platform, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {Theme} from '../constants/Theme';
@@ -16,7 +17,7 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
   const bidWinningTeam = game.teams.find(team => team.id === round.bidWinner);
 
   return (
-    <View style={styles.roundCard}>
+    <CardFrame style={styles.roundCard}>
       <View style={styles.roundHeader}>
         <ThemedText type="subtitle">Round {roundNumber}</ThemedText>
         {round.moonShotAttempted ? (
@@ -115,14 +116,13 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
           );
         })}
       </View>
-    </View>
+    </CardFrame>
   );
 }
 
 const styles = StyleSheet.create({
   roundCard: {
-    borderRadius: Theme.borderRadius.md,
-    padding: Theme.spacing.lg,
+    padding: Theme.spacing.md,
     backgroundColor: Theme.card.background,
     marginBottom: Theme.spacing.md,
     ...Platform.select({
@@ -138,6 +138,8 @@ const styles = StyleSheet.create({
     }),
   } as ViewStyle,
   roundHeader: {
+    flexWrap: 'wrap',
+    gap: Theme.spacing.sm,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

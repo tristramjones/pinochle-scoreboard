@@ -43,6 +43,7 @@ export interface Game {
   rounds: Round[];
   cardImageIndex: number;
   winningScore: number;
+  endedEarly?: boolean;
   version: number; // For future migrations
 }
 
@@ -56,19 +57,80 @@ export interface StorageKeys {
   GAME_SETTINGS: 'pinochle_game_settings';
 }
 
-// Type guard for runtime type checking
-export function isValidGame(game: unknown): game is Game {
-  if (!game || typeof game !== 'object') return false;
+export interface GameLibrary {
+  activeGames: Game[];
+  history: Game[];
+  selectedId: string | null;
+}
 
-  const g = game as Game;
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object' && !Array.isArray(value);
+const isFiniteNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value);
+const isPointsMap = (value: unknown): boolean =>
+  isRecord(value) && Object.values(value).every(isFiniteNumber);
+
+// Reject malformed nested data before rendering or calculating saved scores.
+export function isValidGame(value: unknown): value is Game {
+  if (!isRecord(value)) return false;
+  const {teams, rounds} = value;
   return (
-    typeof g.id === 'string' &&
-    typeof g.timestamp === 'number' &&
-    Array.isArray(g.teams) &&
-    Array.isArray(g.rounds) &&
-    typeof g.cardImageIndex === 'number' &&
-    typeof g.winningScore === 'number' &&
-    typeof g.version === 'number'
+    typeof value.id === 'string' &&
+    value.id.length > 0 &&
+    isFiniteNumber(value.timestamp) &&
+    Array.isArray(teams) &&
+    teams.length === 2 &&
+    teams.every(
+      team =>
+        isRecord(team) &&
+        typeof team.id === 'string' &&
+        typeof team.name === 'string' &&
+        Array.isArray(team.players),
+    ) &&
+    new Set(teams.map(team => team.id)).size === 2 &&
+    Array.isArray(rounds) &&
+    rounds.every(
+      round =>
+        isRecord(round) &&
+        typeof round.id === 'string' &&
+        isFiniteNumber(round.timestamp) &&
+        teams.some(team => team.id === round.bidWinner) &&
+        isFiniteNumber(round.bid) &&
+        round.bid > 0 &&
+        isPointsMap(round.meld) &&
+        isPointsMap(round.trickPoints) &&
+        typeof round.moonShotAttempted === 'boolean' &&
+        (round.moonShotSuccessful === undefined ||
+          typeof round.moonShotSuccessful === 'boolean') &&
+        (round.roundPoints === undefined || isPointsMap(round.roundPoints)),
+    ) &&
+    isFiniteNumber(value.cardImageIndex) &&
+    Number.isInteger(value.cardImageIndex) &&
+    value.cardImageIndex >= 0 &&
+    value.cardImageIndex < 24 &&
+    isFiniteNumber(value.winningScore) &&
+    value.winningScore > 0 &&
+    isFiniteNumber(value.version) &&
+    Number.isInteger(value.version) &&
+    value.version >= 1 &&
+    (value.endedEarly === undefined || typeof value.endedEarly === 'boolean')
+  );
+}
+
+export function isValidLibrary(value: unknown): value is GameLibrary {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.activeGames) ||
+    !Array.isArray(value.history)
+  )
+    return false;
+  const games = [...value.activeGames, ...value.history];
+  return (
+    games.every(isValidGame) &&
+    new Set(games.map(game => game.id)).size === games.length &&
+    (value.selectedId === null ||
+      (typeof value.selectedId === 'string' &&
+        value.activeGames.some(game => game.id === value.selectedId)))
   );
 }
 

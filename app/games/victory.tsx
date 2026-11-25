@@ -5,17 +5,19 @@ import {StyleSheet, View} from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
-import {useGame} from '../../contexts/GameContext';
 
 export default function VictoryScreen() {
   const router = useRouter();
-  const {clearGameOverData} = useGame();
   const params = useLocalSearchParams<{
     teamName: string;
     score: string;
   }>();
 
   useEffect(() => {
+    if (!params.teamName || !params.score) {
+      router.replace('/games');
+      return;
+    }
     // Play haptic feedback
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
@@ -26,12 +28,10 @@ export default function VictoryScreen() {
 
     return () => {
       clearTimeout(timer);
-      clearGameOverData();
     };
-  }, [router, clearGameOverData]);
+  }, [router, params.teamName, params.score]);
 
   if (!params.teamName || !params.score) {
-    router.replace('/games');
     return null;
   }
 

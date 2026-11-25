@@ -1,26 +1,20 @@
+import {CardFrame} from '../../components/CardFrame';
+import {TableScrollView} from '../../components/TableScrollView';
 import {useLocalSearchParams, useRouter} from 'expo-router';
-import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
+import React from 'react';
+import {StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {RoundCard} from '../../components/RoundCard';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
-import {Game} from '../../types/game';
-import {calculateTeamScores} from '../../utils/scoring';
-import * as Storage from '../../utils/storage';
+import {calculateTeamScores, findWinningTeam} from '../../utils/scoring';
+import {useGame} from '../../contexts/GameContext';
 
 export default function GameDetailsScreen() {
   const {id} = useLocalSearchParams();
   const router = useRouter();
-  const [game, setGame] = useState<Game | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    Storage.getGameHistory().then(history => {
-      if (active) setGame(history.find(g => g.id === id) || null);
-    }).catch(error => console.error('Error loading game:', error));
-    return () => { active = false; };
-  }, [id]);
+  const {completedGames, isLoading} = useGame();
+  const game = completedGames.find(g => g.id === id) ?? null;
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString();
@@ -29,7 +23,9 @@ export default function GameDetailsScreen() {
   if (!game) {
     return (
       <View style={[styles.container, styles.containerThemed]}>
-        <ThemedText type="heading">Game not found</ThemedText>
+        <ThemedText type="heading">
+          {isLoading ? 'Opening the ledger…' : 'Game not found'}
+        </ThemedText>
         <ThemedButton
           title="Back to Games"
           onPress={() => router.back()}
@@ -40,12 +36,10 @@ export default function GameDetailsScreen() {
   }
 
   const scores = calculateTeamScores(game);
-  const winner = game.teams.reduce((prev, curr) =>
-    scores[curr.id] > scores[prev.id] ? curr : prev,
-  );
+  const winner = game.endedEarly ? null : findWinningTeam(game);
 
   return (
-    <ScrollView
+    <TableScrollView
       style={[styles.container, styles.containerThemed]}
       contentContainerStyle={styles.contentContainer}
     >
@@ -55,35 +49,38 @@ export default function GameDetailsScreen() {
 
       <ThemedText type="label" style={styles.dateText}>
         {formatDate(game.timestamp)}
+        {game.endedEarly ? ' · Ended early' : ''}
       </ThemedText>
 
       <View style={styles.scoreboardTeams}>
         {game.teams.map(team => (
-          <View key={team.id} style={styles.teamColumn}>
+          <CardFrame key={team.id} style={styles.teamColumn}>
             <View style={styles.teamNameContainer}>
               <ThemedText
                 type="heading"
                 style={[
                   styles.teamName,
-                  team.id === winner.id && styles.winnerText,
+                  team.id === winner?.id && styles.winnerText,
                 ]}
               >
                 {team.name}
               </ThemedText>
-              {team.id === winner.id && (
+              {team.id === winner?.id && (
                 <ThemedText style={styles.trophyIcon}>🏆</ThemedText>
               )}
             </View>
             <ThemedText
               type="heading"
+              numberOfLines={1}
+              adjustsFontSizeToFit
               style={[
                 styles.scoreValue,
-                team.id === winner.id && styles.winnerText,
+                team.id === winner?.id && styles.winnerText,
               ]}
             >
               {scores[team.id]}
             </ThemedText>
-          </View>
+          </CardFrame>
         ))}
       </View>
 
@@ -97,7 +94,7 @@ export default function GameDetailsScreen() {
           />
         ))}
       </View>
-    </ScrollView>
+    </TableScrollView>
   );
 }
 
@@ -127,9 +124,13 @@ const styles = StyleSheet.create({
   scoreboardTeams: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    gap: Theme.spacing.md,
     marginBottom: Theme.spacing.xl,
   } as ViewStyle,
   teamColumn: {
+    flex: 1,
+    paddingHorizontal: Theme.spacing.sm,
+    paddingVertical: Theme.spacing.lg,
     alignItems: 'center',
   } as ViewStyle,
   teamNameContainer: {

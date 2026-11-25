@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
   ViewStyle,
+  View,
 } from 'react-native';
 import {Theme} from '../constants/Theme';
 import {ThemedText} from './ThemedText';
@@ -39,9 +40,12 @@ export function ThemedButton({
         variant === 'primary'
           ? Theme.colors.button.primary
           : Theme.colors.button.secondary,
-      height: buttonSize.height,
+      minHeight: buttonSize.height,
+      paddingVertical: Theme.spacing.sm,
+      borderWidth: 1,
+      borderColor: Theme.colors.accent.gold,
       paddingHorizontal: buttonSize.paddingHorizontal,
-      borderRadius: Theme.borderRadius.md,
+      borderRadius: Theme.borderRadius.lg,
       opacity: disabled ? 0.6 : 1,
     },
     style,
@@ -56,13 +60,31 @@ export function ThemedButton({
           : Theme.colors.button.textSecondary,
       fontSize: buttonSize.fontSize,
       lineHeight: buttonSize.fontSize * buttonSize.lineHeight,
-      fontFamily: Theme.typography.fonts.regular,
+      fontFamily: Theme.typography.fonts.editorial,
     },
     textStyle,
   ];
 
   return (
-    <TouchableOpacity style={buttonStyles} disabled={disabled} {...rest}>
+    <TouchableOpacity
+      accessibilityRole="button"
+      style={buttonStyles}
+      disabled={disabled}
+      {...rest}
+    >
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            margin: 4,
+            borderRadius: 6,
+            borderWidth: 1,
+            borderColor:
+              variant === 'primary' ? '#A87934' : Theme.colors.card.border,
+          },
+        ]}
+      />
       <ThemedText style={textStyles}>{title}</ThemedText>
     </TouchableOpacity>
   );

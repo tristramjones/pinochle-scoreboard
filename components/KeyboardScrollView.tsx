@@ -1,15 +1,16 @@
 import React from 'react';
-import {Platform, ScrollView, ScrollViewProps} from 'react-native';
+import {TableScrollView} from './TableScrollView';
+import {Platform, ScrollViewProps} from 'react-native';
 
 export function KeyboardScrollView({children, ...props}: ScrollViewProps) {
   return (
-    <ScrollView
+    <TableScrollView
       automaticallyAdjustKeyboardInsets
       keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
       keyboardShouldPersistTaps="handled"
       {...props}
     >
       {children}
-    </ScrollView>
+    </TableScrollView>
   );
 }

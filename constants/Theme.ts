@@ -6,38 +6,38 @@
 export const Theme = {
   colors: {
     // Base colors
-    background: '#F8F0D9', // Warm cream background
+    background: '#21120C',
     card: {
-      background: '#F6F0E4', // Warmer cream for cards
-      border: '#E8D5B0',
-      shadow: 'rgba(0, 0, 0, 0.25)', // 15% darker shadow
+      background: '#321D12',
+      border: '#8B6738',
+      shadow: 'rgba(0, 0, 0, 0.25)',
     },
     // Text colors
-    text: '#202017', // Rich dark color for main text
-    textSecondary: '#6B5F51', // Warm brown for secondary text (dates)
+    text: '#F8EACC',
+    textSecondary: '#CBB491',
 
     // Accent colors
-    primary: '#173D2D', // Deep vintage green for primary actions
+    primary: '#E4BC73',
     accent: {
-      burgundy: '#8B2E2E', // Deep red for accents
-      green: '#173D2D', // Deep green
-      gold: '#C6A15B', // Vintage gold
+      burgundy: '#E8A17C',
+      green: '#7F8B65',
+      gold: '#E4BC73',
     },
 
     // Button colors
     button: {
-      primary: '#173D2D', // Deep vintage green
-      secondary: '#FFFDF7', // White background for secondary buttons
-      text: '#FFFDF7', // White text on primary
-      textSecondary: '#173D2D', // Green text on secondary
+      primary: '#E4BC73',
+      secondary: '#2A170E',
+      text: '#21120C',
+      textSecondary: '#E4BC73',
     },
 
     // Input colors
     input: {
-      background: '#FFFDF7',
-      border: '#E8D5B0',
-      text: '#202017',
-      placeholder: '#A39485',
+      background: '#F5E4BD',
+      border: '#8B6738',
+      text: '#2A170E',
+      placeholder: '#7B674B',
     },
   },
 
@@ -45,7 +45,9 @@ export const Theme = {
   typography: {
     fonts: {
       regular: 'CrimsonText',
-      bold: 'CrimsonText-Bold',
+      bold: 'PlayfairDisplay-Bold',
+      display: 'Cinzel',
+      editorial: 'PlayfairDisplay',
     },
     fontSizes: {
       xs: 12,
@@ -75,10 +77,10 @@ export const Theme = {
 
   // Border radius
   borderRadius: {
-    sm: 4,
-    md: 8,
-    lg: 12,
-    xl: 16,
+    sm: 3,
+    md: 6,
+    lg: 10,
+    xl: 14,
   },
 
   // Button
@@ -116,17 +118,17 @@ export const Theme = {
 
   // Standardized card styling
   card: {
-    background: '#F6F0E4', // Warmer cream color
+    background: '#321D12',
     borderRadius: 8,
     shadow: {
-      shadowColor: 'rgba(0, 0, 0, 0.25)', // 15% darker
+      shadowColor: 'rgba(0, 0, 0, 0.25)',
       shadowOffset: {
         width: 0,
         height: 3,
       },
-      shadowOpacity: 0.4, // Increased opacity by ~15%
+      shadowOpacity: 0.4,
       shadowRadius: 6,
-      elevation: 7, // Slightly increased elevation to match
+      elevation: 7,
     },
   },
 };

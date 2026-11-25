@@ -31,7 +31,7 @@ describe('Storage Utils', () => {
 
   beforeEach(() => {
     // Clear all mocks before each test
-    jest.clearAllMocks();
+    jest.resetAllMocks();
 
     mockGame = {
       id: 'game-1',
@@ -185,6 +185,7 @@ describe('Storage Utils', () => {
   describe('backupData', () => {
     it('should create backup with current game and history', async () => {
       (AsyncStorage.getItem as jest.Mock)
+        .mockResolvedValueOnce(null) // no new library
         .mockResolvedValueOnce(JSON.stringify(mockGame)) // current game
         .mockResolvedValueOnce(JSON.stringify([mockGame])); // history
 
@@ -198,6 +199,7 @@ describe('Storage Utils', () => {
 
     it('should handle missing current game', async () => {
       (AsyncStorage.getItem as jest.Mock)
+        .mockResolvedValueOnce(null) // no new library
         .mockResolvedValueOnce(null) // no current game
         .mockResolvedValueOnce(JSON.stringify([mockGame])); // history
 
@@ -225,7 +227,7 @@ describe('Storage Utils', () => {
 
       const result = await Storage.restoreFromBackup();
       expect(result).toBe(true);
-      expect(AsyncStorage.setItem).toHaveBeenCalledTimes(2); // current game and history
+      expect(AsyncStorage.setItem).toHaveBeenCalledTimes(1); // one atomic library restore
     });
 
     it('should handle missing backup data', async () => {
@@ -250,8 +252,57 @@ describe('Storage Utils', () => {
 
       // Check that the migrated data was saved
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-        'pinochle_current_game',
+        'pinochle_library_v2',
         expect.stringContaining('"version":1'),
+      );
+    });
+  });
+
+  describe('multi-game storage compatibility', () => {
+    const library = () => ({
+      activeGames: [mockGame, {...mockGame, id: 'second'}],
+      history: [],
+      selectedId: mockGame.id,
+    });
+
+    it('backs up all ongoing games and the selection', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify(library()),
+      );
+      await Storage.backupData();
+      const backup = JSON.parse(
+        (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
+      );
+      expect(backup.version).toBe(2);
+      expect(backup.library).toEqual(library());
+    });
+
+    it('restores the whole library with one write', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify({version: 2, library: library()}),
+      );
+      await expect(Storage.restoreFromBackup()).resolves.toBe(true);
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        'pinochle_library_v2',
+        JSON.stringify(library()),
+      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not overwrite games with an invalid backup', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify({version: 2, library: {activeGames: []}}),
+      );
+      await expect(Storage.restoreFromBackup()).rejects.toThrow(
+        'Invalid backup library',
+      );
+      expect(AsyncStorage.setItem).not.toHaveBeenCalled();
+    });
+
+    it('clears the new library along with legacy game keys', async () => {
+      await Storage.clearStorage();
+      expect(AsyncStorage.multiRemove).toHaveBeenCalledWith(
+        expect.arrayContaining(['pinochle_library_v2']),
       );
     });
   });
@@ -263,7 +314,9 @@ describe('Storage Utils', () => {
     });
 
     it('should throw StorageError if clear fails', async () => {
-      (AsyncStorage.multiRemove as jest.Mock).mockRejectedValue(new Error('Failed'));
+      (AsyncStorage.multiRemove as jest.Mock).mockRejectedValue(
+        new Error('Failed'),
+      );
       await expect(Storage.clearStorage()).rejects.toThrow(StorageError);
     });
   });
