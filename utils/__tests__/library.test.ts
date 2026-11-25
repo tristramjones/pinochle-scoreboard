@@ -1,10 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Game} from '../../types/game';
-import {closeGame, loadLibrary, saveLibrary} from '../library';
+import {
+  closeGame,
+  loadLibrary,
+  saveLibrary,
+  removeCompletedGame,
+  saveLibraryAfterDeletion,
+} from '../library';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
+  multiSet: jest.fn(),
 }));
 const game = (id: string): Game => ({
   id,
@@ -117,4 +124,90 @@ it('rejects duplicate game IDs before saving', async () => {
     }),
   ).rejects.toThrow('Invalid saved game library');
   expect(AsyncStorage.setItem).not.toHaveBeenCalled();
+});
+
+it('deletes only the selected completed game and preserves the active selection', () => {
+  const library = {
+    activeGames: [game('active')],
+    history: [game('deleted'), game('kept')],
+    selectedId: 'active',
+  };
+  expect(removeCompletedGame(library, 'deleted')).toEqual({
+    ...library,
+    history: [game('kept')],
+  });
+  expect(library.history).toHaveLength(2);
+});
+
+it('removes a deleted game from persisted history, migration copies, and backups', async () => {
+  const original = {
+    activeGames: [game('active')],
+    history: [game('deleted'), game('kept')],
+    selectedId: 'active',
+  };
+  (AsyncStorage.getItem as jest.Mock).mockImplementation(
+    async key =>
+      ({
+        pinochle_current_game: JSON.stringify(game('deleted')),
+        pinochle_game_history: JSON.stringify(original.history),
+        pinochle_data_backup: JSON.stringify({version: 2, library: original}),
+      })[key as string] ?? null,
+  );
+  await saveLibraryAfterDeletion(
+    removeCompletedGame(original, 'deleted'),
+    'deleted',
+  );
+  const writes = Object.fromEntries(
+    (AsyncStorage.multiSet as jest.Mock).mock.calls[0][0],
+  );
+  expect(JSON.parse(writes.pinochle_library_v2 as string).history).toEqual([
+    game('kept'),
+  ]);
+  expect(writes.pinochle_current_game).toBe('null');
+  expect(JSON.parse(writes.pinochle_game_history as string)).toEqual([
+    game('kept'),
+  ]);
+  expect(
+    JSON.parse(writes.pinochle_data_backup as string).library.history,
+  ).toEqual([game('kept')]);
+  expect(
+    JSON.parse(writes.pinochle_data_backup as string).library.activeGames,
+  ).toEqual([game('active')]);
+});
+
+it('removes the game from a legacy backup too', async () => {
+  (AsyncStorage.getItem as jest.Mock).mockImplementation(async key =>
+    key === 'pinochle_data_backup'
+      ? JSON.stringify({
+          version: 1,
+          currentGame: game('deleted'),
+          gameHistory: [game('deleted'), game('kept')],
+        })
+      : null,
+  );
+  await saveLibraryAfterDeletion(
+    {activeGames: [], history: [game('kept')], selectedId: null},
+    'deleted',
+  );
+  const writes = Object.fromEntries(
+    (AsyncStorage.multiSet as jest.Mock).mock.calls[0][0],
+  );
+  expect(JSON.parse(writes.pinochle_data_backup as string)).toEqual({
+    version: 1,
+    currentGame: null,
+    gameHistory: [game('kept')],
+  });
+});
+
+it('reports a failed deletion write', async () => {
+  (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+  (AsyncStorage.multiSet as jest.Mock).mockRejectedValue(
+    new Error('Write failed'),
+  );
+  await expect(
+    saveLibraryAfterDeletion(
+      {activeGames: [], history: [], selectedId: null},
+      'deleted',
+    ),
+  ).rejects.toThrow('Write failed');
 });

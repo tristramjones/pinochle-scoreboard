@@ -44,10 +44,11 @@ export const Theme = {
   // Typography
   typography: {
     fonts: {
-      regular: 'CrimsonText',
+      regular: 'IMFellEnglish',
+      italic: 'IMFellEnglish-Italic',
       bold: 'PlayfairDisplay-Bold',
       display: 'Cinzel',
-      editorial: 'PlayfairDisplay',
+      editorial: 'IMFellEnglish',
     },
     fontSizes: {
       xs: 12,

@@ -20,6 +20,8 @@ const appTheme = {
 
 function RootLayout() {
   const [loaded] = useFonts({
+    IMFellEnglish: require('../assets/fonts/IMFellEnglish-Regular.ttf'),
+    'IMFellEnglish-Italic': require('../assets/fonts/IMFellEnglish-Italic.ttf'),
     CormorantSC: require('../assets/fonts/CormorantSC-SemiBold.ttf'),
     Cinzel: require('../assets/fonts/Cinzel.ttf'),
     PlayfairDisplay: require('../assets/fonts/PlayfairDisplay-Regular.ttf'),

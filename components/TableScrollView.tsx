@@ -5,7 +5,12 @@ import {CardFrame} from './CardFrame';
 import {RoomMasthead} from './RoomMasthead';
 import {Theme} from '../constants/Theme';
 
-export function TableScrollView({style, children, ...props}: ScrollViewProps) {
+export function TableScrollView({
+  style,
+  children,
+  tagline,
+  ...props
+}: ScrollViewProps & {tagline?: string}) {
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -21,7 +26,7 @@ export function TableScrollView({style, children, ...props}: ScrollViewProps) {
       <CardFrame style={styles.frame} fillColor={Theme.colors.background}>
         <View style={styles.viewport}>
           <ScrollView style={[style, styles.scroll]} {...props}>
-            <RoomMasthead />
+            <RoomMasthead tagline={tagline} />
             {children}
           </ScrollView>
         </View>

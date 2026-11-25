@@ -10,6 +10,7 @@ export default function GamesLayout() {
   return (
     <Stack
       screenOptions={{
+        headerTitle: '',
         headerStyle: {
           backgroundColor: Theme.colors.background,
         },

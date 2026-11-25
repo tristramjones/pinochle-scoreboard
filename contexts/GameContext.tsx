@@ -12,6 +12,8 @@ import {Game, RoundData} from '../types/game';
 import {findWinningTeam} from '../utils/scoring';
 import {
   closeGame,
+  removeCompletedGame,
+  saveLibraryAfterDeletion,
   GameLibrary,
   loadLibrary,
   saveLibrary,
@@ -28,6 +30,7 @@ interface GameContextValue {
   addRound: (round: RoundData) => Promise<void>;
   endGame: () => Promise<void>;
   deleteGame: () => Promise<void>;
+  deleteCompletedGame: (id: string) => Promise<void>;
   isReady: boolean;
   retryLoad: () => void;
 }
@@ -79,14 +82,17 @@ export function GameProvider({children}: PropsWithChildren) {
   };
 
   const mutate = useCallback(
-    async (change: (data: GameLibrary) => GameLibrary) => {
+    async (
+      change: (data: GameLibrary) => GameLibrary,
+      persist: (data: GameLibrary) => Promise<void> = saveLibrary,
+    ) => {
       if (!ready.current) throw new Error('Saved games are still loading');
       if (busy.current) throw new Error('Please wait for the current save');
       busy.current = true;
       setLoading(true);
       try {
         const next = change(saved.current);
-        await saveLibrary(next);
+        await persist(next);
         saved.current = next;
         setLibrary(next);
         setError(null);
@@ -172,6 +178,14 @@ export function GameProvider({children}: PropsWithChildren) {
     router.replace('/games');
   };
 
+  const deleteCompletedGame = async (id: string) => {
+    await mutate(
+      data => removeCompletedGame(data, id),
+      data => saveLibraryAfterDeletion(data, id),
+    );
+    router.replace('/games');
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -186,6 +200,7 @@ export function GameProvider({children}: PropsWithChildren) {
         addRound,
         endGame: () => finish(true),
         deleteGame: () => finish(false),
+        deleteCompletedGame,
         isReady,
         retryLoad,
       }}

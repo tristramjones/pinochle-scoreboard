@@ -1,4 +1,4 @@
-import {suitStyles} from './SuitText';
+import {SuitText} from './SuitText';
 import {StyleSheet, View} from 'react-native';
 import {ThemedText} from './ThemedText';
 import {Theme} from '../constants/Theme';
@@ -12,20 +12,14 @@ export function OrnamentalRule({suits = false}: {suits?: boolean}) {
       importantForAccessibility="no-hide-descendants"
     >
       <View style={styles.line} />
-      <ThemedText style={[styles.suits, suits && suitStyles.black]}>
-        {suits ? (
-          <>
-            ♠︎ <ThemedText style={styles.redSuits}>♥︎ ♦︎</ThemedText> ♣︎
-          </>
-        ) : (
-          '◇'
-        )}
+      <ThemedText style={styles.suits}>
+        {suits ? <SuitText text="♠  ♥  ♦  ♣" /> : '◇'}
       </ThemedText>
       <View style={styles.line} />
     </View>
   );
 }
-export function RoomMasthead() {
+export function RoomMasthead({tagline}: {tagline?: string}) {
   return (
     <View style={styles.masthead}>
       <ThemedText
@@ -37,12 +31,21 @@ export function RoomMasthead() {
       >
         The Pinochle Room
       </ThemedText>
+      {tagline && <ThemedText style={styles.tagline}>{tagline}</ThemedText>}
       <OrnamentalRule suits />
     </View>
   );
 }
 const styles = StyleSheet.create({
   masthead: {paddingTop: 8, marginBottom: 24, alignItems: 'center'},
+  tagline: {
+    color: Theme.colors.textSecondary,
+    textAlign: 'center',
+    fontFamily: Theme.typography.fonts.italic,
+    fontSize: 21,
+    lineHeight: 30,
+    marginTop: Theme.spacing.xs,
+  },
   name: {
     fontFamily: 'CormorantSC',
     fontSize: 30,
@@ -60,11 +63,5 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   line: {height: 1, flex: 1, backgroundColor: Theme.colors.card.border},
-  redSuits: {
-    color: '#D32F2F',
-    textShadowRadius: 0,
-    fontSize: 21,
-    lineHeight: 28,
-  },
   suits: {color: Theme.colors.accent.gold, fontSize: 21, lineHeight: 28},
 });

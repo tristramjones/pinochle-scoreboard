@@ -1,4 +1,3 @@
-import {ScreenTitle} from '../../components/ScreenTitle';
 import {CardFrame} from '../../components/CardFrame';
 import {OrnamentalRule} from '../../components/RoomMasthead';
 import {TableScrollView} from '../../components/TableScrollView';
@@ -139,19 +138,6 @@ export default function GamesScreen() {
       style={[styles.container, styles.containerThemed]}
       contentContainerStyle={styles.contentContainer}
     >
-      <View style={styles.welcome}>
-        <ScreenTitle>Tonight’s games</ScreenTitle>
-        <ThemedText type="subtitle" style={styles.tagline}>
-          A good hand. Good company.
-        </ThemedText>
-        <ThemedButton
-          title="Start New Game"
-          disabled={isLoading || !isReady}
-          onPress={() => router.push('/games/new')}
-          size="lg"
-          style={{marginTop: Theme.spacing.lg}}
-        />
-      </View>
       {error && (
         <View style={{gap: Theme.spacing.sm, marginBottom: Theme.spacing.md}}>
           <ThemedText accessibilityRole="alert">
@@ -170,10 +156,14 @@ export default function GamesScreen() {
         </View>
       )}
       <View style={styles.section}>
-        <ThemedText type="heading" style={styles.sectionTitle}>
+        <ThemedText
+          type="heading"
+          accessibilityRole="header"
+          style={styles.sectionTitle}
+        >
           At the table
         </ThemedText>
-        <OrnamentalRule />
+        <ThemedText style={styles.sectionSubtitle}>One more hand.</ThemedText>
         {activeGames.map(game => renderGameCard(game))}
         {activeGames.length === 0 && (
           <ThemedText style={styles.emptyStateText}>
@@ -182,11 +172,22 @@ export default function GamesScreen() {
               : 'No games underway. Deal a new hand.'}
           </ThemedText>
         )}
+        <ThemedButton
+          title="Start New Game"
+          disabled={isLoading || !isReady}
+          onPress={() => router.push('/games/new')}
+          size="lg"
+          style={{marginTop: Theme.spacing.sm}}
+        />
       </View>
 
       {completedGames.length > 0 && (
         <View style={styles.section}>
-          <ThemedText type="heading" style={styles.sectionTitle}>
+          <ThemedText
+            type="heading"
+            accessibilityRole="header"
+            style={styles.sectionTitle}
+          >
             The ledger
           </ThemedText>
           <OrnamentalRule />
@@ -198,15 +199,6 @@ export default function GamesScreen() {
 }
 
 const styles = StyleSheet.create({
-  welcome: {marginBottom: Theme.spacing.xl, paddingBottom: Theme.spacing.md},
-  tagline: {
-    color: Theme.colors.textSecondary,
-    textAlign: 'center',
-    fontFamily: Theme.typography.fonts.regular,
-    fontStyle: 'italic',
-    fontSize: 21,
-    lineHeight: 30,
-  },
   container: {
     flex: 1,
   } as ViewStyle,
@@ -219,6 +211,14 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Theme.spacing.xl,
   } as ViewStyle,
+  sectionSubtitle: {
+    color: Theme.colors.textSecondary,
+    textAlign: 'center',
+    fontFamily: Theme.typography.fonts.italic,
+    fontSize: 21,
+    lineHeight: 30,
+    marginBottom: Theme.spacing.lg,
+  },
   sectionTitle: {
     textAlign: 'center',
     marginBottom: Theme.spacing.xs,

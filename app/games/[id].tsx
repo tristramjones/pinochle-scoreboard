@@ -2,7 +2,7 @@ import {CardFrame} from '../../components/CardFrame';
 import {TableScrollView} from '../../components/TableScrollView';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import React from 'react';
-import {StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
+import {Alert, StyleSheet, TextStyle, View, ViewStyle} from 'react-native';
 import {RoundCard} from '../../components/RoundCard';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
@@ -13,7 +13,7 @@ import {useGame} from '../../contexts/GameContext';
 export default function GameDetailsScreen() {
   const {id} = useLocalSearchParams();
   const router = useRouter();
-  const {completedGames, isLoading} = useGame();
+  const {completedGames, isLoading, deleteCompletedGame} = useGame();
   const game = completedGames.find(g => g.id === id) ?? null;
 
   const formatDate = (timestamp: number) => {
@@ -83,6 +83,32 @@ export default function GameDetailsScreen() {
           </CardFrame>
         ))}
       </View>
+
+      <ThemedButton
+        title="Delete Game"
+        variant="secondary"
+        disabled={isLoading}
+        style={{marginBottom: Theme.spacing.xl}}
+        textStyle={{color: Theme.colors.accent.burgundy}}
+        onPress={() =>
+          Alert.alert(
+            'Delete this completed game?',
+            'Permanently remove this game and all its rounds from this device, including any local backup copy. This cannot be undone.',
+            [
+              {text: 'Cancel', style: 'cancel'},
+              {
+                text: 'Delete Game',
+                style: 'destructive',
+                onPress: () => {
+                  deleteCompletedGame(game.id).catch(() =>
+                    Alert.alert('Unable to delete game', 'Please try again.'),
+                  );
+                },
+              },
+            ],
+          )
+        }
+      />
 
       <View style={styles.rounds}>
         {game.rounds.map((round, index) => (
