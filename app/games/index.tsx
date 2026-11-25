@@ -209,16 +209,16 @@ const styles = StyleSheet.create({
   } as TextStyle,
   gameCard: {
     padding: 20,
-    backgroundColor: Theme.card.background,
+    backgroundColor: Theme.colors.card.background,
     ...Platform.select({
       ios: {
-        shadowColor: Theme.card.shadow.shadowColor,
-        shadowOffset: Theme.card.shadow.shadowOffset,
-        shadowOpacity: Theme.card.shadow.shadowOpacity,
-        shadowRadius: Theme.card.shadow.shadowRadius,
+        shadowColor: Theme.shadows.card.shadowColor,
+        shadowOffset: Theme.shadows.card.shadowOffset,
+        shadowOpacity: Theme.shadows.card.shadowOpacity,
+        shadowRadius: Theme.shadows.card.shadowRadius,
       },
       android: {
-        elevation: Theme.card.shadow.elevation,
+        elevation: Theme.shadows.card.elevation,
       },
     }),
   } as ViewStyle,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   } as ImageStyle,
   dateText: {
     flex: 1,
-    color: Theme.colors.textSecondary,
+    color: Theme.colors.card.textSecondary,
     marginBottom: Theme.spacing.sm,
     textAlign: 'right',
     fontSize: Theme.typography.fontSizes.md,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     paddingRight: Theme.spacing.xs,
   } as ViewStyle,
   teamName: {
-    color: Theme.colors.text,
+    color: Theme.colors.card.text,
     flexGrow: 1,
     flexShrink: 0,
     flexBasis: 160,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   } as TextStyle,
   score: {
-    color: Theme.colors.text,
+    color: Theme.colors.card.text,
     fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.regular,
     textAlign: 'right',
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     lineHeight: 34,
   } as TextStyle,
   winnerText: {
-    color: Theme.colors.text,
+    color: Theme.colors.card.text,
     fontFamily: Theme.typography.fonts.bold,
   } as TextStyle,
   emptyStateText: {

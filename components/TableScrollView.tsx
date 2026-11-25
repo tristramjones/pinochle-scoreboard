@@ -23,7 +23,7 @@ export function TableScrollView({
         },
       ]}
     >
-      <CardFrame style={styles.frame} fillColor={Theme.colors.background}>
+      <CardFrame style={styles.frame} fillColor={Theme.colors.tableBackground}>
         <View style={styles.viewport}>
           <ScrollView style={[style, styles.scroll]} {...props}>
             <RoomMasthead tagline={tagline} />
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   viewport: {
     flex: 1,
     overflow: 'hidden',
-    backgroundColor: Theme.colors.background,
+    backgroundColor: Theme.colors.tableBackground,
   },
   scroll: {backgroundColor: 'transparent'},
 });

@@ -45,7 +45,7 @@ export function ThemedButton({
   const color = filled
     ? Theme.colors.button.text
     : variant === 'destructive'
-      ? Theme.colors.accent.burgundy
+      ? Theme.colors.accent.destructive
       : Theme.colors.button.textSecondary;
   return (
     <TouchableOpacity
@@ -69,7 +69,9 @@ export function ThemedButton({
         {
           minHeight: dimensions.height,
           paddingHorizontal:
-            variant === 'text' ? Theme.spacing.sm : dimensions.paddingHorizontal,
+            variant === 'text'
+              ? Theme.spacing.sm
+              : dimensions.paddingHorizontal,
           backgroundColor:
             filled || variant === 'text'
               ? 'transparent'
@@ -80,7 +82,7 @@ export function ThemedButton({
             filled || variant === 'text'
               ? 'transparent'
               : variant === 'destructive'
-                ? Theme.colors.accent.burgundy
+                ? Theme.colors.accent.destructive
                 : Theme.colors.accent.gold,
         },
         variant === 'text' && styles.compact,
@@ -103,7 +105,7 @@ export function ThemedButton({
               {
                 borderColor:
                   variant === 'destructive'
-                    ? Theme.colors.accent.burgundy
+                    ? Theme.colors.accent.destructive
                     : Theme.colors.card.border,
               },
             ]}
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    fontFamily: Theme.typography.fonts.editorial,
+    fontFamily: Theme.typography.fonts.regular,
     flexShrink: 1,
   },
 });

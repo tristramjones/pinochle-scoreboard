@@ -1,3 +1,4 @@
+import {Palette} from '../constants/Theme';
 import {Fragment} from 'react';
 import {Platform, StyleSheet, Text} from 'react-native';
 
@@ -10,12 +11,12 @@ export const suitStyles = StyleSheet.create({
     }),
     fontStyle: 'normal',
     fontWeight: 'normal',
-    textShadowColor: '#D8BF8E',
+    textShadowColor: Palette.brassLight,
     textShadowOffset: {width: 0, height: 0},
     textShadowRadius: 1.5,
   },
-  red: {color: '#D32F2F'},
-  black: {color: '#111111'},
+  red: {color: Palette.suitRed},
+  black: {color: Palette.suitBlack},
 });
 
 // Suits use the system font so decorative body fonts cannot drop their glyphs.

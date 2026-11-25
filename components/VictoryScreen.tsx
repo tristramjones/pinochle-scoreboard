@@ -14,13 +14,18 @@ import {CardFrame} from './CardFrame';
 import {OrnamentalRule} from './RoomMasthead';
 import {ThemedButton} from './ThemedButton';
 import {ThemedText} from './ThemedText';
-import {Theme} from '../constants/Theme';
+import {Palette, Theme} from '../constants/Theme';
 
 interface VictoryScreenProps {
   winningTeam: {name: string; score: number};
   onContinue: () => void;
 }
-const confettiColors = ['#E4BC73', '#F8EACC', '#20533E', '#A84832'];
+const confettiColors = [
+  Palette.brass,
+  Palette.parchment,
+  Palette.forest,
+  Palette.suitRed,
+];
 
 export default function VictoryScreen({
   winningTeam,
@@ -141,14 +146,14 @@ const styles = StyleSheet.create({
     paddingVertical: Theme.spacing.xl,
     marginVertical: Theme.spacing.md,
   },
-  winner: {textAlign: 'center', color: Theme.colors.text},
+  winner: {textAlign: 'center', color: Theme.colors.card.text},
   score: {
     fontSize: 52,
     lineHeight: 72,
-    color: Theme.colors.accent.gold,
+    color: Theme.colors.card.accent,
     marginTop: Theme.spacing.md,
   },
-  detail: {color: Theme.colors.textSecondary, fontStyle: 'italic'},
+  detail: {color: Theme.colors.card.textSecondary, fontStyle: 'italic'},
   saved: {
     textAlign: 'center',
     color: Theme.colors.textSecondary,

@@ -3,41 +3,60 @@
  * This defines all the design tokens used throughout the app.
  */
 
+// HSL complements: fixed green (~155 degrees) and muted wine (~337 degrees).
+// Champagne gold tints the card surface; the approved gold frame is unchanged.
+export const Palette = {
+  surround: '#101A14',
+  surface: '#E7D2A4',
+  control: '#23362B',
+  forest: '#20533E',
+  wine: '#71364D',
+  parchment: '#F7E8C9',
+  parchmentMuted: '#D2B994',
+  paper: '#F9F1DF',
+  ink: '#23382C',
+  inkMuted: '#515B4D',
+  brass: '#E9C27E',
+  brassMuted: '#A78043',
+  brassLight: '#F3D69D',
+  brassDeep: '#B48B47',
+  brassShadow: '#5D3D23',
+  brassGlow: '#FBE7BF',
+  danger: '#E8B1C2',
+  suitRed: '#D32F2F',
+  suitBlack: '#111111',
+  shadow: 'rgba(0, 0, 0, 0.25)',
+} as const;
+
 export const Theme = {
   colors: {
-    // Base colors
-    background: '#21120C',
+    background: Palette.surround,
+    tableBackground: Palette.forest,
     card: {
-      background: '#321D12',
-      border: '#8B6738',
-      shadow: 'rgba(0, 0, 0, 0.25)',
+      background: Palette.surface,
+      border: Palette.brassMuted,
+      text: Palette.ink,
+      textSecondary: Palette.inkMuted,
+      accent: Palette.forest,
     },
-    // Text colors
-    text: '#F8EACC',
-    textSecondary: '#CBB491',
-
-    // Accent colors
-    primary: '#E4BC73',
+    text: Palette.parchment,
+    textSecondary: Palette.parchmentMuted,
+    primary: Palette.brass,
     accent: {
-      burgundy: '#E8A17C',
-      green: '#7F8B65',
-      gold: '#E4BC73',
+      destructive: Palette.danger,
+      gold: Palette.brass,
     },
-
-    // Button colors
     button: {
-      primary: '#20533E',
-      secondary: '#2A170E',
-      text: '#F8EACC',
-      textSecondary: '#E4BC73',
+      primary: Palette.wine,
+      secondary: Palette.control,
+      text: Palette.parchment,
+      textSecondary: Palette.brass,
     },
-
-    // Input colors
     input: {
-      background: '#F5E4BD',
-      border: '#8B6738',
-      text: '#2A170E',
-      placeholder: '#7B674B',
+      background: Palette.paper,
+      border: Palette.brassMuted,
+      text: Palette.ink,
+      placeholder: Palette.inkMuted,
     },
   },
 
@@ -48,7 +67,6 @@ export const Theme = {
       italic: 'IMFellEnglish-Italic',
       bold: 'PlayfairDisplay-Bold',
       display: 'Cinzel',
-      editorial: 'IMFellEnglish',
     },
     fontSizes: {
       xs: 12,
@@ -110,35 +128,13 @@ export const Theme = {
     },
   },
 
-  // Animation
-  animation: {
-    duration: {
-      fast: 200,
-      normal: 300,
-      slow: 500,
-    },
-  },
-
-  // Standardized card styling
-  card: {
-    background: '#321D12',
-    borderRadius: 8,
-    shadow: {
-      shadowColor: 'rgba(0, 0, 0, 0.25)',
-      shadowOffset: {
-        width: 0,
-        height: 3,
-      },
+  shadows: {
+    card: {
+      shadowColor: Palette.shadow,
+      shadowOffset: {width: 0, height: 3},
       shadowOpacity: 0.4,
       shadowRadius: 6,
       elevation: 7,
     },
   },
 };
-
-// Type definitions for theme
-export type ThemeColors = typeof Theme.colors;
-export type ThemeType = typeof Theme;
-
-// Helper to ensure we're using valid theme colors
-export type ThemeColor = keyof ThemeColors;

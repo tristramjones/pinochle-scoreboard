@@ -1,6 +1,5 @@
 import {StyleSheet, Text, TextStyle, type TextProps} from 'react-native';
 import {Theme} from '../constants/Theme';
-import {useTheme} from '../hooks/useTheme';
 
 export type ThemedTextProps = TextProps & {
   type?:
@@ -12,12 +11,10 @@ export function ThemedText({
   type = 'default',
   ...rest
 }: ThemedTextProps) {
-  const theme = useTheme();
-
   return (
     <Text
       style={[
-        {color: theme.colors.text},
+        {color: Theme.colors.text},
         type === 'default' ? styles.default : undefined,
         type === 'title' ? styles.title : undefined,
         type === 'heading' ? styles.heading : undefined,
@@ -25,7 +22,7 @@ export function ThemedText({
         type === 'label' ? styles.label : undefined,
         type === 'subtitle' ? styles.subtitle : undefined,
         type === 'link'
-          ? [styles.link, {color: theme.colors.primary}]
+          ? [styles.link, {color: Theme.colors.primary}]
           : undefined,
         style,
       ]}

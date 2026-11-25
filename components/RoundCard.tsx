@@ -19,7 +19,9 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
   return (
     <CardFrame style={styles.roundCard}>
       <View style={styles.roundHeader}>
-        <ThemedText type="subtitle">Round {roundNumber}</ThemedText>
+        <ThemedText type="subtitle" style={styles.roundTitle}>
+          Round {roundNumber}
+        </ThemedText>
         {round.moonShotAttempted ? (
           <ThemedText type="label" style={styles.bidText}>
             {bidWinningTeam?.name}{' '}
@@ -98,17 +100,17 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
 const styles = StyleSheet.create({
   roundCard: {
     padding: Theme.spacing.md,
-    backgroundColor: Theme.card.background,
+    backgroundColor: Theme.colors.card.background,
     marginBottom: Theme.spacing.md,
     ...Platform.select({
       ios: {
-        shadowColor: Theme.card.shadow.shadowColor,
-        shadowOffset: Theme.card.shadow.shadowOffset,
-        shadowOpacity: Theme.card.shadow.shadowOpacity,
-        shadowRadius: Theme.card.shadow.shadowRadius,
+        shadowColor: Theme.shadows.card.shadowColor,
+        shadowOffset: Theme.shadows.card.shadowOffset,
+        shadowOpacity: Theme.shadows.card.shadowOpacity,
+        shadowRadius: Theme.shadows.card.shadowRadius,
       },
       android: {
-        elevation: Theme.card.shadow.elevation,
+        elevation: Theme.shadows.card.elevation,
       },
     }),
   } as ViewStyle,
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
   bidText: {
     flexShrink: 1,
     maxWidth: '100%',
-    color: Theme.colors.textSecondary,
+    color: Theme.colors.card.textSecondary,
   } as TextStyle,
   scoreTable: {
     gap: Theme.spacing.sm,
@@ -133,22 +135,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   } as ViewStyle,
   stat: {flex: 1, minWidth: 0, alignItems: 'center', gap: 4},
-  value: {textAlign: 'center'},
+  value: {textAlign: 'center', color: Theme.colors.card.text},
+  roundTitle: {color: Theme.colors.card.text},
   teamResult: {
     gap: Theme.spacing.sm,
     paddingVertical: Theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: Theme.colors.card.border,
   },
-  teamName: {fontSize: 20, lineHeight: 28, textAlign: 'left'},
+  teamName: {
+    fontSize: 20,
+    lineHeight: 28,
+    textAlign: 'left',
+    color: Theme.colors.card.text,
+  },
   headerCell: {
     textAlign: 'center',
     fontSize: Theme.typography.fontSizes.xs,
-    color: Theme.colors.text,
+    color: Theme.colors.card.text,
     textTransform: 'uppercase',
   } as TextStyle,
   bidWinnerText: {
-    color: Theme.colors.accent.burgundy,
+    color: Theme.colors.card.accent,
   } as TextStyle,
   boldText: {
     fontFamily: Theme.typography.fonts.bold,

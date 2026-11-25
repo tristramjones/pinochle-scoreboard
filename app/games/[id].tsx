@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   } as TextStyle,
   dateText: {
     fontSize: Theme.typography.fontSizes.lg,
-    color: Theme.colors.accent.burgundy,
+    color: Theme.colors.accent.destructive,
     textAlign: 'center',
     marginBottom: Theme.spacing.lg,
   } as TextStyle,

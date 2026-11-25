@@ -57,8 +57,10 @@ export default function ScoringHelpScreen() {
         </ThemedText>
 
         <CardFrame style={styles.callout}>
-          <ThemedText type="heading">Win a trick to count meld</ThemedText>
-          <ThemedText style={styles.body}>
+          <ThemedText type="heading" style={styles.cardText}>
+            Win a trick to count meld
+          </ThemedText>
+          <ThemedText style={[styles.body, styles.cardText]}>
             Your team must take at least one trick to count its meld.
           </ThemedText>
         </CardFrame>
@@ -81,8 +83,10 @@ export default function ScoringHelpScreen() {
           trick.
         </ThemedText>
         <CardFrame style={styles.callout}>
-          <ThemedText type="subtitle">Example: bid 300</ThemedText>
-          <ThemedText style={styles.body}>
+          <ThemedText type="subtitle" style={styles.cardText}>
+            Example: bid 300
+          </ThemedText>
+          <ThemedText style={[styles.body, styles.cardText]}>
             100 meld + 200 tricks = +300 points. With only 150 tricks, the total
             is 250, so the team scores −300.
           </ThemedText>
@@ -119,6 +123,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: Theme.colors.textSecondary,
   },
+  cardText: {color: Theme.colors.card.text},
   callout: {
     backgroundColor: Theme.colors.card.background,
     padding: Theme.spacing.lg,

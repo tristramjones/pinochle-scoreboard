@@ -1,7 +1,7 @@
 import {PropsWithChildren, useId, useState} from 'react';
 import {StyleSheet, View, ViewProps} from 'react-native';
 import Svg, {Defs, LinearGradient, Path, Stop} from 'react-native-svg';
-import {Theme} from '../constants/Theme';
+import {Palette, Theme} from '../constants/Theme';
 
 /** A continuous gilded edge with concave corners, drawn at its actual size. */
 export function CardFrame({
@@ -45,16 +45,16 @@ export function CardFrame({
         >
           <Defs>
             <LinearGradient id={gradient} x1="0" y1="0" x2="0.65" y2="1">
-              <Stop offset="0" stopColor="#F3D398" />
-              <Stop offset="0.3" stopColor="#AC762E" />
-              <Stop offset="0.6" stopColor="#F7DCA3" />
-              <Stop offset="1" stopColor="#BA863F" />
+              <Stop offset="0" stopColor={Palette.brassLight} />
+              <Stop offset="0.3" stopColor={Palette.brassMuted} />
+              <Stop offset="0.6" stopColor={Palette.brassLight} />
+              <Stop offset="1" stopColor={Palette.brassDeep} />
             </LinearGradient>
           </Defs>
           <Path
             d={path}
             fill={fillColor}
-            stroke="#533012"
+            stroke={Palette.brassShadow}
             strokeWidth={6}
             strokeLinejoin="round"
           />
@@ -68,7 +68,7 @@ export function CardFrame({
           <Path
             d={path}
             fill="none"
-            stroke="#FFE5AE"
+            stroke={Palette.brassGlow}
             strokeOpacity={0.65}
             strokeWidth={0.65}
             strokeLinejoin="round"
