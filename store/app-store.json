@@ -1,0 +1,23 @@
+{
+  "locale": "en-US",
+  "name": "Pinochle Scoreboard",
+  "subtitle": "Bids, meld, tricks, and scores",
+  "promotionalText": "One more hand. Keep your pinochle table organized with saved games, quick round entry, and an offline scoring guide.",
+  "description": "Keep the focus on the cards and the company. Pinochle Scoreboard brings your table a warm card-room scorebook for bids, meld, tricks, and final scores.\n\nKEEP EVERY TABLE GOING\nStart multiple games and return to any ongoing game when you are ready. Your games and scores stay on your device.\n\nSCORE EACH HAND\nRecord the bid, enter each team's meld and trick points, and let the scoreboard calculate the round. It handles missed bids, the requirement to win a trick to count meld, and moon shots.\n\nKEEP A LEDGER\nReview completed games and their rounds. End a game early to save its scores, or delete games you no longer need.\n\nSCORING HELP AT HAND\nOpen the scoring guide for meld values, trick points, and the scoreboard's rules. Everything you need for scoring works offline.\n\nMade for two-team pinochle with a 1,500-point target. The scoring guide explains the included house rules.\n\nNo account, advertising, or analytics. One more hand.",
+  "keywords": "pinochle,scorekeeper,scoreboard,cards,meld,bid,tricks,offline,scorekeeping,card game",
+  "supportUrl": "https://tristramjones.github.io/pinochle-scoreboard/",
+  "privacyPolicyUrl": "https://tristramjones.github.io/pinochle-scoreboard/privacy.html",
+  "primaryCategory": "Games",
+  "gamesSubcategory": "Card",
+  "reviewNotes": "No sign-in is required. Start a new game, enter two team names, and choose Add a round. Record the bid winner, meld, and trick points. The Scoring guide explains the app's house rules. About and privacy is linked at the bottom of the main table. This is an offline scorekeeping utility; it does not offer wagering, cash prizes, in-app purchases, user accounts, chat, ads, or analytics.",
+  "supportEmail": "trisjones04@gmail.com",
+  "appPrivacyDraft": "Data Not Collected \u2014 based on the current release source. Support email is optional and handled outside the app.",
+  "releaseMethod": "manual",
+  "pending": [
+    "App Store Connect app record and numeric Apple ID",
+    "Apple Developer signing authentication",
+    "Pricing, territories, copyright holder, age-rating questionnaire, and review contact details",
+    "Native iPhone and iPad screenshots",
+    "TestFlight validation before App Review"
+  ]
+}

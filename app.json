@@ -13,7 +13,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.trisjones.pinochle-scoreboard",
-      "buildNumber": "1",
       "infoPlist": {
         "UIBackgroundModes": [],
         "ITSAppUsesNonExemptEncryption": false
@@ -41,6 +40,17 @@
           "imageWidth": 200
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "b50f4304-e6c9-48ed-bf7a-30592d731957"
+      }
+    },
+    "owner": "tristramjones"
   }
 }

@@ -115,3 +115,34 @@ rounds. Previously stored totals that awarded meld without tricks are corrected
 on display. Older automatically-set rounds recorded zero tricks for both teams;
 these now award zero points to the non-bidding team because no actual trick
 result was saved.
+
+## Apple release
+
+The app is linked to
+[its Expo project](https://expo.dev/accounts/tristramjones/projects/pinochle-scoreboard).
+`eas.json` contains production App Store and native simulator build profiles.
+Production build numbers are managed remotely and increment automatically.
+
+After selecting Node.js 24 with `nvm use`:
+
+```sh
+npx --yes eas-cli@27.11.0 build --platform ios --profile production
+npx --yes eas-cli@27.11.0 submit --platform ios --profile production
+```
+
+Apple signing and upload may require the account holder to authenticate in the
+terminal. Enter passwords and verification codes only in the authentication
+flow. Never commit signing keys or credentials. Uploading through Expo Submit
+delivers a build to App Store Connect/TestFlight; App Review and public release
+are separate steps in App Store Connect.
+
+Public support and privacy pages are served by GitHub Pages from `docs/`:
+
+- Support: https://tristramjones.github.io/pinochle-scoreboard/
+- Privacy: https://tristramjones.github.io/pinochle-scoreboard/privacy.html
+
+The in-app About and privacy screen links to those pages. `store/app-store.json`
+contains draft listing copy and remaining submission fields; it is a reference,
+not an automatic metadata-upload configuration. Use native device/simulator
+screenshots for the store. The app supports iPad, so include iPad screenshots.
+Test the signed build through TestFlight before submitting for App Review.

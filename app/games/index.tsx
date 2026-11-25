@@ -174,6 +174,11 @@ export default function GamesScreen() {
           {completedGames.map(game => renderGameCard(game, true))}
         </View>
       )}
+      <ThemedButton
+        title="About and privacy"
+        variant="text"
+        onPress={() => router.push('/games/about')}
+      />
     </TableScrollView>
   );
 }
