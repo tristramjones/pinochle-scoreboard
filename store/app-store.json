@@ -14,10 +14,10 @@
   "appPrivacyDraft": "Data Not Collected \u2014 based on the current release source. Support email is optional and handled outside the app.",
   "releaseMethod": "manual",
   "pending": [
-    "App Store Connect app record and numeric Apple ID",
-    "Apple Developer signing authentication",
-    "Pricing, territories, copyright holder, age-rating questionnaire, and review contact details",
+    "Territories, copyright holder, age-rating questionnaire, and review contact details",
     "Native iPhone and iPad screenshots",
     "TestFlight validation before App Review"
-  ]
+  ],
+  "ascAppId": "6839270738",
+  "price": "Free"
 }
