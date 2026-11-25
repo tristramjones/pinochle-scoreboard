@@ -36,10 +36,6 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
         <View style={styles.tableRow}>
           <ThemedText
             type="label"
-            style={[styles.tableCell, styles.teamCell, styles.headerCell]}
-          />
-          <ThemedText
-            type="label"
             style={[styles.tableCell, styles.headerCell]}
           >
             MELD
@@ -86,32 +82,34 @@ export function RoundCard({round, game, roundNumber}: RoundCardProps) {
             .reduce((sum, r) => sum + calculateRoundPoints(r, team.id), 0);
 
           return (
-            <View key={team.id} style={styles.tableRow}>
+            <View key={team.id} style={styles.teamResult}>
               <ThemedText
                 type="subtitle"
                 style={[
                   styles.tableCell,
-                  styles.teamCell,
+                  styles.teamName,
                   isBidWinner && styles.bidWinnerText,
                 ]}
               >
                 {team.name}
               </ThemedText>
-              <ThemedText type="default" style={styles.tableCell}>
-                {round.moonShotAttempted ? '-' : meldPoints}
-              </ThemedText>
-              <ThemedText type="default" style={styles.tableCell}>
-                {displayTrickPoints}
-              </ThemedText>
-              <ThemedText type="default" style={styles.tableCell}>
-                {roundTotal}
-              </ThemedText>
-              <ThemedText
-                type="default"
-                style={[styles.tableCell, styles.boldText]}
-              >
-                {runningScore}
-              </ThemedText>
+              <View style={styles.tableRow}>
+                <ThemedText type="default" style={styles.tableCell}>
+                  {round.moonShotAttempted ? '-' : meldPoints}
+                </ThemedText>
+                <ThemedText type="default" style={styles.tableCell}>
+                  {displayTrickPoints}
+                </ThemedText>
+                <ThemedText type="default" style={styles.tableCell}>
+                  {roundTotal}
+                </ThemedText>
+                <ThemedText
+                  type="default"
+                  style={[styles.tableCell, styles.boldText]}
+                >
+                  {runningScore}
+                </ThemedText>
+              </View>
             </View>
           );
         })}
@@ -146,6 +144,8 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.md,
   } as ViewStyle,
   bidText: {
+    flexShrink: 1,
+    maxWidth: '100%',
     color: Theme.colors.textSecondary,
   } as TextStyle,
   scoreTable: {
@@ -159,10 +159,13 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   } as TextStyle,
-  teamCell: {
-    flex: 1.5,
-    textAlign: 'left',
-  } as TextStyle,
+  teamResult: {
+    gap: Theme.spacing.sm,
+    paddingVertical: Theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: Theme.colors.card.border,
+  },
+  teamName: {fontSize: 20, lineHeight: 28, textAlign: 'left'},
   headerCell: {
     fontSize: Theme.typography.fontSizes.xs,
     color: Theme.colors.text,

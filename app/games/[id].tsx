@@ -1,4 +1,4 @@
-import {CardFrame} from '../../components/CardFrame';
+import {TeamScoreboard} from '../../components/TeamScoreboard';
 import {TableScrollView} from '../../components/TableScrollView';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import React from 'react';
@@ -7,7 +7,7 @@ import {RoundCard} from '../../components/RoundCard';
 import {ThemedButton} from '../../components/ThemedButton';
 import {ThemedText} from '../../components/ThemedText';
 import {Theme} from '../../constants/Theme';
-import {calculateTeamScores, findWinningTeam} from '../../utils/scoring';
+import {findWinningTeam} from '../../utils/scoring';
 import {useGame} from '../../contexts/GameContext';
 
 export default function GameDetailsScreen() {
@@ -35,7 +35,6 @@ export default function GameDetailsScreen() {
     );
   }
 
-  const scores = calculateTeamScores(game);
   const winner = game.endedEarly ? null : findWinningTeam(game);
 
   return (
@@ -52,37 +51,7 @@ export default function GameDetailsScreen() {
         {game.endedEarly ? ' · Ended early' : ''}
       </ThemedText>
 
-      <View style={styles.scoreboardTeams}>
-        {game.teams.map(team => (
-          <CardFrame key={team.id} style={styles.teamColumn}>
-            <View style={styles.teamNameContainer}>
-              <ThemedText
-                type="heading"
-                style={[
-                  styles.teamName,
-                  team.id === winner?.id && styles.winnerText,
-                ]}
-              >
-                {team.name}
-              </ThemedText>
-              {team.id === winner?.id && (
-                <ThemedText style={styles.trophyIcon}>🏆</ThemedText>
-              )}
-            </View>
-            <ThemedText
-              type="heading"
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              style={[
-                styles.scoreValue,
-                team.id === winner?.id && styles.winnerText,
-              ]}
-            >
-              {scores[team.id]}
-            </ThemedText>
-          </CardFrame>
-        ))}
-      </View>
+      <TeamScoreboard game={game} winnerId={winner?.id} />
 
       <ThemedButton
         title="Delete Game"
@@ -145,44 +114,6 @@ const styles = StyleSheet.create({
     color: Theme.colors.accent.burgundy,
     textAlign: 'center',
     marginBottom: Theme.spacing.lg,
-  } as TextStyle,
-  scoreboardTeams: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    gap: Theme.spacing.md,
-    marginBottom: Theme.spacing.xl,
-  } as ViewStyle,
-  teamColumn: {
-    flex: 1,
-    paddingHorizontal: Theme.spacing.sm,
-    paddingVertical: Theme.spacing.lg,
-    alignItems: 'center',
-  } as ViewStyle,
-  teamNameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Theme.spacing.sm,
-    marginBottom: Theme.spacing.xs,
-    paddingVertical: Theme.spacing.xs,
-  } as ViewStyle,
-  teamName: {
-    fontSize: Theme.typography.fontSizes.xl,
-    fontFamily: Theme.typography.fonts.bold,
-    color: Theme.colors.primary,
-    textAlign: 'center',
-  } as TextStyle,
-  scoreValue: {
-    fontSize: Theme.typography.fontSizes.xl,
-    fontFamily: Theme.typography.fonts.bold,
-    color: Theme.colors.primary,
-    textAlign: 'center',
-  } as TextStyle,
-  winnerText: {
-    color: Theme.colors.primary,
-  } as TextStyle,
-  trophyIcon: {
-    fontSize: Theme.typography.fontSizes.lg,
-    lineHeight: Theme.typography.fontSizes.xl,
   } as TextStyle,
   rounds: {
     gap: Theme.spacing.md,

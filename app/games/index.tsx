@@ -1,3 +1,4 @@
+import {cardImages} from '../../constants/CardImages';
 import {CardFrame} from '../../components/CardFrame';
 import {OrnamentalRule} from '../../components/RoomMasthead';
 import {TableScrollView} from '../../components/TableScrollView';
@@ -20,37 +21,6 @@ import {Theme} from '../../constants/Theme';
 import {useGame} from '../../contexts/GameContext';
 import {Game} from '../../types/game';
 import {calculateTeamScores} from '../../utils/scoring';
-
-const cardImages = [
-  // Spades
-  require('../../assets/images/cards/spades_9.png'),
-  require('../../assets/images/cards/spades_10.png'),
-  require('../../assets/images/cards/spades_jack.png'),
-  require('../../assets/images/cards/spades_queen.png'),
-  require('../../assets/images/cards/spades_king.png'),
-  require('../../assets/images/cards/spades_ace.png'),
-  // Hearts
-  require('../../assets/images/cards/hearts_9.png'),
-  require('../../assets/images/cards/hearts_10.png'),
-  require('../../assets/images/cards/hearts_jack.png'),
-  require('../../assets/images/cards/hearts_queen.png'),
-  require('../../assets/images/cards/hearts_king.png'),
-  require('../../assets/images/cards/hearts_ace.png'),
-  // Diamonds
-  require('../../assets/images/cards/diamonds_9.png'),
-  require('../../assets/images/cards/diamonds_10.png'),
-  require('../../assets/images/cards/diamonds_jack.png'),
-  require('../../assets/images/cards/diamonds_queen.png'),
-  require('../../assets/images/cards/diamonds_king.png'),
-  require('../../assets/images/cards/diamonds_ace.png'),
-  // Clubs
-  require('../../assets/images/cards/clubs_9.png'),
-  require('../../assets/images/cards/clubs_10.png'),
-  require('../../assets/images/cards/clubs_jack.png'),
-  require('../../assets/images/cards/clubs_queen.png'),
-  require('../../assets/images/cards/clubs_king.png'),
-  require('../../assets/images/cards/clubs_ace.png'),
-];
 
 export default function GamesScreen() {
   const router = useRouter();
@@ -105,33 +75,28 @@ export default function GamesScreen() {
               style={styles.cardImage}
               resizeMode="contain"
             />
-            <View style={styles.cardDetails}>
-              <ThemedText type="label" style={styles.dateText}>
-                {formatDate(game.timestamp)} · {game.rounds.length}{' '}
-                {game.rounds.length === 1 ? 'round' : 'rounds'}
-              </ThemedText>
-              <View style={styles.teamsContainer}>
-                {sortedTeams.map((team, index) => (
-                  <View key={team.id} style={styles.teamScore}>
-                    <ThemedText
-                      type="subtitle"
-                      style={[
-                        styles.teamName,
-                        index === 0 && styles.winnerText,
-                      ]}
-                    >
-                      {team.name}
-                    </ThemedText>
-                    <ThemedText
-                      type="score"
-                      style={[styles.score, index === 0 && styles.winnerText]}
-                    >
-                      {scores[team.id]}
-                    </ThemedText>
-                  </View>
-                ))}
+            <ThemedText type="label" style={styles.dateText}>
+              {formatDate(game.timestamp)} · {game.rounds.length}{' '}
+              {game.rounds.length === 1 ? 'round' : 'rounds'}
+            </ThemedText>
+          </View>
+          <View style={styles.teamsContainer}>
+            {sortedTeams.map((team, index) => (
+              <View key={team.id} style={styles.teamScore}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.teamName, index === 0 && styles.winnerText]}
+                >
+                  {team.name}
+                </ThemedText>
+                <ThemedText
+                  type="score"
+                  style={[styles.score, index === 0 && styles.winnerText]}
+                >
+                  {scores[team.id]}
+                </ThemedText>
               </View>
-            </View>
+            ))}
           </View>
         </CardFrame>
       </TouchableOpacity>
@@ -249,19 +214,17 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   cardContent: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    marginBottom: Theme.spacing.md,
     gap: Theme.spacing.md,
   } as ViewStyle,
   cardImage: {
-    width: 60,
-    height: 90,
+    width: 40,
+    height: 60,
     borderRadius: Theme.borderRadius.sm,
   } as ImageStyle,
-  cardDetails: {
-    flex: 1,
-    justifyContent: 'center',
-  } as ViewStyle,
   dateText: {
+    flex: 1,
     color: Theme.colors.textSecondary,
     marginBottom: Theme.spacing.sm,
     textAlign: 'right',
@@ -274,23 +237,25 @@ const styles = StyleSheet.create({
   teamScore: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
+    alignItems: 'flex-start',
+    gap: Theme.spacing.md,
     paddingRight: Theme.spacing.xs,
   } as ViewStyle,
   teamName: {
     color: Theme.colors.text,
     flex: 1,
-    fontSize: Theme.typography.fontSizes.xl,
+    fontSize: Theme.typography.fontSizes.lg,
     fontFamily: Theme.typography.fonts.regular,
-    lineHeight: Theme.typography.fontSizes.xl * 1.1,
+    lineHeight: 30,
   } as TextStyle,
   score: {
     color: Theme.colors.text,
     fontSize: Theme.typography.fontSizes.xl,
     fontFamily: Theme.typography.fonts.regular,
     textAlign: 'right',
-    minWidth: 60,
-    lineHeight: Theme.typography.fontSizes.xl * 1.1,
+    minWidth: 66,
+    flexShrink: 0,
+    lineHeight: 34,
   } as TextStyle,
   winnerText: {
     color: Theme.colors.text,

@@ -1,3 +1,4 @@
+import {NEW_GAME_CARD_INDICES} from '../constants/Cards';
 import {useRouter} from 'expo-router';
 import {
   createContext,
@@ -124,7 +125,10 @@ export function GameProvider({children}: PropsWithChildren) {
         players: [],
       })),
       rounds: [],
-      cardImageIndex: Math.floor(Math.random() * 24),
+      cardImageIndex:
+        NEW_GAME_CARD_INDICES[
+          Math.floor(Math.random() * NEW_GAME_CARD_INDICES.length)
+        ],
       winningScore: 1500,
       version: 1,
     };

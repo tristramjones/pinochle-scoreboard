@@ -22,7 +22,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#20533E"
       },
       "package": "com.trisjones.pinochle_scoreboard"
     },
@@ -37,7 +37,8 @@
         {
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#21120C",
+          "imageWidth": 200
         }
       ]
     ]

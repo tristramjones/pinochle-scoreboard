@@ -1,0 +1,22 @@
+{
+  "tool": "built-in image_gen",
+  "technicalPreparation": "Resampled to 1024px icons/splash and 64px favicon using macOS sips, preserving transparency.",
+  "assets": [
+    {
+      "output": "icon.png",
+      "prompt": "Use case: logo-brand. Asset: production iPhone app icon for Pinochle Scoreboard, square 1024x1024 artwork. Create a rich heirloom card-room emblem: two slightly fanned warm parchment playing cards, front card bearing one bold black spade with a delicate antique-gold highlight, rear card bearing one deep vermilion diamond. Restrained hand-inked contours and subtle gouache texture, elegant and refined rather than childish. Cards occupy the central 65% of the square with clear bold silhouettes visible at tiny launcher sizes. Surround with one tasteful antique-gold playing-card border with curved inset corners, well inside the square edges. Background full bleed deep card-table velvet green #20533E with subtle tonal texture. Warm parchment #F6E7C8, burnished gold #C49A50, near black spade. No text, no letters, no numbers, no score, no React/Expo logo, no mockup, no shadows outside canvas, no photorealism, no extraneous objects. Entire square opaque with all four corners filled green; OS applies corner mask, do not draw a rounded outer app tile. Single finished icon only."
+    },
+    {
+      "output": "adaptive-icon.png",
+      "prompt": "Use case: background-extraction. Image 1 EDIT TARGET is the approved Pinochle Scoreboard icon. Produce a matching Android adaptive-icon FOREGROUND PNG with a genuinely transparent background. Preserve the two fanned parchment cards, gold-edged black spade on front and red diamond on rear, refined ink and watercolor style. REMOVE the green background and REMOVE the surrounding square gold border completely. Keep only the complete pair of playing cards, centered and scaled down to fit entirely within the central 58 percent of both canvas width and height, with generous empty transparent space on every side so circular adaptive masks cannot cut them off. Square canvas. No text, letters, added objects, outer frame, colored backdrop or checkerboard baked into image. All pixels outside the card pair must be transparent."
+    },
+    {
+      "output": "splash-icon.png",
+      "prompt": "Use case: logo-brand. Image 1 is the STYLE AND SUBJECT REFERENCE for Pinochle Scoreboard. Create its splash-screen emblem, square canvas with truly transparent background. Match the exact visual identity: two fanned parchment playing cards, front bold black spade outlined antique gold, back deep red diamond, subtle hand-inked and painted texture. Center the complete pair within central 80% of square width and height, balanced silhouette. No green background, no outer gold frame, no text, no shadow backdrop, no checkerboard. Transparent pixels outside the two cards. This is only the isolated mark for placement on a solid dark brown launch screen."
+    },
+    {
+      "output": "favicon.png",
+      "prompt": "Use case: logo-brand. Image 1 STYLE REFERENCE is Pinochle Scoreboard app icon. Create the matching favicon designed for tiny 32px browser-tab rendering: square opaque deep velvet green background #20533E; two very simple overlapping parchment playing card silhouettes in center taking 75% canvas. Front card has bold black spade outlined muted gold, rear card has bold red diamond. Subtly hand-inked edges consistent with reference but use broad clean filled shapes with very little texture and no fine lines, so suits remain distinct at tiny size. No exterior frame, no lettering, no numbers, no words, no extra icons, no mockup. Single square favicon artwork."
+    }
+  ]
+}

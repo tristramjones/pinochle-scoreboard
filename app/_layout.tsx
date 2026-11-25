@@ -24,9 +24,7 @@ function RootLayout() {
     'IMFellEnglish-Italic': require('../assets/fonts/IMFellEnglish-Italic.ttf'),
     CormorantSC: require('../assets/fonts/CormorantSC-SemiBold.ttf'),
     Cinzel: require('../assets/fonts/Cinzel.ttf'),
-    PlayfairDisplay: require('../assets/fonts/PlayfairDisplay-Regular.ttf'),
     'PlayfairDisplay-Bold': require('../assets/fonts/PlayfairDisplay-Bold.ttf'),
-    CrimsonText: require('../assets/fonts/CrimsonText-Regular.ttf'),
   });
 
   if (!loaded) {
